@@ -69,7 +69,7 @@ export const FeatureCards = () => {
                 <FeatureItem
                   href="/docs/core-concepts/payment-flow"
                   title="How the Yuno Payment Process Works"
-                  desc=" - Learn the step-by-step payment flow and key elements involved."
+                  desc=" - ggLearn the step-by-step payment flow and key elements involved."
                 />
                 <FeatureItem
                   href="/docs/getting-started/quickstart"
