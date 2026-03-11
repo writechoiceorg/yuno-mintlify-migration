@@ -1,280 +1,307 @@
 {
   "navigation": {
-    "anchors": [
+    "groups": [
       {
-        "anchor": "How Yuno Works",
+        "group": "Yuno API Reference",
         "pages": [
-          "docs/what-is-yuno",
-          "docs/how-yuno-payment-flow-works",
+          "reference/api-reference-overview",
           {
-            "group": "Basic Concepts",
+            "group": "Getting Started",
             "pages": [
-              "docs/basic-concepts",
-              "docs/customers",
-              "docs/sessions",
-              "docs/payments-1",
-              "docs/transactions",
-              "docs/tokens",
-              "docs/payment-methods",
-              "docs/webhooks-1",
-              "docs/fraud",
-              "docs/3ds-1"
+              "reference/authentication",
+              "reference/authentication",
+              "reference/api-environments",
+              "reference/response-codes",
+              "reference/postman-collections",
+              "reference/api-updates"
             ]
-          }
-        ]
-      },
-      {
-        "anchor": "Get Started with Yuno",
-        "pages": [
-          "docs/overview",
-          "docs/step-1-set-up-your-account",
-          "docs/step-2-your-first-payment"
-        ]
-      },
-      {
-        "anchor": "Yuno SDKs",
-        "pages": [
-          "docs/quickstart-guide",
-          "docs/understanding-payment-and-enrollment-flows",
-          "docs/choose-your-integration",
+          },
           {
-            "group": "Web SDKs",
+            "group": "Reference",
             "pages": [
-              "docs/payment-flows-web",
-              "docs/payment-flows-web",
-              "docs/enrollment-flows-web",
-              "docs/web-sdk-common-reference",
-              "docs/release-notes-web",
+              "reference/reference-lists",
+              "reference/airline-information",
+              "reference/country-reference",
+              "reference/eci-indicators-list",
+              "reference/industry-category-list",
+              "reference/items-category-list",
+              "reference/payment-type-list",
+              "reference/purposes-list",
+              "reference/transaction-category-list",
+              "reference/shipping-reference"
+            ]
+          },
+          {
+            "group": "Customers",
+            "pages": [
+              "reference/the-customer-object",
+              "reference/the-customer-object",
+              "reference/create-customer",
+              "reference/retrieve-customer",
+              "reference/retrieve-customer-by-external-id",
+              "reference/update-customer",
+              "reference/delete-customer"
+            ]
+          },
+          {
+            "group": "Customer Sessions (Enrollment)",
+            "pages": [
+              "reference/enrollment-workflow",
+              "reference/enrollment-workflow",
+              "reference/the-customer-session-object",
+              "reference/create-customer-session"
+            ]
+          },
+          {
+            "group": "Checkout Sessions",
+            "pages": [
+              "reference/the-checkout-session-object",
+              "reference/the-checkout-session-object",
+              "reference/create-checkout-session",
+              "reference/create-one-time-use-token",
+              "reference/create-one-time-use-token-sdk-checkout",
+              "reference/update-checkout-session",
+              "reference/retrieve-checkout-session",
+              "reference/retrieve-payment-methods-for-checkout"
+            ]
+          },
+          {
+            "group": "Payment Methods (Checkout)",
+            "pages": [
+              "reference/the-payment-method-object-checkout",
+              "reference/the-payment-method-object-checkout",
+              "reference/retrieve-payment-methods-to-enroll-checkout",
+              "reference/enroll-payment-method-checkout",
+              "reference/retrieve-payment-method-by-id-checkout",
+              "reference/unenroll-payment-method-checkout"
+            ]
+          },
+          {
+            "group": "Payment Methods (Direct Workflow)",
+            "pages": [
+              "reference/the-payment-method-object-api",
+              "reference/the-payment-method-object-api",
+              "reference/enroll-payment-method-api",
+              "reference/retrieve-enrolled-payment-method-by-id-api",
+              "reference/retrieve-enrolled-payment-methods-api",
+              "reference/unenroll-payment-method-api"
+            ]
+          },
+          {
+            "group": "Payments",
+            "pages": [
+              "reference/manage-payments",
               {
-                "group": "Secure Fields",
+                "group": "Status and Response Codes",
                 "pages": [
-                  "docs/secure-fields",
-                  "docs/payment-secure-fields",
-                  "docs/enrollment-secure-fields"
+                  "reference/status-and-response-codes",
+                  "reference/payment",
+                  "reference/transaction",
+                  "reference/merchant-advice-codes-mac"
                 ]
               },
               {
-                "group": "SDK Customizations",
+                "group": "Payment Examples",
                 "pages": [
-                  "docs/sdk-customizations-web",
-                  "docs/sdk-customizations-default-design-web",
-                  "docs/sdk-customizations-deprecated-design-web"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Android SDKs",
-            "pages": [
-              "docs/payment-flows-android",
-              "docs/payment-flows-android",
-              "docs/enrollment-flows-android",
-              "docs/android-sdk-common-reference",
-              "docs/release-notes-android",
-              "docs/android-customizations"
-            ]
-          },
-          {
-            "group": "iOS SDKs",
-            "pages": [
-              "docs/payment-flows-ios",
-              "docs/payment-flows-ios",
-              "docs/enrollment-flows-ios",
-              "docs/ios-sdk-common-reference",
-              "docs/release-notes-ios",
-              "docs/ios-customizations"
-            ]
-          },
-          "docs/lite-flutter",
-          "docs/country-coverage",
-          "docs/languages-supported"
-        ]
-      },
-      {
-        "anchor": "Using Yuno",
-        "pages": [
-          "docs/environments",
-          {
-            "group": "Dashboard Overview",
-            "pages": [
-              "docs/your-payment-operative-system",
-              "docs/your-payment-operative-system",
-              "docs/connections",
-              "docs/routing",
-              "docs/monitors",
-              "docs/checkout-builder",
-              "docs/payments",
-              "docs/insights",
-              "docs/reconciliations",
-              "docs/risk-conditions",
-              "docs/payment-links"
-            ]
-          },
-          {
-            "group": "Settings",
-            "pages": [
-              "docs/developers-credentials",
-              "docs/developers-credentials",
-              "docs/account-management",
-              "docs/teams-and-roles",
-              "docs/security",
-              {
-                "group": "Single Sign-On (SSO)",
-                "pages": [
-                  "docs/single-sign-on-sso",
-                  "docs/microsoft-entra-id-sso-guide",
-                  "docs/okta-sso-guide"
+                  "reference/payment-examples",
+                  "reference/bank-transfer-copy",
+                  "reference/bnpl-copy",
+                  "reference/cards",
+                  "reference/payment-link-copy",
+                  "reference/ticket-copy",
+                  "reference/wallet"
                 ]
               },
-              "docs/audit-logs"
-            ]
-          }
-        ]
-      },
-      {
-        "anchor": "Direct Integration Use Cases",
-        "pages": [
-          "docs/direct-flow",
-          "docs/set-up-payment-connection",
-          "docs/create-payment-basic",
-          "docs/refund-payments",
-          "docs/cancel-payments",
-          "docs/capture-payments",
-          "docs/build-reports",
-          "docs/3ds-configuration-and-testing",
-          "docs/yuno-testing-gateway"
-        ]
-      },
-      {
-        "anchor": "Payment Features",
-        "pages": [
-          {
-            "group": "Enrollment",
-            "pages": [
-              "docs/enroll-payment-methods",
-              "docs/enroll-payment-methods",
-              "docs/enroll-cards-with-payment-link"
+              "reference/the-payment-object",
+              "reference/create-payment",
+              "reference/retrieve-payment-by-id",
+              "reference/retrieve-payment-by-merchant-order-id",
+              "reference/refund-payment",
+              "reference/cancel-or-refund-a-payment",
+              "reference/cancel-or-refund-payment-with-transaction",
+              "reference/cancel-payment",
+              "reference/authorize-payment",
+              "reference/capture-authorization",
+              "reference/disputes",
+              "reference/update-dispute",
+              "reference/retrieve-issuers",
+              "reference/notify-fulfillments"
             ]
           },
           {
-            "group": "Installments",
+            "group": "Payment Links",
             "pages": [
-              "docs/installments",
-              "docs/merchant-installments",
-              "docs/provider-installments"
+              "reference/status-payment-links",
+              "reference/status-payment-links",
+              "reference/the-payment-link-object",
+              "reference/create-payment-link",
+              "reference/retrieve-payment-link",
+              "reference/cancel-payment-link"
+            ]
+          },
+          {
+            "group": "Recipients for Marketplace",
+            "pages": [
+              "reference/the-recipient-object",
+              "reference/the-recipient-object",
+              "reference/onboarding-statuses-and-response-codes",
+              "reference/create-recipient-1",
+              "reference/get-recipient",
+              "reference/list-recipients",
+              "reference/update-recipient-1",
+              "reference/delete-recipient",
+              "reference/create-onboarding",
+              "reference/get-onboarding",
+              "reference/update-onboarding",
+              "reference/continue-onboarding",
+              "reference/block-recipient",
+              "reference/unblock-recipient",
+              "reference/transfer-onboarding",
+              {
+                "group": "Get Transfers",
+                "pages": [
+                  "reference/get-transfers",
+                  "reference/get-transfer-by-id",
+                  "reference/list-recipient-transfers",
+                  "reference/list-onboarding-transfers"
+                ]
+              },
+              "reference/reverse-onboarding",
+              "reference/cancel-recipient",
+              "reference/request-a-transfer"
             ]
           },
           {
             "group": "Subscriptions",
             "pages": [
-              "docs/subscriptions",
-              "docs/retries"
-            ]
-          },
-          "docs/stored-credentials",
-          "docs/transaction-retries",
-          "docs/split-payments-marketplace",
-          "docs/account-funding-transactions-afts",
-          "docs/payment-amount-details",
-          "docs/sca-exemptions",
-          "docs/Cancel-and-capture-flow"
-        ]
-      },
-      {
-        "anchor": "Payouts and Disputes",
-        "pages": [
-          "docs/payouts",
-          "docs/chargeback-management",
-          "docs/reason-codes"
-        ]
-      },
-      {
-        "anchor": "Webhooks",
-        "pages": [
-          "docs/webhooks",
-          "docs/configure-webhooks",
-          "docs/object-and-examples",
-          "docs/verify-webhook-signatures-hmac"
-        ]
-      },
-      {
-        "anchor": "Wallets",
-        "pages": [
-          "docs/wallets",
-          {
-            "group": "Apple Pay",
-            "pages": [
-              "docs/apple-pay",
-              "docs/prerequisites-apple-pay",
-              "docs/apple-pay-sdk-integration",
-              "docs/apple-pay-direct-integration"
+              "reference/status-subscriptions",
+              "reference/status-subscriptions",
+              "reference/the-subscription-object",
+              "reference/create-subscription",
+              "reference/retrieve-subscription",
+              "reference/update-subscription",
+              "reference/retry-subscription",
+              "reference/pause-subscription",
+              "reference/resume-subscription",
+              "reference/cancel-subscription"
             ]
           },
           {
-            "group": "Google Pay™",
+            "group": "Payouts",
             "pages": [
-              "docs/google-pay",
-              "docs/google-pay-sdk-integration",
-              "docs/google-pay-direct-integration",
-              "docs/integration-via-provider-google-pay",
-              "docs/google-pay-with-pix"
+              "reference/payout-workflow",
+              "reference/payout-workflow",
+              "reference/the-payout-object",
+              "reference/create-payout",
+              "reference/retrieve-payout-by-id",
+              "reference/retrieve-payout-by-merchant-reference"
             ]
           },
-          "docs/click-to-pay",
-          "docs/nupay"
-        ]
-      },
-      {
-        "anchor": "AI Capabilities",
-        "pages": [
-          "docs/aida-ai-agent",
-          "docs/building-ai-integrations-with-yunos-llms-and-mcp",
-          "docs/remote-yuno-mcp-server",
-          "docs/aida-ai-dashboard"
-        ]
-      },
-      {
-        "anchor": "Security and Compliance",
-        "pages": [
-          "docs/3d-secure",
-          "docs/fingerprint",
-          "docs/card-verification",
-          "docs/pci-compliance",
-          "docs/co-badged-cards-compliance",
-          "docs/network-tokens",
           {
-            "group": "Data Migration Processes",
+            "group": "Reports",
             "pages": [
-              "docs/token-migration-process",
-              "docs/token-migration-process",
-              "docs/network-token-migration-process",
-              "docs/via-api",
-              "docs/exporting-tokens-from-yuno"
+              "reference/report-status",
+              "reference/report-status",
+              "reference/the-reports-object",
+              "reference/reports-fields",
+              "reference/create-a-report",
+              "reference/retrieve-a-report",
+              "reference/download-a-report",
+              "reference/list-all-reports"
+            ]
+          },
+          {
+            "group": "Installments",
+            "pages": [
+              "reference/create-installments-plan",
+              "reference/create-installments-plan",
+              "reference/get-installments-plan",
+              "reference/get-installments-plan-by-account",
+              "reference/update-plan",
+              "reference/delete-installments-plan-by-id"
+            ]
+          },
+          {
+            "group": "AI Caller",
+            "pages": [
+              "reference/declined-payment-calls",
+              "reference/declined-payment-calls",
+              "reference/initiate-recovery-outreach-for-abandoned-user-flows"
+            ]
+          },
+          {
+            "group": "Communications Campaigns",
+            "pages": [
+              "reference/communications-campaigns",
+              "reference/create-campaign",
+              "reference/get-campaign",
+              "reference/list-campaigns",
+              "reference/update-campaign-status",
+              "reference/create-rules",
+              "reference/get-rule",
+              "reference/update-rule",
+              "reference/update-rule-status"
+            ]
+          },
+          {
+            "group": "Conversion Rate",
+            "pages": [
+              "reference/currency-conversion",
+              "reference/currency-conversion",
+              "reference/get-conversion-rate"
+            ]
+          },
+          {
+            "group": "Banking Connectivity",
+            "pages": [
+              "reference/banking-connectivity",
+              {
+                "group": "Entities (Banking Connectivity)",
+                "pages": [
+                  "reference/create-entity",
+                  "reference/create-entity",
+                  "reference/get-entity-details",
+                  "reference/update-entity"
+                ]
+              },
+              {
+                "group": "Entity Onboarding (Banking\n                  Connectivity)",
+                "pages": [
+                  "reference/create-entity-onboarding",
+                  "reference/create-entity-onboarding",
+                  "reference/get-entity-onboarding-status",
+                  "reference/update-entity-onboarding",
+                  "reference/cancel-entity-onboarding"
+                ]
+              },
+              {
+                "group": "Accounts",
+                "pages": [
+                  "reference/accounts-banking",
+                  "reference/create-account-banking",
+                  "reference/get-account-details-banking",
+                  "reference/update-account-banking",
+                  "reference/close-account-banking"
+                ]
+              },
+              {
+                "group": "Entity Transfers (Banking\n                  Connectivity)",
+                "pages": [
+                  "reference/initiate-entity-transfer",
+                  "reference/initiate-entity-transfer",
+                  "reference/get-entity-transfer-status",
+                  "reference/cancel-entity-transfer"
+                ]
+              },
+              {
+                "group": "Webhooks",
+                "pages": [
+                  "reference/webhook-notifications-banking",
+                  "reference/webhook-notifications-banking"
+                ]
+              }
             ]
           }
-        ]
-      },
-      {
-        "anchor": "Plugins",
-        "pages": [
-          {
-            "group": "VTEX",
-            "pages": [
-              "docs/vtex",
-              "docs/configure-yuno-as-provider",
-              "docs/vtex-headless-integration-guide"
-            ]
-          }
-        ]
-      },
-      {
-        "anchor": "Additional Services",
-        "pages": [
-          "docs/card-account-updater",
-          "docs/currency-conversion",
-          "docs/qr-and-instant-pay",
-          "docs/upi-autopay",
-          "docs/environments"
         ]
       }
     ]

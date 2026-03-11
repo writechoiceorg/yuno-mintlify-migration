@@ -441,11 +441,11 @@ Create a new `checkout_session` using the [Create checkout session](https://docs
 * Include the customer ID obtained from the previous step
 * Store the returned `checkout_session` ID for use in Step 5 of the integration
 
-<Callout icon="💳" theme="default">
+<Note>
   ### **Auth vs capture**
 
   Control auth vs capture by sending `payment_method.detail.card.capture` in the checkout session: `false` = authorize only, `true` = capture immediately.
-</Callout>
+</Note>
 
 #### Checkout session options
 

@@ -240,9 +240,9 @@ const enrollmentFlow = {
 
 ### Timing Limitation
 
-<Callout icon="⚠️" theme="warning">
+<Warning>
   You cannot check fingerprints before the customer enters their card information. This is a PCI compliance requirement.
-</Callout>
+</Warning>
 
 **Workaround:** Display existing saved cards before the enrollment form so customers can see what they already have saved.
 
@@ -274,9 +274,9 @@ const isSameCard = (card1, card2) => {
 };
 ```
 
-<Callout icon="⚠️" theme="warning">
+<Warning>
   Different cards may share the same IIN and LFD.
-</Callout>
+</Warning>
 
 ### Card Updates
 

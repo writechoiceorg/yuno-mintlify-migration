@@ -377,3 +377,15 @@ span[class*="line"] * {
 .card.block {
   border-radius: 0 !important;
 }
+
+.company_card_wrapper .card > div {
+  padding: 18px 20px;
+}
+
+.card h2 {
+  margin: 0 !important;
+}
+
+.company_card_wrapper h2 {
+  font-size: 16px !important;
+}

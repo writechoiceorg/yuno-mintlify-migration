@@ -134,11 +134,11 @@ If your payment flow sends users to an external browser (e.g., for 3DS authentic
 | `callback_url`       | Recommended | URL to redirect users back to your app after external browser flows (3DS, bank redirects).                       |
 | `customer_id`        | Yes         | The customer ID obtained from the Create customer endpoint.                                                      |
 
-<Callout icon="💳" theme="default">
+<Note>
   ### Auth vs capture
 
   Control auth vs capture by sending `payment_method.detail.card.capture` in the checkout session: `false` = authorize only, `true` = capture immediately.
-</Callout>
+</Note>
 
 ### Step 4: Implement the payment delegate
 
@@ -462,11 +462,11 @@ Create a new `checkout_session` using the [Create checkout session](https://docs
 * Store the returned `checkout_session` ID for use in Step 6 of the integration
 * Set `workflow` to `SDK_SEAMLESS` when creating the checkout session
 
-<Callout icon="💳" theme="default">
+<Note>
   ### **Auth vs capture**
 
   Control auth vs capture by sending `payment_method.detail.card.capture` in the checkout session: `false` = authorize only, `true` = capture immediately.
-</Callout>
+</Note>
 
 #### Checkout session options
 

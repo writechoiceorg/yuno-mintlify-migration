@@ -4,9 +4,9 @@ title: "SDK Integration"
 
 This guide covers how to integrate Google Pay™ with Yuno using the SDK. With this approach, Yuno's SDK manages the complete Google Pay experience: displaying the Google Pay button, presenting the payment sheet, and handling the payment token. You don't need to integrate directly with the Google Pay API.
 
-<Callout icon="📘" theme="info">
+<Note>
   Before implementing, review the [Google Pay requirements](https://docs.y.uno/docs/google-pay#requirements) and ensure Google Pay is available in your operating countries.
-</Callout>
+</Note>
 
 ## Overview
 
@@ -96,9 +96,9 @@ If you need to call the payment API directly while using the SDK checkout flow, 
 }
 ```
 
-<Callout icon="⚠️" theme="warn">
+<Warning>
   When integrating wallets like Google Pay, the `payment_method.type` field is required even when using the SDK workflow. Set it to `GOOGLE_PAY`.
-</Callout>
+</Warning>
 
 ## Enable and test Google Pay
 

@@ -2,9 +2,9 @@
 title: "Prerequisites (Apple Pay)"
 ---
 
-<Callout icon="📘" theme="info">
+<Note>
   Apple Pay supports third-party browsers such as Google Chrome for users with iOS 18 or higher.
-</Callout>
+</Note>
 
 Use this guide to prepare and configure Apple Pay with Yuno.
 
@@ -15,9 +15,9 @@ When finished, you'll be ready to [choose your integration path](#next-steps)  (
 
 ## Step 1: Register a merchant identifier
 
-<Callout icon="📘" theme="info">
+<Note>
   If you're using VTEX as your e-commerce platform, you'll need to configure your Apple Pay Merchant ID. For detailed instructions, check out the [official VTEX documentation](https://developers.vtex.com/docs/guides/setting-up-merchant-id-in-apple-pay).
-</Callout>
+</Note>
 
 In the Apple Developer dashboard:
 
@@ -121,7 +121,7 @@ The private key will be available as `MerchantIdentityCertificatePrivateKey.pem`
 
 ## Step 9: Upload the merchant identity certificate and key
 
-1. Return to your Apple Pay connection in the <Anchor label="Yuno Dashboard" target="_blank" href="https://auth.y.uno/u/login">Yuno Dashboard</Anchor>.
+1. Return to your Apple Pay connection in the [Yuno Dashboard](https://auth.y.uno/u/login).
 2. Copy the contents of `MerchantIdentityCertificatePrivateKey.pem` and paste them into the **Merchant Identity key** field.
 3. Paste the contents of `merchant_id.pem` into the **Merchant Identity certificate** field.
 
@@ -162,9 +162,9 @@ Once all steps are complete, you can proceed with the Dashboard setup.
 
 Set up a new route to control how payments are processed through Apple Pay.
 
-<Callout icon="📘" theme="info">
+<Note>
   Visit the [Routing](https://docs.y.uno/docs/routing) page for additional information on this step.
-</Callout>
+</Note>
 
 1. In the [Yuno Dashboard](https://dashboard.y.uno/), navigate to the **Routing** section.
 2. Find the **Apple Pay** connection. If you have not created a route for Apple Pay yet, it will be on the **Not published** tab.
@@ -179,9 +179,9 @@ Here's a simple route processing all payments through Apple Pay.
 
 ## Step 13: Enable Apple Pay in Checkout Builder
 
-<Callout icon="📘" theme="info">
+<Note>
   Visit the [Checkout Builder](https://docs.y.uno/docs/checkout-builder) page for additional information on this step.
-</Callout>
+</Note>
 
 To make Apple Pay available to your end users, you have to enable it on the Checkout Builder:
 
@@ -191,9 +191,9 @@ To make Apple Pay available to your end users, you have to enable it on the Chec
 
 <Frame><img src="/images/reference/prerequisites-apple-pay/image6.png" /></Frame>
 
-<Callout icon="📘" theme="info">
+<Note>
   If you plan to implement recurring payments, you will need to configure an additional URL in your Apple Pay connection where customers can manage their subscriptions (cancel, modify, etc.). This URL must be created and hosted by your merchant platform.
-</Callout>
+</Note>
 
 ## Next steps
 

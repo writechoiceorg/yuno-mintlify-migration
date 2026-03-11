@@ -91,15 +91,15 @@ The onboarding workflow follows a structured process that ensures submerchants a
 
 In this section, we explore how the `split_marketplace` object is used to divide a [payment](https://docs.y.uno/reference/create-payment) among multiple recipients. This object is an array where each entry specifies a recipient and their corresponding share of the payment.
 
-<Callout icon="ℹ️" theme="info">
+<Note>
   In this step, reference recipients created in Step 1 (Onboarding).
 
   For `type` = `PURCHASE` or `MARKETPLACE`, include the `recipient_id` of that recipient.
 
   For `PAYMENTFEE`, `VAT` and `COMMISSION`, `recipient_id` is optional.
-</Callout>
+</Note>
 
-<Table align={["left","left","left","left","left"]}>
+<table>
   <thead>
     <tr>
       <th>
@@ -385,7 +385,7 @@ In this section, we explore how the `split_marketplace` object is used to divide
       </td>
     </tr>
   </tbody>
-</Table>
+</table>
 
 <br />
 
@@ -442,9 +442,9 @@ The process has several stages. First, the initial recipient is created with its
 
 1. **Recipient and onboarding (before any transfer)**: [Create recipient](https://docs.y.uno/reference/create-recipient-1), then [create onboarding](https://docs.y.uno/reference/create-onboarding).
 
-<Callout icon="📘" theme="info">
+<Note>
   This step happens in advance when a new recipient is created and its onboarding is assigned. It is not part of the transfer itself.
-</Callout>
+</Note>
 
 If you decide to transfer the onboarding to another recipient, continue the flow:
 
