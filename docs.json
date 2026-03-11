@@ -1,0 +1,617 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Yuno API Documentation",
+  "colors": {
+    "primary": "#3E4FE0",
+    "light": "#E8EAF5",
+    "dark": "#3E4FE0"
+  },
+  "search": {
+    "prompt": "Search..."
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/yuno-docs.svg",
+    "dark": "/logo/yuno-docs.svg"
+  },
+  "fonts": {
+    "heading": {
+      "family": "DM Sans",
+      "weight": 400
+    },
+    "body": {
+      "family": "DM Sans",
+      "weight": 400
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "anchors": [
+          {
+            "anchor": "Getting Started",
+            "icon": "play",
+            "pages": [
+              "getting-started/introduction",
+              "getting-started/how-payments-work",
+              "getting-started/quickstart",
+              "getting-started/authentication",
+              "getting-started/environments"
+            ]
+          },
+          {
+            "anchor": "Core Concepts",
+            "icon": "brain",
+            "pages": [
+              "core-concepts/payment-flow",
+              "core-concepts/customers",
+              "core-concepts/checkout-sessions",
+              "core-concepts/payments",
+              "core-concepts/transactions",
+              "core-concepts/tokens",
+              "core-concepts/payment-methods",
+              "core-concepts/providers",
+              "core-concepts/webhooks",
+              "core-concepts/idempotency",
+              "core-concepts/error-handling"
+            ]
+          },
+          {
+            "anchor": "Guides",
+            "icon": "book-open",
+            "pages": [
+              "guides/integration-overview",
+              {
+                "group": "Direct API",
+                "pages": [
+                  "guides/direct-api/overview",
+                  "guides/direct-api/create-payment",
+                  "guides/direct-api/capture-and-cancel",
+                  "guides/direct-api/refunds"
+                ]
+              },
+              {
+                "group": "Testing",
+                "pages": [
+                  "guides/testing/sandbox-guide",
+                  "guides/testing/test-cards",
+                  "guides/testing/yuno-testing-gateway",
+                  "guides/testing/test-scenarios",
+                  "guides/testing/sdk-testing"
+                ]
+              },
+              {
+                "group": "Webhooks",
+                "pages": [
+                  "guides/webhooks/setup",
+                  "guides/webhooks/events",
+                  "guides/webhooks/verify-signatures",
+                  "guides/webhooks/testing-locally"
+                ]
+              },
+              {
+                "group": "Payment Methods",
+                "pages": [
+                  "guides/payment-methods/by-region",
+                  "guides/payment-methods/cards",
+                  "guides/payment-methods/pix",
+                  "guides/payment-methods/boleto",
+                  "guides/payment-methods/oxxo",
+                  "guides/payment-methods/bank-transfers",
+                  "guides/payment-methods/cash-vouchers",
+                  "guides/payment-methods/bnpl"
+                ]
+              },
+              "guides/postman-collections",
+              {
+                "group": "Orchestration & Optimization",
+                "pages": [
+                  "guides/bin-routing-strategy",
+                  "guides/multi-provider-orchestration",
+                  "guides/currency-optimization",
+                  "guides/orchestration-templates",
+                  "guides/advanced-risk-decisioning",
+                  "guides/network-token-optimization"
+                ]
+              }
+            ]
+          },
+          {
+            "anchor": "Features",
+            "icon": "square-star",
+            "pages": [
+              {
+                "group": "Installments",
+                "pages": [
+                  "features/installments/overview",
+                  "features/installments/merchant-installments",
+                  "features/installments/provider-installments"
+                ]
+              },
+              {
+                "group": "Digital Wallets",
+                "pages": [
+                  "features/digital-wallets/overview",
+                  "features/digital-wallets/apple-pay",
+                  "features/digital-wallets/google-pay",
+                  "features/digital-wallets/click-to-pay",
+                  "features/digital-wallets/nupay",
+                  "features/digital-wallets/upi-autopay"
+                ]
+              },
+              {
+                "group": "Subscriptions",
+                "pages": [
+                  "features/subscriptions/overview",
+                  "features/subscriptions/create-subscription",
+                  "features/subscriptions/smart-retries"
+                ]
+              },
+              {
+                "group": "Banking as a Service",
+                "pages": [
+                  "features/baas/overview"
+                ]
+              },
+              "features/card-account-updater",
+              "features/stored-credentials",
+              "features/transaction-retries",
+              "features/account-funding",
+              "features/payment-links",
+              "features/payouts",
+              "features/reports",
+              "features/split-marketplace",
+              "features/disputes",
+              "features/network-tokens",
+              "features/currency-conversion",
+              "features/ai-optimization"
+            ]
+          },
+          {
+            "anchor": "Security",
+            "icon": "fingerprint",
+            "pages": [
+              "security/3d-secure",
+              "security/3ds-optimization",
+              "security/pci-compliance",
+              "security/pci-saq-guide",
+              "security/card-verification",
+              "security/card-fingerprint",
+              "security/co-badged-cards",
+              "security/sca-exemptions",
+              "security/data-privacy",
+              "security/data-migration",
+              "security/incident-response",
+              "security/chargeback-prevention"
+            ]
+          },
+          {
+            "anchor": "Platform",
+            "icon": "laptop-mobile",
+            "pages": [
+              {
+                "group": "Dashboard",
+                "pages": [
+                  "platform/dashboard/overview",
+                  "platform/dashboard/connections",
+                  "platform/dashboard/routing",
+                  "platform/dashboard/risk-conditions",
+                  "platform/dashboard/checkout-builder",
+                  "platform/dashboard/reconciliations",
+                  "platform/dashboard/monitors",
+                  "platform/dashboard/insights",
+                  "platform/dashboard/settings",
+                  "platform/dashboard/sso",
+                  "platform/dashboard/audit-logs"
+                ]
+              },
+              {
+                "group": "Plugins",
+                "pages": [
+                  "platform/plugins/vtex",
+                  "platform/plugins/vtex-headless"
+                ]
+              }
+            ]
+          },
+          {
+            "anchor": "AI",
+            "icon": "microchip-ai",
+            "pages": [
+              "ai/aida-agent",
+              "ai/aida-dashboard",
+              "ai/aida-implementation-guide",
+              "ai/llm-mcp-integration",
+              "ai/remote-mcp-server",
+              "ai/agent-orchestration",
+              "ai/mcp-tool-reference",
+              "ai/agent-error-recovery"
+            ]
+          },
+          {
+            "anchor": "Troubleshooting",
+            "icon": "bug",
+            "pages": [
+              "troubleshooting/error-codes",
+              "troubleshooting/http-status-codes",
+              "troubleshooting/provider-errors",
+              "troubleshooting/sdk-errors",
+              "troubleshooting/faq"
+            ]
+          },
+          {
+            "anchor": "Reference",
+            "icon": "book-bookmark",
+            "pages": [
+              "reference/coverage",
+              "reference/glossary",
+              "reference/payment-statuses",
+              "reference/response-codes",
+              "reference/languages-supported"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "dropdowns": [
+          {
+            "dropdown": "Overview",
+            "icon": "book-open",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "dropdown": "Reference",
+            "icon": "book-bookmark",
+            "pages": [
+              "reference/airline-information",
+              "reference/country-reference",
+              "reference/eci-indicators",
+              "reference/industry-categories",
+              "reference/items-category",
+              "reference/payment-types",
+              "reference/purposes-list",
+              "reference/transaction-categories",
+              "reference/shipping-reference"
+            ]
+          },
+          {
+            "dropdown": "Checkout Sessions",
+            "icon": "bag-shopping",
+            "pages": [
+              "api-reference/checkout-sessions/object",
+              "api-reference/checkout-sessions/create",
+              "api-reference/checkout-sessions/create-token-direct",
+              "api-reference/checkout-sessions/create-token-sdk",
+              "api-reference/checkout-sessions/update",
+              "api-reference/checkout-sessions/get",
+              "api-reference/checkout-sessions/get-payment-methods"
+            ]
+          },
+          {
+            "dropdown": "Payments",
+            "icon": "badge-dollar",
+            "pages": [
+              "api-reference/payments/object",
+              "api-reference/payments/transaction-object",
+              "api-reference/payments/create",
+              "api-reference/payments/authorize",
+              "api-reference/payments/get",
+              "api-reference/payments/get-by-merchant-order",
+              "api-reference/payments/capture",
+              "api-reference/payments/cancel",
+              "api-reference/payments/refund",
+              "api-reference/payments/cancel-or-refund",
+              "api-reference/payments/notify-fulfillment",
+              "api-reference/payments/create-dispute",
+              "api-reference/payments/update-dispute"
+            ]
+          },
+          {
+            "dropdown": "Customers",
+            "icon": "users",
+            "pages": [
+              "api-reference/customers/object",
+              "api-reference/customers/create",
+              "api-reference/customers/get",
+              "api-reference/customers/get-by-external-id",
+              "api-reference/customers/list",
+              "api-reference/customers/update",
+              "api-reference/customers/delete"
+            ]
+          },
+          {
+            "dropdown": "Customer Sessions (Enrollment)",
+            "icon": "circle-user-clock",
+            "pages": [
+              "api-reference/customer-sessions/enrollment-status",
+              "api-reference/customer-sessions/object",
+              "api-reference/customer-sessions/create"
+            ]
+          },
+          {
+            "dropdown": "Payment Methods",
+            "icon": "credit-card",
+            "pages": [
+              "api-reference/payment-methods/object",
+              "api-reference/payment-methods/enroll",
+              "api-reference/payment-methods/list",
+              "api-reference/payment-methods/get",
+              "api-reference/payment-methods/unenroll"
+            ]
+          },
+          {
+            "dropdown": "Payment Links",
+            "icon": "link",
+            "pages": [
+              "api-reference/payment-links/object",
+              "api-reference/payment-links/create",
+              "api-reference/payment-links/get",
+              "api-reference/payment-links/cancel"
+            ]
+          },
+          {
+            "dropdown": "Subscriptions",
+            "icon": "square-rss",
+            "pages": [
+              "api-reference/subscriptions/object",
+              "api-reference/subscriptions/create",
+              "api-reference/subscriptions/get",
+              "api-reference/subscriptions/update",
+              "api-reference/subscriptions/pause",
+              "api-reference/subscriptions/resume",
+              "api-reference/subscriptions/cancel",
+              "api-reference/subscriptions/retry"
+            ]
+          },
+          {
+            "dropdown": "Installments Plans",
+            "icon": "brain-arrow-curved-right",
+            "pages": [
+              "api-reference/installments-plans/list",
+              "api-reference/installments-plans/create",
+              "api-reference/installments-plans/get",
+              "api-reference/installments-plans/update",
+              "api-reference/installments-plans/delete"
+            ]
+          },
+          {
+            "dropdown": "Issuers",
+            "icon": "building-circle-exclamation",
+            "pages": [
+              "api-reference/issuers/list"
+            ]
+          },
+          {
+            "dropdown": "Payouts",
+            "icon": "slot-machine",
+            "pages": [
+              "api-reference/payouts/object",
+              "api-reference/payouts/create",
+              "api-reference/payouts/get",
+              "api-reference/payouts/get-by-merchant-ref"
+            ]
+          },
+          {
+            "dropdown": "Recipients for Marketplace",
+            "icon": "bags-shopping",
+            "pages": [
+              "api-reference/recipients/object",
+              "api-reference/recipients/onboarding-statuses",
+              "api-reference/recipients/create",
+              "api-reference/recipients/get",
+              "api-reference/recipients/list",
+              "api-reference/recipients/update",
+              "api-reference/recipients/delete",
+              "api-reference/recipients/create-onboarding",
+              "api-reference/recipients/get-onboarding",
+              "api-reference/recipients/update-onboarding",
+              "api-reference/recipients/continue-onboarding",
+              "api-reference/recipients/block-onboarding",
+              "api-reference/recipients/unblock-onboarding",
+              "api-reference/recipients/transfer-onboarding",
+              "api-reference/recipients/get-transfer",
+              "api-reference/recipients/list-transfers",
+              "api-reference/recipients/reverse-transfer",
+              "api-reference/recipients/cancel-onboarding",
+              "api-reference/recipients/request-transfer"
+            ]
+          },
+          {
+            "dropdown": "Reports",
+            "icon": "chart-bar",
+            "pages": [
+              "api-reference/reports/report-status",
+              "api-reference/reports/object",
+              "api-reference/reports/fields",
+              "api-reference/reports/create",
+              "api-reference/reports/get",
+              "api-reference/reports/download",
+              "api-reference/reports/list"
+            ]
+          },
+          {
+            "dropdown": "Webhooks",
+            "icon": "webhook",
+            "pages": [
+              "api-reference/webhooks/register"
+            ]
+          },
+          {
+            "dropdown": "Currency Conversion",
+            "icon": "box-dollar",
+            "pages": [
+              "api-reference/currency-conversion/get-rates"
+            ]
+          },
+          {
+            "dropdown": "BaaS — Entities",
+            "icon": "building",
+            "pages": [
+              "api-reference/baas/create-entity",
+              "api-reference/baas/get-entity",
+              "api-reference/baas/update-entity"
+            ]
+          },
+          {
+            "dropdown": "BaaS — Onboarding",
+            "icon": "ticket",
+            "pages": [
+              "api-reference/baas/create-onboarding",
+              "api-reference/baas/get-onboarding",
+              "api-reference/baas/update-onboarding",
+              "api-reference/baas/cancel-onboarding"
+            ]
+          },
+          {
+            "dropdown": "BaaS — Accounts",
+            "icon": "clipboard-user",
+            "pages": [
+              "api-reference/baas/create-account",
+              "api-reference/baas/get-account",
+              "api-reference/baas/update-account",
+              "api-reference/baas/close-account"
+            ]
+          },
+          {
+            "dropdown": "BaaS — Transfers",
+            "icon": "money-bill-transfer",
+            "pages": [
+              "api-reference/baas/create-transfer",
+              "api-reference/baas/get-transfer",
+              "api-reference/baas/cancel-transfer"
+            ]
+          },
+          {
+            "dropdown": "BaaS — Webhooks",
+            "icon": "webhook",
+            "pages": [
+              "api-reference/baas/webhook-notifications"
+            ]
+          },
+          {
+            "dropdown": "Smart Support",
+            "icon": "bell-concierge",
+            "pages": [
+              "api-reference/smart-support/recover-declined",
+              "api-reference/smart-support/recover-abandoned"
+            ]
+          },
+          {
+            "dropdown": "Campaigns",
+            "icon": "cabin",
+            "pages": [
+              "api-reference/campaigns/create",
+              "api-reference/campaigns/get",
+              "api-reference/campaigns/list",
+              "api-reference/campaigns/update-status",
+              "api-reference/campaigns/create-rule",
+              "api-reference/campaigns/get-rule",
+              "api-reference/campaigns/update-rule",
+              "api-reference/campaigns/update-rule-status"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDKs",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "guides/sdk/overview",
+              "guides/sdk/full-checkout"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "guides/sdk/seamless-checkout",
+              "guides/sdk/lite-checkout",
+              "guides/sdk/secure-fields",
+              "guides/sdk/headless"
+            ]
+          },
+          {
+            "group": "Mobile",
+            "pages": [
+              "guides/sdk/mobile-overview",
+              "guides/sdk/ios-checkout",
+              "guides/sdk/android-checkout",
+              "guides/sdk/flutter-checkout"
+            ]
+          },
+          {
+            "group": "Framework Components",
+            "pages": [
+              "guides/sdk/react-components",
+              "guides/sdk/vue-components"
+            ]
+          },
+          {
+            "group": "Customization",
+            "pages": [
+              "guides/sdk/customization",
+              "guides/sdk/enrollment"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "guides/sdk/web-reference"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "groups": [
+          {
+            "group": "Changelog",
+            "pages": [
+              "changelog/overview",
+              "changelog/api",
+              "changelog/web-sdk",
+              "changelog/android-sdk",
+              "changelog/ios-sdk",
+              "changelog/flutter-sdk"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {}
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/yuno-payments"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@y.uno"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://dashboard.y.uno"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/guides/sdk/ios-reference",
+      "destination": "/guides/sdk/ios-checkout#api-reference"
+    },
+    {
+      "source": "/guides/sdk/android-reference",
+      "destination": "/guides/sdk/android-checkout#api-reference"
+    }
+  ]
+}
