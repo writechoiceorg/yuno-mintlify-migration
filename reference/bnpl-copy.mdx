@@ -2,8 +2,6 @@
 title: "BNPL"
 ---
 
-import { HTMLBlock } from "/snippets/HTMLBlock.jsx";
-
 This page presents examples of requests and responses for creating BNPL payments using the [Create Payment](https://docs.y.uno/reference/create-payment) endpoint with the REDIRECT workflow for back-to-back integrations.
 
 To test the creation of each payment, you can copy the content from the request code and use it on your machine or paste it on the [Create Payment](https://docs.y.uno/reference/create-payment) endpoint to test using Readme.
@@ -16,141 +14,20 @@ Some payment methods and providers may only be available in specific countries a
 
 ## BNPL available examples
 
-<HTMLBlock>
-  {`
-  <style>
-    
-
-    .table-of-contents-btn-shelf {
-      margin: 0 0 0 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: 1fr;
-      gap: 10px;
-    }
-
-    @media only screen and (max-width: 800px) {
-      .table-of-contents-btn-shelf {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-
-    .table-of-contents-btn {
-      font-size: 0.85rem;
-      border: 1px solid var(--yuno-purple-50);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0.6rem;
-      border-radius: 7px;
-      font-size: 0.85rem;
-      color: var(--yuno-purple);
-      font-weight: 600;
-      transition: transform .1s;
-    }
-
-    .table-of-contents-btn-on-click-effects {
-      cursor: pointer;
-    }
-
-    .table-of-contents-btn-on-click-effects:hover {
-      transform: scale(1.02);
-      box-shadow: 0 5px 5px var(--yuno-purple-10);
-    }
-
-    .table-of-contents-btn .card-logo div {
-      height: 23px;
-      width: 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    
-
-    .table-of-contents-btn img {
-      max-height: 23px;
-      max-width: 23px;
-    }
-
-    .table-of-contents-btn .card-title {
-      display: inline-block;
-      ;
-      padding: 0;
-      margin: 0;
-    }
-
-    
-
-    @media (prefers-color-scheme: dark) {
-      .table-of-contents-btn-on-click-effects:hover {
-        box-shadow: none !important;
-      }
-    }
-
-    [data-color-mode="dark"] .table-of-contents-btn-on-click-effects:hover {
-      box-shadow: none !important;
-    }
-  </style>
-
-  <body>
-    <section class="table-of-contents-btn-shelf">
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/bnpl-copy#acuotaz';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/acuotaz_logosimbolo.png" alt="Acuotaz logo">
-            </div>
-          </div>
-          <span class='card-title'>Acuotaz</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/bnpl-copy#addi';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/addi_logosimbolo.png" alt="Addi logo">
-            </div>
-          </div>
-          <span class='card-title'>Addi</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/bnpl-copy#klarna';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/klarna_logosimbolo.png" alt="Klarna logo">
-            </div>
-          </div>
-          <span class='card-title'>Klarna</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/bnpl-copy#wibond';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/wibond_logosimbolo.png" alt="Wibond logo">
-            </div>
-          </div>
-          <span class='card-title'>Wibond</span>
-        </div>
-      </div>
-    </section>
-  </body>
-  `}
-</HTMLBlock>
+<div className="company_card_wrapper">
+<CardGroup cols={3}>
+  <Card horizontal title="Acuotaz" icon="https://icons.prod.y.uno/acuotaz_logosimbolo.png" href="/reference/bnpl-copy#acuotaz" />
+  <Card horizontal title="Addi" icon="https://icons.prod.y.uno/addi_logosimbolo.png" href="/reference/bnpl-copy#addi" />
+  <Card horizontal title="Klarna" icon="https://icons.prod.y.uno/klarna_logosimbolo.png" href="/reference/bnpl-copy#klarna" />
+  <Card horizontal title="Wibond" icon="https://icons.prod.y.uno/wibond_logosimbolo.png" href="/reference/bnpl-copy#wibond" />
+</CardGroup>
+</div>
 
 ### Acuotaz
 
 Example of a request for a BNPL payment using Acuotaz. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -326,7 +203,7 @@ curl --request POST \
 
 Example of a request for a BNPL payment using Addi. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <Your--Idempotency-Key>' \
@@ -492,7 +369,7 @@ curl --request POST \
 
 Example of a request for a BNPL payment using Klarna. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -586,7 +463,7 @@ curl --request POST \
 
 Example of a request for a BNPL payment using Wibond. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \

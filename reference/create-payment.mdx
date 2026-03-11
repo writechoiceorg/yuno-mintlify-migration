@@ -3,8 +3,6 @@ title: "Create Payment"
 openapi: "/openapi.json POST /v1/payments"
 ---
 
-import { HTMLBlock } from "/snippets/HTMLBlock.jsx";
-
 This request creates a payment after you created a checkout session.
 
 <Danger>
@@ -35,22 +33,3 @@ On the other hand, if you wish to process the payment in Two Steps (First Author
 2. Capture the created authorization using the [Capture Authorization](https://docs.y.uno/reference/capture-authorization) request.
 
 Note that this request requires an `X-Idempotency-Key`. Check the [Authentication](https://docs.y.uno/reference/authentication#idempotency) page for more information.
-
-<HTMLBlock>
-  {`
-  <style>
-    .rm-Playground { 
-      padding-bottom: 20px; 
-      overflow: scroll; 
-    }
-
-    .hub-footer { 
-      position: static; 
-    }
-
-    .link_stored_credential {
-      color: rgb(81, 60, 225) !important;
-    }
-  </style>
-  `}
-</HTMLBlock>

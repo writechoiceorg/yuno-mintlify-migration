@@ -6,15 +6,15 @@ The Yuno API uses the ApiKey security schema to authenticate HTTP requests. API 
 
 All requests require `public-api-key` and `private-secret-key` headers. Find them in your [Yuno Dashboard](https://dashboard.y.uno/developers).
 
-<Callout icon="❗️" theme="error">
+<Danger>
   Do not share your secret API keys in public places like GitHub or Bitbucket to avoid malicious API calls.
-</Callout>
+</Danger>
 
 Occasionally, an `X-Idempotency-Key` may be required. This UUID must be unique for each request. See [Idempotency](https://docs.y.uno/reference/authentication#idempotency) for details.
 
 **Example request**:
 
-```curl
+```sh
 curl --request <Method> \\
      --url <URL> \\
      --header 'X-Idempotency-Key: 7bf41af5-70ae-4e79-9b28-a8fa75c3ac53' \\

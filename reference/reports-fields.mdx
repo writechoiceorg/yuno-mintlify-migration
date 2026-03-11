@@ -2,8 +2,6 @@
 title: "Reports Fields"
 ---
 
-import { HTMLBlock } from "/snippets/HTMLBlock.jsx";
-
 In this section, you can find all report types and related fields available when generating your reports. Take into account the description of the fields, where you can find the origin of the data and its availability.
 
 Yuno provides several report types:
@@ -30,145 +28,7 @@ The report fields are subject to modifications, and new fields can be added to t
 
 ## Payment report
 
-<HTMLBlock>
-  {`
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-
-    .table-card {
-      border-radius: 10px;
-      border: 1px solid #614ad623;
-      display: flex;
-      transition: all .2s;
-    }
-
-    .table-card:hover {
-      box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .table-card .control-icon {
-      fill: rebeccapurple;
-      transition: .3s ease;
-      pointer-events: none;
-    }
-
-    .table-card .control-icon-close {
-      display: none;
-    }
-
-    details[open] .control-icon-close {
-      display: initial;
-      transition: .3s ease;
-    }
-
-    details[open] .control-icon-expand {
-      display: none;
-    }
-
-    details[open] summary {
-      border: 1px solid #614ad623;
-    }
-
-
-    .table-card summary {
-      padding: 0.8rem 1rem;
-      border-radius: 10px;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .table-card summary .table-call {
-      display: block;
-      padding: 0;
-      margin: 0;
-      font-size: 1rem;
-
-    }
-
-
-    .table-card summary .sumary-icon {
-      display: flex;
-      justify-content: flex-end;
-      flex-grow: 1;
-    }
-
-    .table-card .table-div {
-      margin: 0.5rem 0;
-      padding: 0 0.5rem;
-    }
-
-    .table-card .table-div table {
-      margin: 0 !important;
-    }
-
-    .table-card .table-div td {
-      text-align: center;
-    }
-
-    .table-card .table-div tbody tr {
-      font-size: 0.8rem;
-      overflow-wrap: break-word;
-    }
-
-    .table-card .table-div tbody tr :first-child {
-      font-weight: 600;
-    }
-
-
-
-
-    @media only screen and (max-width: 700px) {
-      .table-card .table-div table {
-        display: block !important;
-        overflow-x: auto !important;
-      }
-    }
-
-
-
-
-    details[open] div {
-      animation: sweep .3s ease-in-out;
-    }
-
-    @keyframes sweep {
-      0% {
-        opacity: 0;
-        margin-left: -10px
-      }
-
-      100% {
-        opacity: 1;
-        margin-left: 0px
-      }
-    }
-  </style>
-
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Payment report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
+<Accordion title="Payment report field details">
         <table>
           <thead>
             <tr>
@@ -922,36 +782,12 @@ The report fields are subject to modifications, and new fields can be added to t
             </tr>
           </tbody>
         </table>
-
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+</Accordion>
 
 ## Transaction report
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Transaction report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
-       <table>
+<Accordion title="Transaction report field details">
+  <table>
     <thead>
       <tr>
         <th>Parameter</th>
@@ -1569,11 +1405,7 @@ The report fields are subject to modifications, and new fields can be added to t
       </tr>
     </tbody>
   </table>
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+</Accordion>
 
 ## Transaction reconciliation report
 
@@ -1597,286 +1429,261 @@ The report fields are subject to modifications, and new fields can be added to t
   * `retrieval_reference_number`
 </Note>
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Transaction reconciliation report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
-        <table>
-          <thead>
-            <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>account_id</code></td>
-              <td>string</td>
-              <td>The unique identifier of the account (MAX 64; MIN 36).</td>
-              <td>64143128-dd12-11ec-9d64-0242ac120002</td>
-            </tr>
-            <tr>
-              <td><code>country</code></td>
-              <td>enum</td>
-              <td>The country where the transaction must be processed (MAX 2; MIN 2; ISO 3166-1).</td>
-              <td>US</td>
-            </tr>
-            <tr>
-              <td><code>type</code></td>
-              <td>enum</td>
-              <td>The transaction type (MAX 255; MIN 3).</td>
-              <td>PURCHASE</td>
-            </tr>
-            <tr>
-              <td><code>payment_method_category</code></td>
-              <td>enum</td>
-              <td>Category of the transaction (MAX 255; MIN 3).</td>
-              <td>BANK_TRANSFER</td>
-            </tr>
-            <tr>
-              <td><code>payment_method_type</code></td>
-              <td>enum</td>
-              <td>The type of payment method selected by the customer (MAX 255; MIN 3).</td>
-              <td>BANKABC_TRANSFER</td>
-            </tr>
-            <tr>
-              <td><code>provider_id</code></td>
-              <td>enum</td>
-              <td>The ID of the provider that processed the transaction.</td>
-              <td>PROVIDER ID</td>
-            </tr>
-            <tr>
-              <td><code>customer_id</code></td>
-              <td>string</td>
-              <td>The unique identifier of the customer (MAX 255; MIN 3).</td>
-              <td>23456</td>
-            </tr>
-            <tr>
-              <td><code>payment_id</code></td>
-              <td>string</td>
-              <td>The unique identifier of the payment (MAX 64; MIN 36).</td>
-              <td>5104911d-5df9-229e-8468-bd41abea1</td>
-            </tr>
-            <tr>
-              <td><code>merchant_order_id</code></td>
-              <td>string</td>
-              <td>Identification of the order assigned by your company (MAX 255; MIN 3).</td>
-              <td>123456789</td>
-            </tr>
-            <tr>
-              <td><code>merchant_transaction_id</code></td>
-              <td>string</td>
-              <td>Identification of the transaction assigned by your company (MAX 255; MIN 3).</td>
-              <td>987654321</td>
-            </tr>
-            <tr>
-              <td><code>transaction_id</code></td>
-              <td>string</td>
-              <td>The unique identifier of the transaction assigned by Yuno (MAX 64; MIN 36).</td>
-              <td>9104911d-5df9-429e-8488-ad41abea1a4b</td>
-            </tr>
-            <tr>
-              <td><code>provider_transaction_id</code></td>
-              <td>string</td>
-              <td>The unique identifier of the transaction from the provider (MAX 255; MIN 3).</td>
-              <td>53443e9c-dd17-11ec-9d64-0242ac120002</td>
-            </tr>
-            <tr>
-              <td><code>third_party_transaction_id</code></td>
-              <td>string</td>
-              <td>The unique identifier of a third party transaction (MAX 255; MIN 3).</td>
-              <td>69ad0a39-b769-423c-b223-d7b8bf9a1c2d</td>
-            </tr>
-            <tr>
-              <td><code>status</code></td>
-              <td>string</td>
-              <td>The status of the transaction (MAX 255; MIN 3).</td>
-              <td>SUCCEEDED</td>
-            </tr>
-            <tr>
-              <td><code>response_code</code></td>
-              <td>string</td>
-              <td>The code that represents the response to the outcome of the transaction.</td>
-              <td>SUCCEEDED</td>
-            </tr>
-            <tr>
-              <td><code>provider_status</code></td>
-              <td>string</td>
-              <td>The transaction status from the provider (MAX 255; MIN 3).</td>
-              <td>Authorised</td>
-            </tr>
-            <tr>
-              <td><code>amount</code></td>
-              <td>number</td>
-              <td>The amount of the transaction.</td>
-              <td>100</td>
-            </tr>
+<Accordion title="Transaction reconciliation report field details">
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>account_id</code></td>
+      <td>string</td>
+      <td>The unique identifier of the account (MAX 64; MIN 36).</td>
+      <td>64143128-dd12-11ec-9d64-0242ac120002</td>
+    </tr>
+    <tr>
+      <td><code>country</code></td>
+      <td>enum</td>
+      <td>The country where the transaction must be processed (MAX 2; MIN 2; ISO 3166-1).</td>
+      <td>US</td>
+    </tr>
+    <tr>
+      <td><code>type</code></td>
+      <td>enum</td>
+      <td>The transaction type (MAX 255; MIN 3).</td>
+      <td>PURCHASE</td>
+    </tr>
+    <tr>
+      <td><code>payment_method_category</code></td>
+      <td>enum</td>
+      <td>Category of the transaction (MAX 255; MIN 3).</td>
+      <td>BANK_TRANSFER</td>
+    </tr>
+    <tr>
+      <td><code>payment_method_type</code></td>
+      <td>enum</td>
+      <td>The type of payment method selected by the customer (MAX 255; MIN 3).</td>
+      <td>BANKABC_TRANSFER</td>
+    </tr>
+    <tr>
+      <td><code>provider_id</code></td>
+      <td>enum</td>
+      <td>The ID of the provider that processed the transaction.</td>
+      <td>PROVIDER ID</td>
+    </tr>
+    <tr>
+      <td><code>customer_id</code></td>
+      <td>string</td>
+      <td>The unique identifier of the customer (MAX 255; MIN 3).</td>
+      <td>23456</td>
+    </tr>
+    <tr>
+      <td><code>payment_id</code></td>
+      <td>string</td>
+      <td>The unique identifier of the payment (MAX 64; MIN 36).</td>
+      <td>5104911d-5df9-229e-8468-bd41abea1</td>
+    </tr>
+    <tr>
+      <td><code>merchant_order_id</code></td>
+      <td>string</td>
+      <td>Identification of the order assigned by your company (MAX 255; MIN 3).</td>
+      <td>123456789</td>
+    </tr>
+    <tr>
+      <td><code>merchant_transaction_id</code></td>
+      <td>string</td>
+      <td>Identification of the transaction assigned by your company (MAX 255; MIN 3).</td>
+      <td>987654321</td>
+    </tr>
+    <tr>
+      <td><code>transaction_id</code></td>
+      <td>string</td>
+      <td>The unique identifier of the transaction assigned by Yuno (MAX 64; MIN 36).</td>
+      <td>9104911d-5df9-429e-8488-ad41abea1a4b</td>
+    </tr>
+    <tr>
+      <td><code>provider_transaction_id</code></td>
+      <td>string</td>
+      <td>The unique identifier of the transaction from the provider (MAX 255; MIN 3).</td>
+      <td>53443e9c-dd17-11ec-9d64-0242ac120002</td>
+    </tr>
+    <tr>
+      <td><code>third_party_transaction_id</code></td>
+      <td>string</td>
+      <td>The unique identifier of a third party transaction (MAX 255; MIN 3).</td>
+      <td>69ad0a39-b769-423c-b223-d7b8bf9a1c2d</td>
+    </tr>
+    <tr>
+      <td><code>status</code></td>
+      <td>string</td>
+      <td>The status of the transaction (MAX 255; MIN 3).</td>
+      <td>SUCCEEDED</td>
+    </tr>
+    <tr>
+      <td><code>response_code</code></td>
+      <td>string</td>
+      <td>The code that represents the response to the outcome of the transaction.</td>
+      <td>SUCCEEDED</td>
+    </tr>
+    <tr>
+      <td><code>provider_status</code></td>
+      <td>string</td>
+      <td>The transaction status from the provider (MAX 255; MIN 3).</td>
+      <td>Authorised</td>
+    </tr>
+    <tr>
+      <td><code>amount</code></td>
+      <td>number</td>
+      <td>The amount of the transaction.</td>
+      <td>100</td>
+    </tr>
 
-            <tr>
-              <td><code>currency</code></td>
-              <td>enum</td>
-              <td>The currency used to make the payment (MAX 3; MIN 3; <a href="/reference/country-reference">ISO
-                  4217</a>).</td>
-              <td>COP</td>
-            </tr>
-            <tr>
-              <td><code>card_type</code></td>
-              <td>string</td>
-              <td>The type of the card's issuer (MAX 255; MIN 3).</td>
-              <td>CREDIT</td>
-            </tr>
-             <tr>
-              <td><code>card_expiration_month</code></td>
-              <td>number</td>
-              <td>Card expiration month (MAX 2; MIN 1).</td>
-              <td>10</td>
-            </tr>
-            <tr>
-              <td><code>card_expiration_year</code></td>
-              <td>number</td>
-              <td>Card expiration year (MAX 2; MIN 2).</td>
-              <td>10</td>
-            </tr>
-            <tr>
-              <td><code>card_brand</code></td>
-              <td>string</td>
-              <td>The card's brand information (MAX 255; MIN 3).</td>
-              <td>VISA</td>
-            </tr>
-            <tr>
-              <td><code>provider_card_brand</code></td>
-              <td>string</td>
-              <td>The payment method or card brand (MAX 255; MIN 3).</td>
-              <td>ABC</td>
-            </tr>
-            <tr>
-              <td><code>retrieval_reference_number</code></td>
-              <td>string</td>
-              <td>Unique reference number for transaction retrieval (MAX 255; MIN 3).</td>
-              <td>CAQMCAQRisS2iL</td>
-            </tr>
-            <tr>
-              <td><code>card_category</code></td>
-              <td>enum</td>
-              <td>Category of the card used in the transaction (MAX 255; MIN 3).</td>
-              <td>CLASSIC</td>
-            </tr>
-            <tr>
-              <td><code>card_iin</code></td>
-              <td>number</td>
-              <td>The issuer identification number (IIN) refers to the first few digits of a payment card number issued by
-                a financial institution (MAX 8; MIN 8).</td>
-              <td>123456</td>
-            </tr>
-            <tr>
-              <td><code>card_lfd</code></td>
-              <td>number</td>
-              <td>Last four digits of the card (MAX 4; MIN 4).</td>
-              <td>7890</td>
-            </tr>
-            <tr>
-              <td><code>card_issuer_name</code></td>
-              <td>enum</td>
-              <td>Bank to which the card corresponds.</td>
-              <td>Bank ABC</td>
-            </tr>
-            <tr>
-              <td><code>card_issuer_country</code></td>
-              <td>enum</td>
-              <td>Country in which settlement was made (MAX 2; MIN 2).</td>
-              <td>UY</td>
-            </tr>
-            <tr>
-              <td><code>authorization_code</code></td>
-              <td>string</td>
-              <td>The acquirer's response code.</td>
-              <td>742A64</td>
-            </tr>
-            <tr>
-              <td><code>installments</code></td>
-              <td>number</td>
-              <td>In case of a card transaction, the number of installments in which the payment was requested (MAX 2; MIN
-                1).</td>
-              <td>1</td>
-            </tr>
-            <tr>
-              <td><code>pnr</code></td>
-              <td>string</td>
-              <td>The passenger name record (MAX 255; MIN 3).</td>
-              <td>1P-2UUGJW</td>
-            </tr>
-            <tr>
-              <td><code>created_at</code></td>
-              <td>timestamp</td>
-              <td>Transaction creation date (MAX 27; MIN 27; <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO
-                  8601</a>).</td>
-              <td>2022-05-09T20:46:54.786342Z</td>
-            </tr>
-            <tr>
-              <td><code>updated_at</code></td>
-              <td>timestamp</td>
-              <td>The date and time from the last time the transaction was updated.</td>
-              <td>2022-05-15T20:46:54.786342Z</td>
-            </tr>
+    <tr>
+      <td><code>currency</code></td>
+      <td>enum</td>
+      <td>The currency used to make the payment (MAX 3; MIN 3; <a href="/reference/country-reference">ISO
+          4217</a>).</td>
+      <td>COP</td>
+    </tr>
+    <tr>
+      <td><code>card_type</code></td>
+      <td>string</td>
+      <td>The type of the card's issuer (MAX 255; MIN 3).</td>
+      <td>CREDIT</td>
+    </tr>
+      <tr>
+      <td><code>card_expiration_month</code></td>
+      <td>number</td>
+      <td>Card expiration month (MAX 2; MIN 1).</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td><code>card_expiration_year</code></td>
+      <td>number</td>
+      <td>Card expiration year (MAX 2; MIN 2).</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td><code>card_brand</code></td>
+      <td>string</td>
+      <td>The card's brand information (MAX 255; MIN 3).</td>
+      <td>VISA</td>
+    </tr>
+    <tr>
+      <td><code>provider_card_brand</code></td>
+      <td>string</td>
+      <td>The payment method or card brand (MAX 255; MIN 3).</td>
+      <td>ABC</td>
+    </tr>
+    <tr>
+      <td><code>retrieval_reference_number</code></td>
+      <td>string</td>
+      <td>Unique reference number for transaction retrieval (MAX 255; MIN 3).</td>
+      <td>CAQMCAQRisS2iL</td>
+    </tr>
+    <tr>
+      <td><code>card_category</code></td>
+      <td>enum</td>
+      <td>Category of the card used in the transaction (MAX 255; MIN 3).</td>
+      <td>CLASSIC</td>
+    </tr>
+    <tr>
+      <td><code>card_iin</code></td>
+      <td>number</td>
+      <td>The issuer identification number (IIN) refers to the first few digits of a payment card number issued by
+        a financial institution (MAX 8; MIN 8).</td>
+      <td>123456</td>
+    </tr>
+    <tr>
+      <td><code>card_lfd</code></td>
+      <td>number</td>
+      <td>Last four digits of the card (MAX 4; MIN 4).</td>
+      <td>7890</td>
+    </tr>
+    <tr>
+      <td><code>card_issuer_name</code></td>
+      <td>enum</td>
+      <td>Bank to which the card corresponds.</td>
+      <td>Bank ABC</td>
+    </tr>
+    <tr>
+      <td><code>card_issuer_country</code></td>
+      <td>enum</td>
+      <td>Country in which settlement was made (MAX 2; MIN 2).</td>
+      <td>UY</td>
+    </tr>
+    <tr>
+      <td><code>authorization_code</code></td>
+      <td>string</td>
+      <td>The acquirer's response code.</td>
+      <td>742A64</td>
+    </tr>
+    <tr>
+      <td><code>installments</code></td>
+      <td>number</td>
+      <td>In case of a card transaction, the number of installments in which the payment was requested (MAX 2; MIN
+        1).</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td><code>pnr</code></td>
+      <td>string</td>
+      <td>The passenger name record (MAX 255; MIN 3).</td>
+      <td>1P-2UUGJW</td>
+    </tr>
+    <tr>
+      <td><code>created_at</code></td>
+      <td>timestamp</td>
+      <td>Transaction creation date (MAX 27; MIN 27; <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO
+          8601</a>).</td>
+      <td>2022-05-09T20:46:54.786342Z</td>
+    </tr>
+    <tr>
+      <td><code>updated_at</code></td>
+      <td>timestamp</td>
+      <td>The date and time from the last time the transaction was updated.</td>
+      <td>2022-05-15T20:46:54.786342Z</td>
+    </tr>
 
-            <tr>
-              <td><code>reconciliation_status</code></td>
-              <td>enum</td>
-              <td>The reconciliation status of a transaction (MAX 255; MIN 3).</td>
-              <td>RECONCILED</td>
-            </tr>
-            <tr>
-              <td><code>reconciliation_sub_status</code></td>
-              <td>enum</td>
-              <td>The reconciliation substatus of a transaction (MAX 255; MIN 3).</td>
-              <td>AUTOMATICALLY</td>
-            </tr>
-            <tr>
-              <td><code>reconciliation_date</code></td>
-              <td>string</td>
-              <td>The date the transaction was reconciled (MAX 27; MIN 27; <a
-                  href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a>).</td>
-              <td>2022-05-09T20:46:54.786342Z</td>
-            </tr>
-            <tr>
-              <td><code>reconciliation_id</code></td>
-              <td>enum</td>
-              <td>The unique identifier assigned to a transaction when it is reconciled (MAX 255; MIN 3).</td>
-              <td>2478d494-4a20-45b1-8a12-1c2604cf2d1d</td>
-            </tr>
-            <tr>
-              <td><code>reconciliation_settlement_date</code></td>
-              <td>timestamp</td>
-              <td>Date by the acquirer in which the funds will be deposited in the merchant's bank account.</td>
-              <td>2022-05-09 0:00</td>
-            </tr>
-          </tbody>
-        </table>
-
-
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+    <tr>
+      <td><code>reconciliation_status</code></td>
+      <td>enum</td>
+      <td>The reconciliation status of a transaction (MAX 255; MIN 3).</td>
+      <td>RECONCILED</td>
+    </tr>
+    <tr>
+      <td><code>reconciliation_sub_status</code></td>
+      <td>enum</td>
+      <td>The reconciliation substatus of a transaction (MAX 255; MIN 3).</td>
+      <td>AUTOMATICALLY</td>
+    </tr>
+    <tr>
+      <td><code>reconciliation_date</code></td>
+      <td>string</td>
+      <td>The date the transaction was reconciled (MAX 27; MIN 27; <a
+          href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a>).</td>
+      <td>2022-05-09T20:46:54.786342Z</td>
+    </tr>
+    <tr>
+      <td><code>reconciliation_id</code></td>
+      <td>enum</td>
+      <td>The unique identifier assigned to a transaction when it is reconciled (MAX 255; MIN 3).</td>
+      <td>2478d494-4a20-45b1-8a12-1c2604cf2d1d</td>
+    </tr>
+    <tr>
+      <td><code>reconciliation_settlement_date</code></td>
+      <td>timestamp</td>
+      <td>Date by the acquirer in which the funds will be deposited in the merchant's bank account.</td>
+      <td>2022-05-09 0:00</td>
+    </tr>
+  </tbody>
+</table>
+</Accordion>
 
 ## Settlement report
 
@@ -1889,548 +1696,501 @@ The settlement report has two types of reports:
 * **Header**: Shows the settlement summary.
 * **Body**: shows the data of each header.
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Settlement report field details - Header </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
-        <table>
-          <thead>
-            <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>type</code></td>
-              <td>string</td>
-              <td>Row type. Value: <code>HEADER</code> (MAX 255; MIN 3).</td>
-              <td>HEADER</td>
-            </tr>
-            <tr>
-              <td><code>acquirer</code></td>
-              <td>enum</td>
-              <td>Name of the acquirer that processed the original payment. In aggregator models, the provider is the same
-                as the acquirer. In other models, they may be different entities (MAX 255; MIN 3).</td>
-              <td>Acquirer ABC</td>
-            </tr>
-            <tr>
-              <td><code>number_of_transactions</code></td>
-              <td>number</td>
-              <td>Total transactions contained in the report for the acquirer (MAX 255; MIN 1).</td>
-              <td>15</td>
-            </tr>
-            <tr>
-              <td><code>gross_currency</code></td>
-              <td>enum</td>
-              <td>Currency code in which transactions were made (MAX 3; MIN 3; ISO 4217).</td>
-              <td>USD</td>
-            </tr>
-            <tr>
-              <td><code>gross_credit</code></td>
-              <td>decimal</td>
-              <td>For credit transactions, the corresponding gross amount (multiple of 0.0001).</td>
-              <td>1000.0</td>
-            </tr>
-            <tr>
-              <td><code>gross_debit</code></td>
-              <td>decimal</td>
-              <td>For debit transactions, the corresponding gross amount (multiple of 0.0001).</td>
-              <td>1000.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_currency</code></td>
-              <td>enum</td>
-              <td>Currency code in which settlement was made (MAX 3; MIN 3; ISO 4217).</td>
-              <td>USD</td>
-            </tr>
-            <tr>
-              <td><code>settlement_gross_amount</code></td>
-              <td>decimal</td>
-              <td>The corresponding gross amount for all transactions in settlement currency (multiple of 0.0001).</td>
-              <td>100.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_credit_fees</code></td>
-              <td>decimal</td>
-              <td>Commission fee that was withheld by the acquirer on credit transactions in settlement currency. This
-                should be the difference between the gross and net amounts (multiple of 0.0001).</td>
-              <td>15.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_debit_fees</code></td>
-              <td>decimal</td>
-              <td>Commission fee that was withheld by the acquirer on debit transactions in settlement currency. This
-                should be the difference between the gross and net amounts (multiple of 0.0001).</td>
-              <td>5.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_fee_taxes</code></td>
-              <td>decimal</td>
-              <td>Commission fee tax that was withheld by the acquirer in settlement currency. This should be the
-                difference between the gross and net amounts (multiple of 0.0001).</td>
-              <td>0.10</td>
-            </tr>
-            <tr>
-              <td><code>settlement_taxes</code></td>
-              <td>decimal</td>
-              <td>Value of taxes applied to the transactions in settlement currency. This should be the difference between
-                the gross and net amounts (multiple of 0.0001).</td>
-              <td>1.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_net_credit</code></td>
-              <td>decimal</td>
-              <td>Amount submitted in the credit transaction requests minus acquirer fees in settlement currency (multiple
-                of 0.0001).</td>
-              <td>970.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_net_debit</code></td>
-              <td>decimal</td>
-              <td>Amount submitted in the debit transaction requests minus acquirer fees in settlement currency (multiple
-                of 0.0001).</td>
-              <td>970.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_net_balance</code></td>
-              <td>decimal</td>
-              <td>Net credit/debit amount in settlement currency (multiple of 0.0001).</td>
-              <td>1000.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_batch_id</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>This field contains the unique acquirer settlement batch number that you can find on your bank statement
-                for the corresponding deposit (MAX 255; MIN 3).</td>
-              <td>SETT-111450235000</td>
-            </tr>
-            <tr>
-              <td><code>settlement_date</code><sup>(A)</sup></td>
-              <td>date</td>
-              <td>Estimated date by the acquirer on which the funds will be deposited in the merchant's bank account.</td>
-              <td>2022-05-09</td>
-            </tr>
-            <tr>
-              <td><code>country</code><sup>(A)</sup></td>
-              <td>enum</td>
-              <td>Country of the merchant account (ISO 3166-1).</td>
-              <td>US</td>
-            </tr>
-          </tbody>
-        </table>
+<Accordion title="Settlement report field details - Header">
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>type</code></td>
+      <td>string</td>
+      <td>Row type. Value: <code>HEADER</code> (MAX 255; MIN 3).</td>
+      <td>HEADER</td>
+    </tr>
+    <tr>
+      <td><code>acquirer</code></td>
+      <td>enum</td>
+      <td>Name of the acquirer that processed the original payment. In aggregator models, the provider is the same
+        as the acquirer. In other models, they may be different entities (MAX 255; MIN 3).</td>
+      <td>Acquirer ABC</td>
+    </tr>
+    <tr>
+      <td><code>number_of_transactions</code></td>
+      <td>number</td>
+      <td>Total transactions contained in the report for the acquirer (MAX 255; MIN 1).</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <td><code>gross_currency</code></td>
+      <td>enum</td>
+      <td>Currency code in which transactions were made (MAX 3; MIN 3; ISO 4217).</td>
+      <td>USD</td>
+    </tr>
+    <tr>
+      <td><code>gross_credit</code></td>
+      <td>decimal</td>
+      <td>For credit transactions, the corresponding gross amount (multiple of 0.0001).</td>
+      <td>1000.0</td>
+    </tr>
+    <tr>
+      <td><code>gross_debit</code></td>
+      <td>decimal</td>
+      <td>For debit transactions, the corresponding gross amount (multiple of 0.0001).</td>
+      <td>1000.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_currency</code></td>
+      <td>enum</td>
+      <td>Currency code in which settlement was made (MAX 3; MIN 3; ISO 4217).</td>
+      <td>USD</td>
+    </tr>
+    <tr>
+      <td><code>settlement_gross_amount</code></td>
+      <td>decimal</td>
+      <td>The corresponding gross amount for all transactions in settlement currency (multiple of 0.0001).</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_credit_fees</code></td>
+      <td>decimal</td>
+      <td>Commission fee that was withheld by the acquirer on credit transactions in settlement currency. This
+        should be the difference between the gross and net amounts (multiple of 0.0001).</td>
+      <td>15.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_debit_fees</code></td>
+      <td>decimal</td>
+      <td>Commission fee that was withheld by the acquirer on debit transactions in settlement currency. This
+        should be the difference between the gross and net amounts (multiple of 0.0001).</td>
+      <td>5.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_fee_taxes</code></td>
+      <td>decimal</td>
+      <td>Commission fee tax that was withheld by the acquirer in settlement currency. This should be the
+        difference between the gross and net amounts (multiple of 0.0001).</td>
+      <td>0.10</td>
+    </tr>
+    <tr>
+      <td><code>settlement_taxes</code></td>
+      <td>decimal</td>
+      <td>Value of taxes applied to the transactions in settlement currency. This should be the difference between
+        the gross and net amounts (multiple of 0.0001).</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_net_credit</code></td>
+      <td>decimal</td>
+      <td>Amount submitted in the credit transaction requests minus acquirer fees in settlement currency (multiple
+        of 0.0001).</td>
+      <td>970.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_net_debit</code></td>
+      <td>decimal</td>
+      <td>Amount submitted in the debit transaction requests minus acquirer fees in settlement currency (multiple
+        of 0.0001).</td>
+      <td>970.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_net_balance</code></td>
+      <td>decimal</td>
+      <td>Net credit/debit amount in settlement currency (multiple of 0.0001).</td>
+      <td>1000.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_batch_id</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>This field contains the unique acquirer settlement batch number that you can find on your bank statement
+        for the corresponding deposit (MAX 255; MIN 3).</td>
+      <td>SETT-111450235000</td>
+    </tr>
+    <tr>
+      <td><code>settlement_date</code><sup>(A)</sup></td>
+      <td>date</td>
+      <td>Estimated date by the acquirer on which the funds will be deposited in the merchant's bank account.</td>
+      <td>2022-05-09</td>
+    </tr>
+    <tr>
+      <td><code>country</code><sup>(A)</sup></td>
+      <td>enum</td>
+      <td>Country of the merchant account (ISO 3166-1).</td>
+      <td>US</td>
+    </tr>
+  </tbody>
+</table>
+</Accordion>
 
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+<Accordion title="Settlement report field details - Body">
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>account_id</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>The merchant account ID (MAX 64; MIN 36).</td>
+      <td>64143128-dd12-11ec-9d64-0242ac120002</td>
+    </tr>
+    <tr>
+      <td><code>provider_merchant_id</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>Merchant ID in the PSP system (MAX 255; MIN 3).</td>
+      <td>15a8c304-d334-4da7-bccb-09cf85a1d7a6</td>
+    </tr>
+    <tr>
+      <td><code>country</code><sup>(A)</sup></td>
+      <td>enum</td>
+      <td>Country of the merchant account (<a href="/reference/country-reference">ISO 3166-1</a>).</td>
+      <td>US</td>
+    </tr>
+    <tr>
+      <td><code>settlement_batch_id</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>This field contains the unique acquirer settlement batch number that you can find on your bank statement
+        for the corresponding deposit (MAX 255; MIN 3).</td>
+      <td>SETT-111450235000</td>
+    </tr>
+    <tr>
+      <td><code>settlement_date</code><sup>(A)</sup></td>
+      <td>date</td>
+      <td>Estimated date by the acquirer when the funds will be deposited into the merchant's bank account.</td>
+      <td>2022-05-09</td>
+    </tr>
+    <tr>
+      <td><code>payment_method_category</code></td>
+      <td>enum</td>
+      <td>Category of the transaction (MAX 255; MIN 3).</td>
+      <td>BANK_TRANSFER</td>
+    </tr>
+    <tr>
+      <td><code>payment_method_type</code></td>
+      <td>enum</td>
+      <td>The type of payment method selected by the customer (MAX 255; MIN 3).</td>
+      <td>BANKABC_TRANSFER</td>
+    </tr>
+    <tr>
+      <td><code>provider_id</code></td>
+      <td>enum</td>
+      <td>Identification of the provider (MAX 255; MIN 3).</td>
+      <td>PROVIDER ID</td>
+    </tr>
+    <tr>
+      <td><code>acquirer</code></td>
+      <td>enum</td>
+      <td>Name of the acquirer that processed the original payment. In aggregator models, the provider is the same
+        as the acquirer. In other models, they may be different entities (MAX 255; MIN 3).</td>
+      <td>Acquirer ABC</td>
+    </tr>
+    <tr>
+      <td><code>payment_id</code></td>
+      <td>string</td>
+      <td>The unique identifier of the payment (MAX 64; MIN 36).</td>
+      <td>5104911d-5df9-229e-8468-bd41abea1</td>
+    </tr>
+    <tr>
+      <td><code>merchant_order_id</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>Identification of the order (MAX 255; MIN 3).</td>
+      <td>abc123456789</td>
+    </tr>
+    <tr>
+      <td><code>merchant_transaction_id</code></td>
+      <td>string</td>
+      <td>Identification of the transaction assigned by the merchant (MAX 255; MIN 3).</td>
+      <td>987654321</td>
+    </tr>
+    <tr>
+      <td><code>transaction_id</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>The unique identifier of the transaction assigned by Yuno (MAX 64; MIN 36).</td>
+      <td>9104911d-5df9-429e-8488-ad41abea1a4b</td>
+    </tr>
+    <tr>
+      <td><code>provider_transaction_id</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>The unique identifier of the transaction assigned by the gateway. This field is empty if the gateway
+        doesn't provide transaction information (MAX 255; MIN 3).</td>
+      <td>53443e9c-dd17-11ec-9d64-0242ac120002</td>
+    </tr>
+    <tr>
+      <td><code>third_party_transaction_id</code></td>
+      <td>string</td>
+      <td>The unique identifier of a third party transaction (MAX 255; MIN 3).</td>
+      <td>69ad0a39-b769-423c-b223-d7b8bf9a1c2d</td>
+    </tr>
+    <tr>
+      <td><code>transaction_date</code></td>
+      <td>timestamp</td>
+      <td>Transaction creation date (MAX 27; MIN 27)</td>
+      <td>2022-05-09 20:46:54.000</td>
+    </tr>
+    <tr>
+      <td><code>type</code></td>
+      <td>string</td>
+      <td>The transaction type. We display the types sent by the provider (MAX 255; MIN 3).</td>
+      <td>PURCHASE</td>
+    </tr>
+    <tr>
+      <td><code>gross_currency</code></td>
+      <td>enum</td>
+      <td>Currency code in which the transaction was made (MAX 3; MIN 3; <a
+          href="/reference/country-reference">ISO 4217</a>).</td>
+      <td>USD</td>
+    </tr>
+    <tr>
+      <td><code>gross_credit</code></td>
+      <td>decimal</td>
+      <td>For credit transactions, the corresponding gross amount (multiple of 0.0001).</td>
+      <td>1000.0</td>
+    </tr>
+    <tr>
+      <td><code>gross_debit</code></td>
+      <td>decimal</td>
+      <td>For debit transactions, the corresponding gross amount (multiple of 0.0001).</td>
+      <td>1000.0</td>
+    </tr>
+    <tr>
+      <td><code>fee_rate</code><sup>(A)</sup></td>
+      <td>decimal</td>
+      <td>Percentage value of the fee retained by the acquirer. This field is empty if the acquirer doesn't
+        provide transaction information.</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <td><code>settlement_currency</code></td>
+      <td>enum</td>
+      <td>Currency code in which settlement was made (MAX 3; MIN 3; <a href="/reference/country-reference">ISO
+          4217</a>).</td>
+      <td>USD</td>
+    </tr>
+    <tr>
+      <td><code>fx_rate</code></td>
+      <td>decimal</td>
+      <td>The exchange rate applied to the transaction at the time of settlement (multiple of 0.0001).</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td><code>settlement_gross_amount</code></td>
+      <td>decimal</td>
+      <td>The corresponding gross amount for all transactions in settlement currency (multiple of 0.0001).</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_fees</code></td>
+      <td>decimal</td>
+      <td>The commission fee that was withheld by the acquirer on transactions in settlement currency. This should
+        be the difference between the gross and net amounts (multiple of 0.0001).</td>
+      <td>15.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_fee_taxes</code></td>
+      <td>decimal</td>
+      <td>The commission fee tax that was withheld by the acquirer in settlement currency. This should be the
+        difference between the gross and net amounts (multiple of 0.0001).</td>
+      <td>0.10</td>
+    </tr>
+    <tr>
+      <td><code>settlement_taxes</code></td>
+      <td>decimal</td>
+      <td>The value of taxes applied to the transactions in settlement currency. This should be the difference
+        between the gross and net amounts (multiple of 0.0001).</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_cost_of_installments</code></td>
+      <td>decimal</td>
+      <td>The commission fee that was withheld by the acquirer for advance installments in settlement currency
+        (multiple of 0.0001). This should be the difference between the gross and net amounts.</td>
+      <td>15.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_net_credit</code></td>
+      <td>decimal</td>
+      <td>The amount submitted in the credit transaction requests minus acquirer fees in settlement currency
+        (multiple of 0.0001).</td>
+      <td>970.0</td>
+    </tr>
+    <tr>
+      <td><code>settlement_net_debit</code></td>
+      <td>decimal</td>
+      <td>The amount submitted in the debit transaction requests minus acquirer fees in settlement currency
+        (multiple of 0.0001).</td>
+      <td>970.0</td>
+    </tr>
+    <tr>
+        <td><code>settlement_net_amount</code></td>
+        <td>decimal</td>
+        <td>The corresponding net amount for all transactions in settlement currency (multiple of 0.0001).</td>
+        <td>100.0</td>
+    </tr>
+    <tr>
+      <td><code>card_type</code></td>
+      <td>enum</td>
+      <td>Type of card used in the transaction (MAX 7; MIN 5).</td>
+      <td>CREDIT</td>
+    </tr>
+    <tr>
+      <td><code>card_brand</code></td>
+      <td>enum</td>
+      <td>Brand of the card used in the transaction (MAX 255; MIN 3).</td>
+      <td>VISA</td>
+    </tr>
+    <tr>
+      <td><code>card_category</code></td>
+      <td>enum</td>
+      <td>Category of the card used in the transaction (MAX 255; MIN 3).</td>
+      <td>premium</td>
+    </tr>
+    <tr>
+      <td><code>card_iin</code><sup>(A)</sup></td>
+      <td>number</td>
+      <td>The issuer identification number (IIN) refers to the first few digits of a payment card number issued by
+        a financial institution (MAX 8; MIN 8).</td>
+      <td>123456</td>
+    </tr>
+    <tr>
+      <td><code>card_lfd</code><sup>(A)</sup></td>
+      <td>number</td>
+      <td>Last four digits of the card (MAX 4; MIN 4).</td>
+      <td>7890</td>
+    </tr>
+    <tr>
+      <td><code>authorization_code</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>
+        In case of a card transaction, the code assigned by the issuing bank to the transaction when it is
+        authorized. This field is empty if the gateway doesn't provide transaction information (MAX 255; MIN 3).
+      </td>
+      <td>123456</td>
+    </tr>
+    <tr>
+      <td><code>customer_id</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>The unique identifier of the customer (MAX 255; MIN 3).</td>
+      <td>23456</td>
+    </tr>
+    <tr>
+      <td><code>voucher</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>In case of a card transaction, the unique identifier of the payment receipt assigned by the issuing
+        bank. This field is empty if the gateway doesn't provide transaction information (MAX 255; MIN 3).</td>
+      <td>43564</td>
+    </tr>
+    <tr>
+      <td><code>installments</code></td>
+      <td>number</td>
+      <td>In case of a card transaction, the number of installments in which the payment was requested (MAX 2; MIN
+        1).</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td><code>installment_number</code><sup>(A)</sup></td>
+      <td>string</td>
+      <td>In case of a card transaction in installments, the installment number that is being settled in this
+        batch. If the installment payment is made in a single batch, the field is empty (MAX 6; MIN 3).</td>
+      <td>1/3</td>
+    </tr>
+    <tr>
+      <td><code>pnr</code></td>
+      <td>string</td>
+      <td>The passenger name record (MAX 255; MIN 3).</td>
+      <td>1P-2UUGJW</td>
+    </tr>
+    <tr>
+      <td><code>reconciliation</code></td>
+      <td>struct</td>
+      <td>Reconciliation information structure containing status, date, and ID details.</td>
+      <td>`{"status": "RECONCILED", "date": "2022-05-09"}`</td>
+    </tr>
+    <tr>
+      <td><code>reconciliation_status</code></td>
+      <td>enum</td>
+      <td>The reconciliation status of a transaction (MAX 255; MIN 3).</td>
+      <td>RECONCILED</td>
+    </tr>
+    <tr>
+      <td><code>reconciliation_sub_status</code></td>
+      <td>enum</td>
+      <td>The reconciliation substatus of a transaction (MAX 255; MIN 3).</td>
+      <td>AUTOMATICALLY</td>
+    </tr>
+    <tr>
+      <td><code>reconciliation_date</code></td>
+      <td>date</td>
+      <td>The date the transaction was reconciled (MAX 27; MIN 27).</td>
+      <td>2022-05-09 20:46:54.000</td>
+    </tr>
+    <tr>
+      <td><code>reconciliation_id</code></td>
+      <td>string</td>
+      <td>The unique identifier assigned to a transaction when it is reconciled (MAX 255; MIN 3).</td>
+      <td>2478d494-4a20-45b1-8a12-1c2604cf2d1d</td>
+    </tr>
+    <tr>
+      <td><code>legal_entity</code></td>
+      <td>string</td>
+      <td>The legal entity of the merchant (MAX 255; MIN 3).</td>
+      <td>Legal Entity ABC</td>
+    </tr>
+    <tr>
+      <td><code>provider_merchant_account_name</code></td>
+      <td>string</td>
+      <td>Name of the merchant account assigned by the payment provider.</td>
+      <td>Merchant account ABC</td>
+    </tr>
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Settlement report field details - Body </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
-        <table>
-          <thead>
-            <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>account_id</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>The merchant account ID (MAX 64; MIN 36).</td>
-              <td>64143128-dd12-11ec-9d64-0242ac120002</td>
-            </tr>
-            <tr>
-              <td><code>provider_merchant_id</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>Merchant ID in the PSP system (MAX 255; MIN 3).</td>
-              <td>15a8c304-d334-4da7-bccb-09cf85a1d7a6</td>
-            </tr>
-            <tr>
-              <td><code>country</code><sup>(A)</sup></td>
-              <td>enum</td>
-              <td>Country of the merchant account (<a href="/reference/country-reference">ISO 3166-1</a>).</td>
-              <td>US</td>
-            </tr>
-            <tr>
-              <td><code>settlement_batch_id</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>This field contains the unique acquirer settlement batch number that you can find on your bank statement
-                for the corresponding deposit (MAX 255; MIN 3).</td>
-              <td>SETT-111450235000</td>
-            </tr>
-            <tr>
-              <td><code>settlement_date</code><sup>(A)</sup></td>
-              <td>date</td>
-              <td>Estimated date by the acquirer when the funds will be deposited into the merchant's bank account.</td>
-              <td>2022-05-09</td>
-            </tr>
-            <tr>
-              <td><code>payment_method_category</code></td>
-              <td>enum</td>
-              <td>Category of the transaction (MAX 255; MIN 3).</td>
-              <td>BANK_TRANSFER</td>
-            </tr>
-            <tr>
-              <td><code>payment_method_type</code></td>
-              <td>enum</td>
-              <td>The type of payment method selected by the customer (MAX 255; MIN 3).</td>
-              <td>BANKABC_TRANSFER</td>
-            </tr>
-            <tr>
-              <td><code>provider_id</code></td>
-              <td>enum</td>
-              <td>Identification of the provider (MAX 255; MIN 3).</td>
-              <td>PROVIDER ID</td>
-            </tr>
-            <tr>
-              <td><code>acquirer</code></td>
-              <td>enum</td>
-              <td>Name of the acquirer that processed the original payment. In aggregator models, the provider is the same
-                as the acquirer. In other models, they may be different entities (MAX 255; MIN 3).</td>
-              <td>Acquirer ABC</td>
-            </tr>
-            <tr>
-              <td><code>payment_id</code></td>
-              <td>string</td>
-              <td>The unique identifier of the payment (MAX 64; MIN 36).</td>
-              <td>5104911d-5df9-229e-8468-bd41abea1</td>
-            </tr>
-            <tr>
-              <td><code>merchant_order_id</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>Identification of the order (MAX 255; MIN 3).</td>
-              <td>abc123456789</td>
-            </tr>
-            <tr>
-              <td><code>merchant_transaction_id</code></td>
-              <td>string</td>
-              <td>Identification of the transaction assigned by the merchant (MAX 255; MIN 3).</td>
-              <td>987654321</td>
-            </tr>
-            <tr>
-              <td><code>transaction_id</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>The unique identifier of the transaction assigned by Yuno (MAX 64; MIN 36).</td>
-              <td>9104911d-5df9-429e-8488-ad41abea1a4b</td>
-            </tr>
-            <tr>
-              <td><code>provider_transaction_id</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>The unique identifier of the transaction assigned by the gateway. This field is empty if the gateway
-                doesn't provide transaction information (MAX 255; MIN 3).</td>
-              <td>53443e9c-dd17-11ec-9d64-0242ac120002</td>
-            </tr>
-            <tr>
-              <td><code>third_party_transaction_id</code></td>
-              <td>string</td>
-              <td>The unique identifier of a third party transaction (MAX 255; MIN 3).</td>
-              <td>69ad0a39-b769-423c-b223-d7b8bf9a1c2d</td>
-            </tr>
-            <tr>
-              <td><code>transaction_date</code></td>
-              <td>timestamp</td>
-              <td>Transaction creation date (MAX 27; MIN 27)</td>
-              <td>2022-05-09 20:46:54.000</td>
-            </tr>
-            <tr>
-              <td><code>type</code></td>
-              <td>string</td>
-              <td>The transaction type. We display the types sent by the provider (MAX 255; MIN 3).</td>
-              <td>PURCHASE</td>
-            </tr>
-            <tr>
-              <td><code>gross_currency</code></td>
-              <td>enum</td>
-              <td>Currency code in which the transaction was made (MAX 3; MIN 3; <a
-                  href="/reference/country-reference">ISO 4217</a>).</td>
-              <td>USD</td>
-            </tr>
-            <tr>
-              <td><code>gross_credit</code></td>
-              <td>decimal</td>
-              <td>For credit transactions, the corresponding gross amount (multiple of 0.0001).</td>
-              <td>1000.0</td>
-            </tr>
-            <tr>
-              <td><code>gross_debit</code></td>
-              <td>decimal</td>
-              <td>For debit transactions, the corresponding gross amount (multiple of 0.0001).</td>
-              <td>1000.0</td>
-            </tr>
-            <tr>
-              <td><code>fee_rate</code><sup>(A)</sup></td>
-              <td>decimal</td>
-              <td>Percentage value of the fee retained by the acquirer. This field is empty if the acquirer doesn't
-                provide transaction information.</td>
-              <td>15</td>
-            </tr>
-            <tr>
-              <td><code>settlement_currency</code></td>
-              <td>enum</td>
-              <td>Currency code in which settlement was made (MAX 3; MIN 3; <a href="/reference/country-reference">ISO
-                  4217</a>).</td>
-              <td>USD</td>
-            </tr>
-            <tr>
-              <td><code>fx_rate</code></td>
-              <td>decimal</td>
-              <td>The exchange rate applied to the transaction at the time of settlement (multiple of 0.0001).</td>
-              <td>10</td>
-            </tr>
-            <tr>
-              <td><code>settlement_gross_amount</code></td>
-              <td>decimal</td>
-              <td>The corresponding gross amount for all transactions in settlement currency (multiple of 0.0001).</td>
-              <td>100.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_fees</code></td>
-              <td>decimal</td>
-              <td>The commission fee that was withheld by the acquirer on transactions in settlement currency. This should
-                be the difference between the gross and net amounts (multiple of 0.0001).</td>
-              <td>15.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_fee_taxes</code></td>
-              <td>decimal</td>
-              <td>The commission fee tax that was withheld by the acquirer in settlement currency. This should be the
-                difference between the gross and net amounts (multiple of 0.0001).</td>
-              <td>0.10</td>
-            </tr>
-            <tr>
-              <td><code>settlement_taxes</code></td>
-              <td>decimal</td>
-              <td>The value of taxes applied to the transactions in settlement currency. This should be the difference
-                between the gross and net amounts (multiple of 0.0001).</td>
-              <td>1.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_cost_of_installments</code></td>
-              <td>decimal</td>
-              <td>The commission fee that was withheld by the acquirer for advance installments in settlement currency
-                (multiple of 0.0001). This should be the difference between the gross and net amounts.</td>
-              <td>15.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_net_credit</code></td>
-              <td>decimal</td>
-              <td>The amount submitted in the credit transaction requests minus acquirer fees in settlement currency
-                (multiple of 0.0001).</td>
-              <td>970.0</td>
-            </tr>
-            <tr>
-              <td><code>settlement_net_debit</code></td>
-              <td>decimal</td>
-              <td>The amount submitted in the debit transaction requests minus acquirer fees in settlement currency
-                (multiple of 0.0001).</td>
-              <td>970.0</td>
-            </tr>
-            <tr>
-                <td><code>settlement_net_amount</code></td>
-                <td>decimal</td>
-                <td>The corresponding net amount for all transactions in settlement currency (multiple of 0.0001).</td>
-                <td>100.0</td>
-            </tr>
-            <tr>
-              <td><code>card_type</code></td>
-              <td>enum</td>
-              <td>Type of card used in the transaction (MAX 7; MIN 5).</td>
-              <td>CREDIT</td>
-            </tr>
-            <tr>
-              <td><code>card_brand</code></td>
-              <td>enum</td>
-              <td>Brand of the card used in the transaction (MAX 255; MIN 3).</td>
-              <td>VISA</td>
-            </tr>
-            <tr>
-              <td><code>card_category</code></td>
-              <td>enum</td>
-              <td>Category of the card used in the transaction (MAX 255; MIN 3).</td>
-              <td>premium</td>
-            </tr>
-            <tr>
-              <td><code>card_iin</code><sup>(A)</sup></td>
-              <td>number</td>
-              <td>The issuer identification number (IIN) refers to the first few digits of a payment card number issued by
-                a financial institution (MAX 8; MIN 8).</td>
-              <td>123456</td>
-            </tr>
-            <tr>
-              <td><code>card_lfd</code><sup>(A)</sup></td>
-              <td>number</td>
-              <td>Last four digits of the card (MAX 4; MIN 4).</td>
-              <td>7890</td>
-            </tr>
-            <tr>
-              <td><code>authorization_code</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>In case of a card transaction, the code assigned by the issuing bank to the transaction when it is
-                authorized. This field is empty if the gateway doesn't provide transaction information (MAX 255; MIN 3).
-              </td>
-              <td>123456</td>
-            </tr>
-            <tr>
-              <td><code>customer_id</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>The unique identifier of the customer (MAX 255; MIN 3).</td>
-              <td>23456</td>
-            </tr>
-            <tr>
-              <td><code>voucher</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>In case of a card transaction, the unique identifier of the payment receipt assigned by the issuing
-                bank. This field is empty if the gateway doesn't provide transaction information (MAX 255; MIN 3).</td>
-              <td>43564</td>
-            </tr>
-            <tr>
-              <td><code>installments</code></td>
-              <td>number</td>
-              <td>In case of a card transaction, the number of installments in which the payment was requested (MAX 2; MIN
-                1).</td>
-              <td>1</td>
-            </tr>
-            <tr>
-              <td><code>installment_number</code><sup>(A)</sup></td>
-              <td>string</td>
-              <td>In case of a card transaction in installments, the installment number that is being settled in this
-                batch. If the installment payment is made in a single batch, the field is empty (MAX 6; MIN 3).</td>
-              <td>1/3</td>
-            </tr>
-            <tr>
-              <td><code>pnr</code></td>
-              <td>string</td>
-              <td>The passenger name record (MAX 255; MIN 3).</td>
-              <td>1P-2UUGJW</td>
-            </tr>
-            <tr>
-              <td><code>reconciliation</code></td>
-              <td>struct</td>
-              <td>Reconciliation information structure containing status, date, and ID details.</td>
-              <td>{"status": "RECONCILED", "date": "2022-05-09"}</td>
-            </tr>
-            <tr>
-              <td><code>reconciliation_status</code></td>
-              <td>enum</td>
-              <td>The reconciliation status of a transaction (MAX 255; MIN 3).</td>
-              <td>RECONCILED</td>
-            </tr>
-            <tr>
-              <td><code>reconciliation_sub_status</code></td>
-              <td>enum</td>
-              <td>The reconciliation substatus of a transaction (MAX 255; MIN 3).</td>
-              <td>AUTOMATICALLY</td>
-            </tr>
-            <tr>
-              <td><code>reconciliation_date</code></td>
-              <td>date</td>
-              <td>The date the transaction was reconciled (MAX 27; MIN 27).</td>
-              <td>2022-05-09 20:46:54.000</td>
-            </tr>
-            <tr>
-              <td><code>reconciliation_id</code></td>
-              <td>string</td>
-              <td>The unique identifier assigned to a transaction when it is reconciled (MAX 255; MIN 3).</td>
-              <td>2478d494-4a20-45b1-8a12-1c2604cf2d1d</td>
-            </tr>
-            <tr>
-              <td><code>legal_entity</code></td>
-              <td>string</td>
-              <td>The legal entity of the merchant (MAX 255; MIN 3).</td>
-              <td>Legal Entity ABC</td>
-            </tr>
-            <tr>
-              <td><code>provider_merchant_account_name</code></td>
-              <td>string</td>
-              <td>Name of the merchant account assigned by the payment provider.</td>
-              <td>Merchant account ABC</td>
-            </tr>
-
-            <tr>
-              <td><code>description</code><sup>(A)</sup></td>
-              <td>enum</td>
-              <td>Description of the merchant.</td>
-              <td>Merchant Ecommerce</td>
-            </tr>
-            <tr>
-                <td><code>event_type</code></td>
-                <td>string</td>
-                <td>Type of the movement 1- Settlement</td>
-                <td>1</td>
-            </tr>
-            <tr>
-                <td><code>adjustment_type</code></td>
-                <td>string</td>
-                <td>Adjustment code informed by the provider.</td>
-                <td>12</td>
-            </tr>
-            <tr>
-                <td><code>bank_account</code></td>
-                <td>string</td>
-                <td>Bank details of the institution where the merchant received the settlement amount.</td>
-                <td>12345-6</td>
-            </tr>
-            <tr>
-                <td><code>bank_agency</code></td>
-                <td>string</td>
-                <td>Bank details of the institution where the merchant received the settlement amount.</td>
-                <td>012</td>
-            </tr>
-            <tr>
-                <td><code>bank</code></td>
-                <td>string</td>
-                <td>Bank details of the institution where the merchant received the settlement amount.</td>
-                <td>123</td>
-            </tr>
-          </tbody>
-        </table>
-
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+    <tr>
+      <td><code>description</code><sup>(A)</sup></td>
+      <td>enum</td>
+      <td>Description of the merchant.</td>
+      <td>Merchant Ecommerce</td>
+    </tr>
+    <tr>
+        <td><code>event_type</code></td>
+        <td>string</td>
+        <td>Type of the movement 1- Settlement</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td><code>adjustment_type</code></td>
+        <td>string</td>
+        <td>Adjustment code informed by the provider.</td>
+        <td>12</td>
+    </tr>
+    <tr>
+        <td><code>bank_account</code></td>
+        <td>string</td>
+        <td>Bank details of the institution where the merchant received the settlement amount.</td>
+        <td>12345-6</td>
+    </tr>
+    <tr>
+        <td><code>bank_agency</code></td>
+        <td>string</td>
+        <td>Bank details of the institution where the merchant received the settlement amount.</td>
+        <td>012</td>
+    </tr>
+    <tr>
+        <td><code>bank</code></td>
+        <td>string</td>
+        <td>Bank details of the institution where the merchant received the settlement amount.</td>
+        <td>123</td>
+    </tr>
+  </tbody>
+</table>
+</Accordion>
 
 <b>(A)</b> The availability of this data field depends on whether the processor or acquirer provides the information. If Yuno can identify the transaction, it will display the data; otherwise, the field may be empty.
 
@@ -2438,26 +2198,7 @@ The settlement report has two types of reports:
 
 The communications report provides detailed information about all communications (calls, messages) between customers and the merchant through Yuno's communication channels. This report includes data about call durations, message content, communication status, and other relevant metrics.
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Communications report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
+<Accordion title="Communications report field details">
         <table>
           <thead>
             <tr>
@@ -2526,7 +2267,7 @@ The communications report provides detailed information about all communications
               <td><code>messages</code></td>
               <td>array</td>
               <td>Array of messages exchanged during the communication.</td>
-              <td>[{"content": "Hello", "timestamp": "2024-03-15 14:30:00"}]</td>
+              <td>`[{"content": "Hello", "timestamp": "2024-03-15 14:30:00"}]`</td>
             </tr>
             <tr>
               <td><code>summary</code></td>
@@ -2548,36 +2289,13 @@ The communications report provides detailed information about all communications
             </tr>
           </tbody>
         </table>
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+</Accordion>
 
 ## Fraud Transactions report
 
 The fraud transactions report provides detailed information about transactions that have been flagged for potential fraud by Yuno's fraud detection systems. This report includes fraud scores, provider responses, and transaction details for risk analysis.
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Fraud Transactions report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
+<Accordion title="Fraud Transactions report field details">
         <table>
           <thead>
             <tr>
@@ -2704,36 +2422,13 @@ The fraud transactions report provides detailed information about transactions t
             </tr>
           </tbody>
         </table>
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+</Accordion>
 
 ## Payouts report
 
 The payouts report provides detailed information about all payout transactions processed through Yuno. This report includes beneficiary details, withdrawal methods, payout status, and financial information for tracking and reconciliation purposes.
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Payouts report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
+<Accordion title="Payouts report field details">
         <table>
           <thead>
             <tr>
@@ -3028,36 +2723,13 @@ The payouts report provides detailed information about all payout transactions p
             </tr>
           </tbody>
         </table>
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+</Accordion>
 
 ## Fees report
 
 The fees report provides detailed information about all fees and charges applied to transactions processed through Yuno. This report includes acquirer fees, taxes, calculated costs, and fee status information for financial analysis and reconciliation.
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Fees report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
+<Accordion title="Fees report field details">
         <table>
           <thead>
             <tr>
@@ -3214,36 +2886,13 @@ The fees report provides detailed information about all fees and charges applied
             </tr>
           </tbody>
         </table>
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+</Accordion>
 
 ## Agenda report
 
 The agenda report provides detailed information about scheduled and planned transactions, including installment payments, advancement details, and reconciliation schedules. This report helps track transaction lifecycle and settlement planning.
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Agenda report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
+<Accordion title="Agenda report field details">
         <table>
           <thead>
             <tr>
@@ -3508,36 +3157,13 @@ The agenda report provides detailed information about scheduled and planned tran
             </tr>
           </tbody>
         </table>
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+</Accordion>
 
 ## Sales Conciliation report
 
 The sales conciliation report provides detailed information about sales transactions and their reconciliation status. This report includes transaction details, confirmation status, and provider information for sales tracking and reconciliation purposes.
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Sales Conciliation report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
+<Accordion title="Sales Conciliation report field details">
         <table>
           <thead>
             <tr>
@@ -3766,36 +3392,13 @@ The sales conciliation report provides detailed information about sales transact
             </tr>
           </tbody>
         </table>
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+</Accordion>
 
 ## Advancements report
 
 The advancements report provides detailed information about all advancement operations processed through Yuno. This report includes negotiation details, UR operations, bank information, and financial data for tracking advancement transactions.
 
-<HTMLBlock>
-  {`
-  <body>
-    <details class="table-card">
-      <summary>
-        <span class="table-call">Advancements report field details </span>
-        <div class="sumary-icon">
-          <svg class="control-icon control-icon-expand" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-          </svg>
-          <svg class="control-icon control-icon-close" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-              d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
-          </svg>
-        </div>
-      </summary>
-      <div class="table-div">
+<Accordion title="Advancements report field details">
         <table>
           <thead>
             <tr>
@@ -3940,8 +3543,4 @@ The advancements report provides detailed information about all advancement oper
             </tr>
           </tbody>
         </table>
-      </div>
-    </details>
-  </body>
-  `}
-</HTMLBlock>
+</Accordion>

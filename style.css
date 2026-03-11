@@ -384,8 +384,10 @@ span[class*="line"] * {
 
 .card h2 {
   margin: 0 !important;
+  margin-top: 10px;
 }
 
 .company_card_wrapper h2 {
   font-size: 16px !important;
+  margin: 0 !important;
 }

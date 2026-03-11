@@ -32,6 +32,7 @@
         "anchors": [
           {
             "anchor": "How Yuno Works",
+            "icon": "book-open",
             "pages": [
               "docs/what-is-yuno",
               "docs/how-yuno-payment-flow-works",
@@ -54,6 +55,7 @@
           },
           {
             "anchor": "Get Started with Yuno",
+            "icon": "rocket",
             "pages": [
               "docs/overview",
               "docs/step-1-set-up-your-account",
@@ -62,6 +64,7 @@
           },
           {
             "anchor": "Yuno SDKs",
+            "icon": "code",
             "pages": [
               "docs/quickstart-guide",
               "docs/understanding-payment-and-enrollment-flows",
@@ -118,6 +121,7 @@
           },
           {
             "anchor": "Using Yuno",
+            "icon": "gauge-high",
             "pages": [
               "docs/environments",
               {
@@ -157,6 +161,7 @@
           },
           {
             "anchor": "Direct Integration Use Cases",
+            "icon": "plug",
             "pages": [
               "docs/direct-flow",
               "docs/set-up-payment-connection",
@@ -171,6 +176,7 @@
           },
           {
             "anchor": "Payment Features",
+            "icon": "credit-card",
             "pages": [
               {
                 "group": "Enrollment",
@@ -205,6 +211,7 @@
           },
           {
             "anchor": "Payouts and Disputes",
+            "icon": "money-bill-transfer",
             "pages": [
               "docs/payouts",
               "docs/chargeback-management",
@@ -213,6 +220,7 @@
           },
           {
             "anchor": "Webhooks",
+            "icon": "bell",
             "pages": [
               "docs/webhooks",
               "docs/configure-webhooks",
@@ -222,6 +230,7 @@
           },
           {
             "anchor": "Wallets",
+            "icon": "wallet",
             "pages": [
               "docs/wallets",
               {
@@ -249,6 +258,7 @@
           },
           {
             "anchor": "AI Capabilities",
+            "icon": "robot",
             "pages": [
               "docs/aida-ai-agent",
               "docs/building-ai-integrations-with-yunos-llms-and-mcp",
@@ -258,6 +268,7 @@
           },
           {
             "anchor": "Security and Compliance",
+            "icon": "shield-halved",
             "pages": [
               "docs/3d-secure",
               "docs/fingerprint",
@@ -279,6 +290,7 @@
           },
           {
             "anchor": "Plugins",
+            "icon": "puzzle-piece",
             "pages": [
               {
                 "group": "VTEX",
@@ -292,6 +304,7 @@
           },
           {
             "anchor": "Additional Services",
+            "icon": "circle-plus",
             "pages": [
               "docs/card-account-updater",
               "docs/currency-conversion",
@@ -304,288 +317,301 @@
       },
       {
         "tab": "API Reference",
-        "groups": [
+        "dropdowns": [
           {
-            "group": "Yuno API Reference",
+            "dropdown": "Getting Started",
+            "icon": "flag",
             "pages": [
               "reference/api-reference-overview",
+              "reference/authentication",
+              "reference/api-environments",
+              "reference/response-codes",
+              "reference/postman-collections",
+              "reference/api-updates"
+            ]
+          },
+          {
+            "dropdown": "Reference",
+            "icon": "list",
+            "pages": [
+              "reference/reference-lists",
+              "reference/airline-information",
+              "reference/country-reference",
+              "reference/eci-indicators-list",
+              "reference/industry-category-list",
+              "reference/items-category-list",
+              "reference/payment-type-list",
+              "reference/purposes-list",
+              "reference/transaction-category-list",
+              "reference/shipping-reference"
+            ]
+          },
+          {
+            "dropdown": "Customers",
+            "icon": "users",
+            "pages": [
+              "reference/the-customer-object",
+              "reference/create-customer",
+              "reference/retrieve-customer",
+              "reference/retrieve-customer-by-external-id",
+              "reference/update-customer",
+              "reference/delete-customer"
+            ]
+          },
+          {
+            "dropdown": "Customer Sessions (Enrollment)",
+            "icon": "user-check",
+            "pages": [
+              "reference/enrollment-workflow",
+              "reference/the-customer-session-object",
+              "reference/create-customer-session"
+            ]
+          },
+          {
+            "dropdown": "Checkout Sessions",
+            "icon": "cart-shopping",
+            "pages": [
+              "reference/the-checkout-session-object",
+              "reference/create-checkout-session",
+              "reference/create-one-time-use-token",
+              "reference/create-one-time-use-token-sdk-checkout",
+              "reference/update-checkout-session",
+              "reference/retrieve-checkout-session",
+              "reference/retrieve-payment-methods-for-checkout"
+            ]
+          },
+          {
+            "dropdown": "Payment Methods (Checkout)",
+            "icon": "credit-card",
+            "pages": [
+              "reference/the-payment-method-object-checkout",
+              "reference/retrieve-payment-methods-to-enroll-checkout",
+              "reference/enroll-payment-method-checkout",
+              "reference/retrieve-payment-method-by-id-checkout",
+              "reference/unenroll-payment-method-checkout"
+            ]
+          },
+          {
+            "dropdown": "Payment Methods (Direct Workflow)",
+            "icon": "code-branch",
+            "pages": [
+              "reference/the-payment-method-object-api",
+              "reference/enroll-payment-method-api",
+              "reference/retrieve-enrolled-payment-method-by-id-api",
+              "reference/retrieve-enrolled-payment-methods-api",
+              "reference/unenroll-payment-method-api"
+            ]
+          },
+          {
+            "dropdown": "Payments",
+            "icon": "money-bill",
+            "pages": [
+              "reference/manage-payments",
               {
-                "group": "Getting Started",
+                "group": "Status and Response Codes",
                 "pages": [
-                  "reference/authentication",
-                  "reference/api-environments",
-                  "reference/response-codes",
-                  "reference/postman-collections",
-                  "reference/api-updates"
+                  "reference/status-and-response-codes",
+                  "reference/payment",
+                  "reference/transaction",
+                  "reference/merchant-advice-codes-mac"
                 ]
               },
               {
-                "group": "Reference",
-                "root": "reference/reference-lists",
+                "group": "Payment Examples",
                 "pages": [
-                  "reference/airline-information",
-                  "reference/country-reference",
-                  "reference/eci-indicators-list",
-                  "reference/industry-category-list",
-                  "reference/items-category-list",
-                  "reference/payment-type-list",
-                  "reference/purposes-list",
-                  "reference/transaction-category-list",
-                  "reference/shipping-reference"
+                  "reference/payment-examples",
+                  "reference/bank-transfer-copy",
+                  "reference/bnpl-copy",
+                  "reference/cards",
+                  "reference/payment-link-copy",
+                  "reference/ticket-copy",
+                  "reference/wallet"
+                ]
+              },
+              "reference/the-payment-object",
+              "reference/create-payment",
+              "reference/retrieve-payment-by-id",
+              "reference/retrieve-payment-by-merchant-order-id",
+              "reference/refund-payment",
+              "reference/cancel-or-refund-a-payment",
+              "reference/cancel-or-refund-payment-with-transaction",
+              "reference/cancel-payment",
+              "reference/authorize-payment",
+              "reference/capture-authorization",
+              "reference/disputes",
+              "reference/update-dispute",
+              "reference/retrieve-issuers",
+              "reference/notify-fulfillments"
+            ]
+          },
+          {
+            "dropdown": "Payment Links",
+            "icon": "link",
+            "pages": [
+              "reference/status-payment-links",
+              "reference/the-payment-link-object",
+              "reference/create-payment-link",
+              "reference/retrieve-payment-link",
+              "reference/cancel-payment-link"
+            ]
+          },
+          {
+            "dropdown": "Recipients for Marketplace",
+            "icon": "store",
+            "pages": [
+              "reference/the-recipient-object",
+              "reference/onboarding-statuses-and-response-codes",
+              "reference/create-recipient-1",
+              "reference/get-recipient",
+              "reference/list-recipients",
+              "reference/update-recipient-1",
+              "reference/delete-recipient",
+              "reference/create-onboarding",
+              "reference/get-onboarding",
+              "reference/update-onboarding",
+              "reference/continue-onboarding",
+              "reference/block-recipient",
+              "reference/unblock-recipient",
+              "reference/transfer-onboarding",
+              {
+                "group": "Get Transfers",
+                "pages": [
+                  "reference/get-transfers",
+                  "reference/get-transfer-by-id",
+                  "reference/list-recipient-transfers",
+                  "reference/list-onboarding-transfers"
+                ]
+              },
+              "reference/reverse-onboarding",
+              "reference/cancel-recipient",
+              "reference/request-a-transfer"
+            ]
+          },
+          {
+            "dropdown": "Subscriptions",
+            "icon": "rotate",
+            "pages": [
+              "reference/status-subscriptions",
+              "reference/the-subscription-object",
+              "reference/create-subscription",
+              "reference/retrieve-subscription",
+              "reference/update-subscription",
+              "reference/retry-subscription",
+              "reference/pause-subscription",
+              "reference/resume-subscription",
+              "reference/cancel-subscription"
+            ]
+          },
+          {
+            "dropdown": "Payouts",
+            "icon": "money-bill-transfer",
+            "pages": [
+              "reference/payout-workflow",
+              "reference/the-payout-object",
+              "reference/create-payout",
+              "reference/retrieve-payout-by-id",
+              "reference/retrieve-payout-by-merchant-reference"
+            ]
+          },
+          {
+            "dropdown": "Reports",
+            "icon": "chart-bar",
+            "pages": [
+              "reference/report-status",
+              "reference/the-reports-object",
+              "reference/reports-fields",
+              "reference/create-a-report",
+              "reference/retrieve-a-report",
+              "reference/download-a-report",
+              "reference/list-all-reports"
+            ]
+          },
+          {
+            "dropdown": "Installments",
+            "icon": "layer-group",
+            "pages": [
+              "reference/create-installments-plan",
+              "reference/get-installments-plan",
+              "reference/get-installments-plan-by-account",
+              "reference/update-plan",
+              "reference/delete-installments-plan-by-id"
+            ]
+          },
+          {
+            "dropdown": "AI Caller",
+            "icon": "phone-volume",
+            "pages": [
+              "reference/declined-payment-calls",
+              "reference/initiate-recovery-outreach-for-abandoned-user-flows"
+            ]
+          },
+          {
+            "dropdown": "Communications Campaigns",
+            "icon": "bullhorn",
+            "pages": [
+              "reference/communications-campaigns",
+              "reference/create-campaign",
+              "reference/get-campaign",
+              "reference/list-campaigns",
+              "reference/update-campaign-status",
+              "reference/create-rules",
+              "reference/get-rule",
+              "reference/update-rule",
+              "reference/update-rule-status"
+            ]
+          },
+          {
+            "dropdown": "Conversion Rate",
+            "icon": "arrow-right-arrow-left",
+            "pages": [
+              "reference/currency-conversion",
+              "reference/get-conversion-rate"
+            ]
+          },
+          {
+            "dropdown": "Banking Connectivity",
+            "icon": "building-columns",
+            "pages": [
+              "reference/banking-connectivity",
+              {
+                "group": "Entities (Banking Connectivity)",
+                "pages": [
+                  "reference/create-entity",
+                  "reference/get-entity-details",
+                  "reference/update-entity"
                 ]
               },
               {
-                "group": "Customers",
+                "group": "Entity Onboarding (Banking Connectivity)",
                 "pages": [
-                  "reference/the-customer-object",
-                  "reference/create-customer",
-                  "reference/retrieve-customer",
-                  "reference/retrieve-customer-by-external-id",
-                  "reference/update-customer",
-                  "reference/delete-customer"
+                  "reference/create-entity-onboarding",
+                  "reference/get-entity-onboarding-status",
+                  "reference/update-entity-onboarding",
+                  "reference/cancel-entity-onboarding"
                 ]
               },
               {
-                "group": "Customer Sessions (Enrollment)",
+                "group": "Accounts",
                 "pages": [
-                  "reference/enrollment-workflow",
-                  "reference/the-customer-session-object",
-                  "reference/create-customer-session"
+                  "reference/accounts-banking",
+                  "reference/create-account-banking",
+                  "reference/get-account-details-banking",
+                  "reference/update-account-banking",
+                  "reference/close-account-banking"
                 ]
               },
               {
-                "group": "Checkout Sessions",
+                "group": "Entity Transfers (Banking Connectivity)",
                 "pages": [
-                  "reference/the-checkout-session-object",
-                  "reference/create-checkout-session",
-                  "reference/create-one-time-use-token",
-                  "reference/create-one-time-use-token-sdk-checkout",
-                  "reference/update-checkout-session",
-                  "reference/retrieve-checkout-session",
-                  "reference/retrieve-payment-methods-for-checkout"
+                  "reference/initiate-entity-transfer",
+                  "reference/get-entity-transfer-status",
+                  "reference/cancel-entity-transfer"
                 ]
               },
               {
-                "group": "Payment Methods (Checkout)",
+                "group": "Webhooks",
                 "pages": [
-                  "reference/the-payment-method-object-checkout",
-                  "reference/retrieve-payment-methods-to-enroll-checkout",
-                  "reference/enroll-payment-method-checkout",
-                  "reference/retrieve-payment-method-by-id-checkout",
-                  "reference/unenroll-payment-method-checkout"
-                ]
-              },
-              {
-                "group": "Payment Methods (Direct Workflow)",
-                "pages": [
-                  "reference/the-payment-method-object-api",
-                  "reference/enroll-payment-method-api",
-                  "reference/retrieve-enrolled-payment-method-by-id-api",
-                  "reference/retrieve-enrolled-payment-methods-api",
-                  "reference/unenroll-payment-method-api"
-                ]
-              },
-              {
-                "group": "Payments",
-                "pages": [
-                  "reference/manage-payments",
-                  {
-                    "group": "Status and Response Codes",
-                    "pages": [
-                      "reference/status-and-response-codes",
-                      "reference/payment",
-                      "reference/transaction",
-                      "reference/merchant-advice-codes-mac"
-                    ]
-                  },
-                  {
-                    "group": "Payment Examples",
-                    "pages": [
-                      "reference/payment-examples",
-                      "reference/bank-transfer-copy",
-                      "reference/bnpl-copy",
-                      "reference/cards",
-                      "reference/payment-link-copy",
-                      "reference/ticket-copy",
-                      "reference/wallet"
-                    ]
-                  },
-                  "reference/the-payment-object",
-                  "reference/create-payment",
-                  "reference/retrieve-payment-by-id",
-                  "reference/retrieve-payment-by-merchant-order-id",
-                  "reference/refund-payment",
-                  "reference/cancel-or-refund-a-payment",
-                  "reference/cancel-or-refund-payment-with-transaction",
-                  "reference/cancel-payment",
-                  "reference/authorize-payment",
-                  "reference/capture-authorization",
-                  "reference/disputes",
-                  "reference/update-dispute",
-                  "reference/retrieve-issuers",
-                  "reference/notify-fulfillments"
-                ]
-              },
-              {
-                "group": "Payment Links",
-                "pages": [
-                  "reference/status-payment-links",
-                  "reference/the-payment-link-object",
-                  "reference/create-payment-link",
-                  "reference/retrieve-payment-link",
-                  "reference/cancel-payment-link"
-                ]
-              },
-              {
-                "group": "Recipients for Marketplace",
-                "pages": [
-                  "reference/the-recipient-object",
-                  "reference/onboarding-statuses-and-response-codes",
-                  "reference/create-recipient-1",
-                  "reference/get-recipient",
-                  "reference/list-recipients",
-                  "reference/update-recipient-1",
-                  "reference/delete-recipient",
-                  "reference/create-onboarding",
-                  "reference/get-onboarding",
-                  "reference/update-onboarding",
-                  "reference/continue-onboarding",
-                  "reference/block-recipient",
-                  "reference/unblock-recipient",
-                  "reference/transfer-onboarding",
-                  {
-                    "group": "Get Transfers",
-                    "pages": [
-                      "reference/get-transfers",
-                      "reference/get-transfer-by-id",
-                      "reference/list-recipient-transfers",
-                      "reference/list-onboarding-transfers"
-                    ]
-                  },
-                  "reference/reverse-onboarding",
-                  "reference/cancel-recipient",
-                  "reference/request-a-transfer"
-                ]
-              },
-              {
-                "group": "Subscriptions",
-                "pages": [
-                  "reference/status-subscriptions",
-                  "reference/the-subscription-object",
-                  "reference/create-subscription",
-                  "reference/retrieve-subscription",
-                  "reference/update-subscription",
-                  "reference/retry-subscription",
-                  "reference/pause-subscription",
-                  "reference/resume-subscription",
-                  "reference/cancel-subscription"
-                ]
-              },
-              {
-                "group": "Payouts",
-                "pages": [
-                  "reference/payout-workflow",
-                  "reference/the-payout-object",
-                  "reference/create-payout",
-                  "reference/retrieve-payout-by-id",
-                  "reference/retrieve-payout-by-merchant-reference"
-                ]
-              },
-              {
-                "group": "Reports",
-                "pages": [
-                  "reference/report-status",
-                  "reference/the-reports-object",
-                  "reference/reports-fields",
-                  "reference/create-a-report",
-                  "reference/retrieve-a-report",
-                  "reference/download-a-report",
-                  "reference/list-all-reports"
-                ]
-              },
-              {
-                "group": "Installments",
-                "pages": [
-                  "reference/create-installments-plan",
-                  "reference/get-installments-plan",
-                  "reference/get-installments-plan-by-account",
-                  "reference/update-plan",
-                  "reference/delete-installments-plan-by-id"
-                ]
-              },
-              {
-                "group": "AI Caller",
-                "pages": [
-                  "reference/declined-payment-calls",
-                  "reference/initiate-recovery-outreach-for-abandoned-user-flows"
-                ]
-              },
-              {
-                "group": "Communications Campaigns",
-                "pages": [
-                  "reference/communications-campaigns",
-                  "reference/create-campaign",
-                  "reference/get-campaign",
-                  "reference/list-campaigns",
-                  "reference/update-campaign-status",
-                  "reference/create-rules",
-                  "reference/get-rule",
-                  "reference/update-rule",
-                  "reference/update-rule-status"
-                ]
-              },
-              {
-                "group": "Conversion Rate",
-                "pages": [
-                  "reference/currency-conversion",
-                  "reference/get-conversion-rate"
-                ]
-              },
-              {
-                "group": "Banking Connectivity",
-                "pages": [
-                  "reference/banking-connectivity",
-                  {
-                    "group": "Entities (Banking Connectivity)",
-                    "pages": [
-                      "reference/create-entity",
-                      "reference/get-entity-details",
-                      "reference/update-entity"
-                    ]
-                  },
-                  {
-                    "group": "Entity Onboarding (Banking Connectivity)",
-                    "pages": [
-                      "reference/create-entity-onboarding",
-                      "reference/get-entity-onboarding-status",
-                      "reference/update-entity-onboarding",
-                      "reference/cancel-entity-onboarding"
-                    ]
-                  },
-                  {
-                    "group": "Accounts",
-                    "pages": [
-                      "reference/accounts-banking",
-                      "reference/create-account-banking",
-                      "reference/get-account-details-banking",
-                      "reference/update-account-banking",
-                      "reference/close-account-banking"
-                    ]
-                  },
-                  {
-                    "group": "Entity Transfers (Banking Connectivity)",
-                    "pages": [
-                      "reference/initiate-entity-transfer",
-                      "reference/get-entity-transfer-status",
-                      "reference/cancel-entity-transfer"
-                    ]
-                  },
-                  {
-                    "group": "Webhooks",
-                    "pages": [
-                      "reference/webhook-notifications-banking"
-                    ]
-                  }
+                  "reference/webhook-notifications-banking"
                 ]
               }
             ]

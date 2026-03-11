@@ -2,7 +2,6 @@
 title: "Payment Link"
 ---
 
-import { HTMLBlock } from "/snippets/HTMLBlock.jsx";
 
 This page presents examples of requests and responses for creating payments using the [Create Payment](https://docs.y.uno/reference/create-payment) endpoint and Payment Link as payment method.
 
@@ -16,141 +15,19 @@ Some payment methods and providers may only be available in specific countries a
 
 ## Payment Link available examples
 
-<HTMLBlock>
-  {`
-  <style>
-    
 
-    .table-of-contents-btn-shelf {
-      margin: 0 0 0 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: 1fr;
-      gap: 10px;
-    }
-
-    @media only screen and (max-width: 800px) {
-      .table-of-contents-btn-shelf {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-
-    .table-of-contents-btn {
-      font-size: 0.85rem;
-      border: 1px solid var(--yuno-purple-50);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0.6rem;
-      border-radius: 7px;
-      font-size: 0.85rem;
-      color: var(--yuno-purple);
-      font-weight: 600;
-      transition: transform .1s;
-    }
-
-    .table-of-contents-btn-on-click-effects {
-      cursor: pointer;
-    }
-
-    .table-of-contents-btn-on-click-effects:hover {
-      transform: scale(1.02);
-      box-shadow: 0 5px 5px var(--yuno-purple-10);
-    }
-
-    .table-of-contents-btn .card-logo div {
-      height: 23px;
-      width: 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    
-
-    .table-of-contents-btn img {
-      max-height: 23px;
-      max-width: 23px;
-    }
-
-    .table-of-contents-btn .card-title {
-      display: inline-block;
-      ;
-      padding: 0;
-      margin: 0;
-    }
-
-    
-
-    @media (prefers-color-scheme: dark) {
-      .table-of-contents-btn-on-click-effects:hover {
-        box-shadow: none !important;
-      }
-    }
-
-    [data-color-mode="dark"] .table-of-contents-btn-on-click-effects:hover {
-      box-shadow: none !important;
-    }
-  </style>
-
-  <body>
-    <section class="table-of-contents-btn-shelf">
-       <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/payment-link-copy#mercado-pago-checkout-pro';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/payvalida_logosimbolo.png" alt="Payvalida logo">
-            </div>
-          </div>
-          <span class='card-title'>Payvalida</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/payment-link-copy#tarjeta-clave';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/tarjetaclave_logosimbolo.png" alt="Tarjeta clave logo">
-            </div>
-          </div>
-          <span class='card-title'>Tarjeta Clave</span>
-        </div>
-      </div>
-     <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/payment-link-copy#webpay';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/webpay_logosimbolo.png" alt="Webpay logo">
-            </div>
-          </div>
-          <span class='card-title'>Webpay</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/payment-link-copy#pago-efectivo';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/pagoefectivo_logosimbolo.png" alt="Pago Efectivo logo">
-            </div>
-          </div>
-          <span class='card-title'>Pago Efectivo</span>
-        </div>
-      </div>
-    </section>
-  </body>
-  `}
-</HTMLBlock>
+<CardGroup cols={3}>
+  <Card title="Payvalida" icon="https://icons.prod.y.uno/payvalida_logosimbolo.png" href="/reference/payment-link-copy#mercado-pago-checkout-pro" />
+  <Card title="Tarjeta Clave" icon="https://icons.prod.y.uno/tarjetaclave_logosimbolo.png" href="/reference/payment-link-copy#tarjeta-clave" />
+  <Card title="Webpay" icon="https://icons.prod.y.uno/webpay_logosimbolo.png" href="/reference/payment-link-copy#webpay" />
+  <Card title="Pago Efectivo" icon="https://icons.prod.y.uno/pagoefectivo_logosimbolo.png" href="/reference/payment-link-copy#pago-efectivo" />
+</CardGroup>
 
 ### Payvalida
 
 Example of a request for a Payment Link payment using Payvalida. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -311,7 +188,7 @@ curl --request POST \
 
 Example of a request for a Payment Link payment using Tarjeta Clave. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -468,7 +345,7 @@ curl --request POST \
 
 Example of a request for a Payment Link payment using Webpay. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -619,7 +496,7 @@ curl --request POST \
 
 Example of a request for a Payment Link payment using Pago Efectivo. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \

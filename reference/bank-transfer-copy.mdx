@@ -2,8 +2,6 @@
 title: "Bank Transfer"
 ---
 
-import { HTMLBlock } from '/snippets/HTMLBlock.jsx';
-
 This page presents examples of requests and responses for creating Bank Transfer payments using the [Create Payment](https://docs.y.uno/reference/create-payment) endpoint.
 
 To test the creation of each payment, you can copy the content from the request code and use it on your machine or paste it on the [Create Payment](https://docs.y.uno/reference/create-payment) endpoint to test using Readme.
@@ -16,216 +14,25 @@ Some payment methods and providers may only be available in specific countries a
 
 ## Bank Transfer available examples
 
-<HTMLBlock>
-  {`
-  <style>
-    
-
-    .table-of-contents-btn-shelf {
-      margin: 0 0 0 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: 1fr;
-      gap: 10px;
-    }
-
-    @media only screen and (max-width: 800px) {
-      .table-of-contents-btn-shelf {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-
-    .table-of-contents-btn {
-      font-size: 0.85rem;
-      border: 1px solid var(--yuno-purple-50);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0.6rem;
-      border-radius: 7px;
-      font-size: 0.85rem;
-      color: var(--yuno-purple);
-      font-weight: 600;
-      transition: transform .1s;
-    }
-
-    .table-of-contents-btn-on-click-effects {
-      cursor: pointer;
-    }
-
-    .table-of-contents-btn-on-click-effects:hover {
-      transform: scale(1.02);
-      box-shadow: 0 5px 5px var(--yuno-purple-10);
-    }
-
-    .table-of-contents-btn .card-logo div {
-      height: 23px;
-      width: 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    
-
-    .table-of-contents-btn img {
-      max-height: 23px;
-      max-width: 23px;
-    }
-
-    .table-of-contents-btn .card-title {
-      display: inline-block;
-      ;
-      padding: 0;
-      margin: 0;
-    }
-
-    
-
-    @media (prefers-color-scheme: dark) {
-      .table-of-contents-btn-on-click-effects:hover {
-        box-shadow: none !important;
-      }
-    }
-
-    [data-color-mode="dark"] .table-of-contents-btn-on-click-effects:hover {
-      box-shadow: none !important;
-    }
-  </style>
-
-  <body>
-    <section class="table-of-contents-btn-shelf">
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='bank-transfer-copy#bancolombia-button';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/bancolombia_logosimbolo.png" alt="Bancolombia Button logo">
-            </div>
-          </div>
-          <span class='card-title'>Bancolombia Button</span>
-        </div>
-      </div>
-      
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='bank-transfer-copy#daviplata';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/daviplata_logosimbolo.png" alt="Daviplata logo">
-            </div>
-          </div>
-          <span class='card-title'>Daviplata</span>
-        </div>
-      </div>
-      
-          <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='bank-transfer-copy#pix';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/pix_logosimbolo.png" alt="PIX logo">
-            </div>
-          </div>
-          <span class='card-title'>PIX</span>
-        </div>
-      </div>
-      
-      <!-- <div class="table-of-contents-btn" onclick="window.location='/reference/bank-transfer-examples#pse';">
-        <p>
-          PSE
-        </p>
-      </div> -->
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='bank-transfer-copy#pse';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/pse_logosimbolo.png" alt="PSE logo">
-            </div>
-          </div>
-          <span class='card-title'>PSE</span>
-        </div>
-      </div>
-      <!-- <div class="table-of-contents-btn" onclick="window.location='/reference/bank-transfer-examples#safetypay';">
-        <p>
-          SafetyPay
-        </p>
-      </div> -->
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='bank-transfer-copy#safetypay';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/safetypay_logosimbolo.png" alt="SafetyPay logo">
-            </div>
-          </div>
-          <span class='card-title'>SafetyPay</span>
-        </div>
-      </div>
-      <!-- <div class="table-of-contents-btn" onclick="window.location='/reference/bank-transfer-examples#spei-direct';">
-        <p>
-          SPEI Direct
-        </p>
-      </div> -->
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='bank-transfer-copy#spei';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/spei_logosimbolo.png" alt="SPEI Direct logo">
-            </div>
-          </div>
-          <span class='card-title'>SPEI</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='bank-transfer-copy#codi';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/codi_logosimbolo.png" alt="Codi logo">
-            </div>
-          </div>
-          <span class='card-title'>Codi</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='bank-transfer-copy#nupay';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/nubank_logosimbolo.png" alt="Nupay logo">
-            </div>
-          </div>
-          <span class='card-title'>NuPay</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='bank-transfer-copy#yappy';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/yappy_logosimbolo.png" alt="Yappy logo">
-            </div>
-          </div>
-          <span class='card-title'>Yappy</span>
-        </div>
-      </div>
-
-
-    </section>
-  </body>
-  `}
-</HTMLBlock>
+<div className="company_card_wrapper">
+<CardGroup cols={3}>
+  <Card horizontal title="Bancolombia Button" icon="https://icons.prod.y.uno/bancolombia_logosimbolo.png" href="#bancolombia-button" />
+  <Card horizontal title="Daviplata" icon="https://icons.prod.y.uno/daviplata_logosimbolo.png" href="#daviplata" />
+  <Card horizontal title="PIX" icon="https://icons.prod.y.uno/pix_logosimbolo.png" href="#pix" />
+  <Card horizontal title="PSE" icon="https://icons.prod.y.uno/pse_logosimbolo.png" href="#pse" />
+  <Card horizontal title="SafetyPay" icon="https://icons.prod.y.uno/safetypay_logosimbolo.png" href="#safetypay" />
+  <Card horizontal title="SPEI" icon="https://icons.prod.y.uno/spei_logosimbolo.png" href="#spei" />
+  <Card horizontal title="Codi" icon="https://icons.prod.y.uno/codi_logosimbolo.png" href="#codi" />
+  <Card horizontal title="NuPay" icon="https://icons.prod.y.uno/nubank_logosimbolo.png" href="#nupay" />
+  <Card horizontal title="Yappy" icon="https://icons.prod.y.uno/yappy_logosimbolo.png" href="#yappy" />
+</CardGroup>
+</div>
 
 ### Bancolombia Button
 
 Example of a request for a Bank Transfer payment using Bancolombia Button. Below you find the JSON body request example.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <Your--Idempotency-Key>' \
@@ -415,7 +222,7 @@ curl --request POST \
 
 Example of a request for a Bank Transfer payment using Daviplata. Below you find the JSON body request example.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -717,7 +524,7 @@ curl --request POST \
 
 Example of a request for a Bank Transfer payment using PIX. Below you find the JSON body request example.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -930,7 +737,7 @@ curl --request POST \
 
 Example of a request for a Bank Transfer payment using PSE. Below you find the JSON body request example.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -1103,7 +910,7 @@ curl --request POST \
 
 Example of a request for a Bank Transfer payment using SafetyPay. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -1271,7 +1078,7 @@ curl --request POST \
 
 Example of a request for a Bank Transfer payment using SPEI Direct. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -1435,7 +1242,7 @@ curl --request POST \
 
 Example of a request for a Bank Transfer payment using Codi. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -1599,7 +1406,7 @@ curl --request POST \
 
 Example of a request for a Bank Transfer payment using Nupay. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -1812,7 +1619,7 @@ curl --request POST \
 
 Example of a request for a Bank Transfer payment using Yappy. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \

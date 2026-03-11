@@ -2,7 +2,6 @@
 title: "Ticket"
 ---
 
-import { HTMLBlock } from "/snippets/HTMLBlock.jsx";
 
 This page presents examples of requests and responses for creating payments using the [Create Payment](https://docs.y.uno/reference/create-payment) endpoint and Ticket payment methods.
 
@@ -16,130 +15,19 @@ Some payment methods and providers may only be available in specific countries a
 
 ## Ticket available examples
 
-<HTMLBlock>
-  {`
-  <style>
-    
-
-    .table-of-contents-btn-shelf {
-      margin: 0 0 0 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: 1fr;
-      gap: 10px;
-    }
-
-    @media only screen and (max-width: 800px) {
-      .table-of-contents-btn-shelf {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-
-    .table-of-contents-btn {
-      font-size: 0.85rem;
-      border: 1px solid var(--yuno-purple-50);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0.6rem;
-      border-radius: 7px;
-      font-size: 0.85rem;
-      color: var(--yuno-purple);
-      font-weight: 600;
-      transition: transform .1s;
-    }
-
-    .table-of-contents-btn-on-click-effects {
-      cursor: pointer;
-    }
-
-    .table-of-contents-btn-on-click-effects:hover {
-      transform: scale(1.02);
-      box-shadow: 0 5px 5px var(--yuno-purple-10);
-    }
-
-    .table-of-contents-btn .card-logo div {
-      height: 23px;
-      width: 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    
-
-    .table-of-contents-btn img {
-      max-height: 23px;
-      max-width: 23px;
-    }
-
-    .table-of-contents-btn .card-title {
-      display: inline-block;
-      ;
-      padding: 0;
-      margin: 0;
-    }
-
-    
-
-    @media (prefers-color-scheme: dark) {
-      .table-of-contents-btn-on-click-effects:hover {
-        box-shadow: none !important;
-      }
-    }
-
-    [data-color-mode="dark"] .table-of-contents-btn-on-click-effects:hover {
-      box-shadow: none !important;
-    }
-  </style>
-
-  <body>
-    <section class="table-of-contents-btn-shelf">
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='ticket-copy#arcus';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/arcus_logosimbolo.png" alt="Arcus logo">
-            </div>
-          </div>
-          <span class='card-title'>Arcus</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='ticket-copy#efecty';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/efecty_logosimbolo.png" alt="Efecty logo">
-            </div>
-          </div>
-          <span class='card-title'>Efecty</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='ticket-copy#oxxo';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/oxxo_logosimbolo.png" alt="Oxxo logo">
-            </div>
-          </div>
-          <span class='card-title'>Oxxo</span>
-        </div>
-      </div>
-    </section>
-  </body>
-  `}
-</HTMLBlock>
+<div className="company_card_wrapper">
+<CardGroup cols={3}>
+  <Card horizontal title="Arcus" icon="https://icons.prod.y.uno/arcus_logosimbolo.png" href="#arcus" />
+  <Card horizontal title="Efecty" icon="https://icons.prod.y.uno/efecty_logosimbolo.png" href="#efecty" />
+  <Card horizontal title="Oxxo" icon="https://icons.prod.y.uno/oxxo_logosimbolo.png" href="#oxxo" />
+</CardGroup>
+</div>
 
 ### Arcus
 
 Example of a request for a Cash payment using Arcus. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -395,7 +283,7 @@ curl --request POST \
 
 Example of a request for a Ticket payment using Efecty. Below you find the JSON body request example.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -546,7 +434,7 @@ curl --request POST \
 
 Example of a request for a Ticket payment using Oxxo. Below you find the JSON body request example.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \

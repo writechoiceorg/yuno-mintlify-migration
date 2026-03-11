@@ -2,7 +2,6 @@
 title: "Cards"
 ---
 
-import { HTMLBlock } from "/snippets/HTMLBlock.jsx";
 
 This page presents examples of requests and responses for creating payments and authorizations using the [Create Payment](https://docs.y.uno/reference/create-payment) endpoint and Card as payment method.
 
@@ -10,177 +9,22 @@ To test the creation of each payment, you can copy the content from the request 
 
 ## Cards available examples
 
-<HTMLBlock>
-  {`
-  <style>
-    .table-of-contents-btn-shelf {
-      margin: 0 0 0 0;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: 1fr;
-      gap: 10px;
-    }
 
-    @media only screen and (max-width: 800px) {
-      .table-of-contents-btn-shelf {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-
-    .table-of-contents-btn {
-      font-size: 0.85rem;
-      border: 1px solid var(--yuno-purple-50);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0.6rem;
-      border-radius: 7px;
-      font-size: 0.85rem;
-      color: var(--yuno-purple);
-      font-weight: 600;
-      transition: transform .1s;
-    }
-
-    .table-of-contents-btn-on-click-effects {
-      cursor: pointer;
-    }
-
-    .table-of-contents-btn-on-click-effects:hover {
-      transform: scale(1.02);
-      box-shadow: 0 5px 5px var(--yuno-purple-10);
-    }
-
-    .table-of-contents-btn .card-logo div {
-      height: 23px;
-      width: 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    
-
-    .table-of-contents-btn img {
-      max-height: 23px;
-      max-width: 23px;
-    }
-
-    .table-of-contents-btn .card-title {
-      display: inline-block;
-      ;
-      padding: 0;
-      margin: 0;
-    }
-
-    
-
-    @media (prefers-color-scheme: dark) {
-      .table-of-contents-btn-on-click-effects:hover {
-        box-shadow: none !important;
-      }
-    }
-
-    [data-color-mode="dark"] .table-of-contents-btn-on-click-effects:hover {
-      box-shadow: none !important;
-    }
-  </style>
-
-  <body>
-    <section class="table-of-contents-btn-shelf">
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/cards#card-direct-for-authorization';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/card_logosimbolo.png" alt="Card logo">
-            </div>
-          </div>
-          <span class='card-title'>Card Direct for authorization</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/cards#card-direct-for-authorization-with-airline-data';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/card_logosimbolo.png" alt="Card logo">
-            </div>
-          </div>
-          <span class='card-title'>Card Direct for authorization with airline data</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/cards#card-direct-with-installments';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/card_logosimbolo.png" alt="Card logo">
-            </div>
-          </div>
-          <span class='card-title'>Card Direct with installments</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/cards#card-direct-with-vault-on-success';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/card_logosimbolo.png" alt="Card logo">
-            </div>
-          </div>
-          <span class='card-title'>Card Direct with vault on success</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/cards#card-direct-with-vaulted-token';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/card_logosimbolo.png" alt="Card logo">
-            </div>
-          </div>
-          <span class='card-title'>Card Direct with vaulted token</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/cards#card-direct-with-3ds';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/card_logosimbolo.png" alt="Card logo">
-            </div>
-          </div>
-          <span class='card-title'>Card Direct with 3DS</span>
-        </div>
-      </div>
-      <div class="payment-card-button">
-        <div class="table-of-contents-btn table-of-contents-btn-on-click-effects"
-          onclick="window.location='/reference/cards#card-direct-with-customer-billing-shipping-and-order-items';">
-          <div class="card-logo">
-            <div>
-              <img src="https://icons.prod.y.uno/card_logosimbolo.png" alt="Card logo">
-            </div>
-          </div>
-          <span class='card-title'>Card Direct with customer, billing, shipping and order items</span>
-        </div>
-      </div>
-
-
-
-
-
-    </section>
-  </body>
-  `}
-</HTMLBlock>
+<CardGroup cols={3}>
+  <Card title="Card Direct for authorization" icon="https://icons.prod.y.uno/card_logosimbolo.png" href="/reference/cards#card-direct-for-authorization" />
+  <Card title="Card Direct for authorization with airline data" icon="https://icons.prod.y.uno/card_logosimbolo.png" href="/reference/cards#card-direct-for-authorization-with-airline-data" />
+  <Card title="Card Direct with installments" icon="https://icons.prod.y.uno/card_logosimbolo.png" href="/reference/cards#card-direct-with-installments" />
+  <Card title="Card Direct with vault on success" icon="https://icons.prod.y.uno/card_logosimbolo.png" href="/reference/cards#card-direct-with-vault-on-success" />
+  <Card title="Card Direct with vaulted token" icon="https://icons.prod.y.uno/card_logosimbolo.png" href="/reference/cards#card-direct-with-vaulted-token" />
+  <Card title="Card Direct with 3DS" icon="https://icons.prod.y.uno/card_logosimbolo.png" href="/reference/cards#card-direct-with-3ds" />
+  <Card title="Card Direct with customer, billing, shipping and order items" icon="https://icons.prod.y.uno/card_logosimbolo.png" href="/reference/cards#card-direct-with-customer-billing-shipping-and-order-items" />
+</CardGroup>
 
 ### Card Direct for authorization
 
 Example of a request for authorization using Card Direct. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -561,7 +405,7 @@ curl --request POST \
 
 Example of a request for authorization with airline data using Card Direct. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -1132,7 +976,7 @@ curl --request POST \
 
 Example of a request for payment with installments using Card Direct. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -1502,7 +1346,7 @@ curl --request POST \
 
 Example of a request for payment using Card Direct. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -1966,7 +1810,7 @@ curl --request POST \
 
 Example of a successful request for payment using Card Direct. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -2360,7 +2204,7 @@ curl --request POST \
 
 Example of a request for payment using Card Direct with a vaulted token. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \
@@ -2743,7 +2587,7 @@ curl --request POST \
 
 Example of a request for payment using Card Direct with the 3DS implementation that requires the Yuno Setup. Below are examples of a request and the received response for successful payment creation. The request is presented using the cURL format, and the response is a JSON object.
 
-```curl Request (cURL)
+```sh Request (cURL)
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/payments \
      --header 'X-Idempotency-Key: <your-X-idempotency-key>' \

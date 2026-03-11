@@ -44,7 +44,7 @@ To complete the migration process, you need to enroll payment methods for each c
 
 Utilize the [Enroll Payment Method](https://docs.y.uno/reference/enroll-payment-method-api) endpoint to register the payment methods. Remember, the `customer_id` required for this request is the `id` obtained during the customer creation in [Step 1](https://docs.y.uno/docs/via-api#step-1-create-customers). Additionally, include the `provider_data` object containing the external provider's token, as shown in the code snippet below:
 
-```curl Request
+```sh Request
 curl --request POST \
      --url https://api-sandbox.y.uno/v1/customers/{{customer_id}}/payment-methods \
      --header 'X-Idempotency-Key: <Your X-Idempotency-Key>' \
