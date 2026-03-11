@@ -36,30 +36,24 @@
             "pages": [
               "docs/what-is-yuno",
               "docs/how-yuno-payment-flow-works",
-              {
-                "group": "Basic Concepts",
-                "root": "docs/basic-concepts",
-                "pages": [
-                  "docs/customers",
-                  "docs/sessions",
-                  "docs/payments-1",
-                  "docs/transactions",
-                  "docs/tokens",
-                  "docs/payment-methods",
-                  "docs/webhooks-1",
-                  "docs/fraud",
-                  "docs/3ds-1"
-                ]
-              }
+              "docs/step-1-set-up-your-account",
+              "docs/step-2-your-first-payment"
             ]
           },
           {
-            "anchor": "Get Started with Yuno",
-            "icon": "rocket",
+            "anchor": "Basic Concepts",
+            "icon": "brain",
             "pages": [
-              "docs/overview",
-              "docs/step-1-set-up-your-account",
-              "docs/step-2-your-first-payment"
+              "docs/basic-concepts",
+              "docs/customers",
+              "docs/sessions",
+              "docs/payments-1",
+              "docs/transactions",
+              "docs/tokens",
+              "docs/payment-methods",
+              "docs/webhooks-1",
+              "docs/fraud",
+              "docs/3ds-1"
             ]
           },
           {
