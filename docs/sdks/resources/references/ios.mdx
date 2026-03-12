@@ -27,7 +27,7 @@ Parameters for payment flows. All parameters used in [Payment flows (iOS)](../fu
 | `language`                 | string           | No       | Language code for the SDK UI (e.g. `en`, `pt-BR`). Optional. See [Supported languages](../languages-supported) when available.                                                                                                                                                |
 | `viewController`           | UIViewController | Yes*     | The view controller that presents the payment flow. The SDK uses it to present modals and capture result.                                                                                                                                                                 |
 | `yunoCreatePayment(with:)` | delegate         | Yes      | Delegate method: create the payment on your backend using the one-time token provided by the SDK. After creating the payment via the API, inform the SDK so it can continue the flow.                                                                                      |
-| `yunoPaymentResult(_:)`    | delegate         | No       | Delegate method: invoked when the payment flow finishes. Receives a `Yuno.Result` enum value (`.succeeded`, `.fail`, `.processing`, `.reject`, `.userCancelled`, `.internalError`). These values map to [payment statuses](ref:payment). Use for UI updates or navigation. |
+| `yunoPaymentResult(_:)`    | delegate         | No       | Delegate method: invoked when the payment flow finishes. Receives a `Yuno.Result` enum value (`.succeeded`, `.fail`, `.processing`, `.reject`, `.userCancelled`, `.internalError`). These values map to [payment statuses](/reference/getting-started/response-codes). Use for UI updates or navigation. |
 
 ## YunoConfig options (initialize)
 
@@ -43,7 +43,7 @@ Runtime behavior and appearance are configured via `YunoConfig` when calling `Yu
 
 ## Enrollment parameters (full reference)
 
-Parameters for enrollment flows. All parameters used in [Enrollment flows (iOS)](enrollment-flows-ios) are listed here with full detail.
+Parameters for enrollment flows. All parameters used in [Enrollment flows (iOS)](../../card-enrollment/ios-enrollment) are listed here with full detail.
 
 | Parameter                  | Type             | Required | Description                                                                                                                                                                                      |
 | -------------------------- | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -56,4 +56,4 @@ Parameters for enrollment flows. All parameters used in [Enrollment flows (iOS)]
 
 ## Enrolling payment methods
 
-You can enroll payment methods (store cards for future use) during the payment flow or via dedicated enrollment flows. For payment flows, enable save card in `YunoConfig` and set `payment_method.vault_on_success` (or equivalent) when creating the checkout session where supported. For dedicated enrollment, see [Enrollment flows (iOS)](enrollment-flows-ios).
+You can enroll payment methods (store cards for future use) during the payment flow or via dedicated enrollment flows. For payment flows, enable save card in `YunoConfig` and set `payment_method.vault_on_success` (or equivalent) when creating the checkout session where supported. For dedicated enrollment, see [Enrollment flows (iOS)](../../card-enrollment/ios-enrollment).

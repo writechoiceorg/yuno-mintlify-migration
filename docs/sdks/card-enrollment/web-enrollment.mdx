@@ -19,7 +19,7 @@ Include the library in your project by following the same steps as in [payment f
 
 ## Requirements
 
-* A [customer](ref:create-customer) created in Yuno, a [customer session](ref:create-customer-session), and an [enrollment payment method object](ref:enroll-payment-method-checkout): reference each API when setting up your backend.
+* A [customer](ref:create-customer) created in Yuno, a [customer session](/reference/customer-sessions-enrollment/create-customer-session), and an [enrollment payment method object](ref:enroll-payment-method-checkout): reference each API when setting up your backend.
 * Public API key (obtain from the [Yuno Dashboard](https://dashboard.y.uno/) → **Developers** > **Credentials**)
 
 ## Parameters
@@ -53,7 +53,7 @@ See [Quickstart guide](../overview/quickstart#web-sdk-integration) for initializ
 
 ### Step 3: Create a customer session and an enrollment payment method object
 
-Create a [customer session](ref:create-customer-session) and an [enrollment payment method object](ref:enroll-payment-method-checkout) on your **server-side** to keep private API keys secure; define which payment method the customer can enroll when creating the payment method object.
+Create a [customer session](/reference/customer-sessions-enrollment/create-customer-session) and an [enrollment payment method object](ref:enroll-payment-method-checkout) on your **server-side** to keep private API keys secure; define which payment method the customer can enroll when creating the payment method object.
 
 #### Server-side example
 
@@ -123,7 +123,7 @@ Use `yuno.mountEnrollment` with the parameters below.
 
 | Parameter                         | Description                                                                                                                                                                                                                                       |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `customerSession`                 | Refers to the current enrollment's [customer session](ref:create-customer-session). Example: `e15648b0-fcd5-4799-a14c-cc463ae8a133`.                                                                                                              |
+| `customerSession`                 | Refers to the current enrollment's [customer session](/reference/customer-sessions-enrollment/create-customer-session). Example: `e15648b0-fcd5-4799-a14c-cc463ae8a133`.                                                                                                              |
 | `countryCode`                     | Country for the payment process. Use an `ENUM` value; see [Country Coverage](../resources/country-coverage).                                                                                                                                                   |
 | `language`                        | Language for payment forms. Use any code listed in [Supported languages](../resources/languages-supported). Example: `en-US`. Defaults to browser language when available.                                                                                     |
 | `showLoading`                     | Controls visibility of the Yuno loading/spinner page during the payment process.                                                                                                                                                                  |

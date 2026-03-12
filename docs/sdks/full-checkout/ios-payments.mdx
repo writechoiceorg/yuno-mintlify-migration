@@ -58,7 +58,7 @@ For the full list of parameters and YunoConfig, see the [iOS SDK Common Referenc
 | `language`                 | Language code for the UI. Optional.                                                                                                                                    |
 | `viewController`           | UIViewController that presents the payment flow. Required for delegate.                                                                                                |
 | `yunoCreatePayment(with:)` | Delegate: create payment on your backend with the one-time token.                                                                                                      |
-| `yunoPaymentResult(_:)`    | Delegate: payment finished. Receives `Yuno.Result` value (e.g., `.succeeded`, `.fail`, `.processing`). See [Payment Status reference](ref:payment) for status mapping. |
+| `yunoPaymentResult(_:)`    | Delegate: payment finished. Receives `Yuno.Result` value (e.g., `.succeeded`, `.fail`, `.processing`). See [Payment Status reference](/reference/getting-started/response-codes) for status mapping. |
 | `YunoConfig` (initialize)  | Optional: appearance, saveCardEnabled, keepLoader, hideCardholderName, cardNumberPlaceholder. See Common Reference.                                      |
 
 ## full-checkout
@@ -112,7 +112,7 @@ customization options:
 
 ### Step 3: Create the checkout session
 
-Each payment requires a new `checkout_session`. Use the [Create checkout session](ref:create-checkout-session) endpoint to create one; use that session to initiate the payment.
+Each payment requires a new `checkout_session`. Use the [Create checkout session](/reference/checkout-sessions/create-checkout-session) endpoint to create one; use that session to initiate the payment.
 
 If your payment flow sends users to an external browser (e.g., for 3DS authentication or bank redirects), set the `callback_url` when creating your checkout session. See [Handle external browser return](#step-6-handle-external-browser-return-optional) for details.
 
@@ -177,7 +177,7 @@ class ViewController: UIViewController, YunoPaymentDelegate {
 | `viewController`                       | The `UIViewController` used to present the payment flow. Required for proper UI presentation.                                                   |
 | `yunoCreatePayment(with:)`             | Called when a one-time token is generated. Create the payment on your backend.                                                                  |
 | `yunoCreatePayment(with:information:)` | Alternative callback that includes additional token information. Use only one version.                                                          |
-| `yunoPaymentResult(_:)`                | Called when the payment process completes. Receives a `Yuno.Result` enum value. See [Payment Status reference](ref:payment) for status mapping. |
+| `yunoPaymentResult(_:)`                | Called when the payment process completes. Receives a `Yuno.Result` enum value. See [Payment Status reference](/reference/getting-started/response-codes) for status mapping. |
 
 <Danger>
 **Important Note**
