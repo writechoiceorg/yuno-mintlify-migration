@@ -713,7 +713,7 @@
     },
     {
       "source": "/docs/basic-concepts",
-      "destination": "/docs/basic-concepts/index"
+      "destination": "/docs/basic-concepts"
     },
     {
       "source": "/docs/customers",
@@ -781,7 +781,7 @@
     },
     {
       "source": "/docs/secure-fields",
-      "destination": "/docs/yuno-sdks/web-sdks/secure-fields/index"
+      "destination": "/docs/yuno-sdks/web-sdks/secure-fields"
     },
     {
       "source": "/docs/payment-secure-fields",
@@ -917,7 +917,7 @@
     },
     {
       "source": "/docs/single-sign-on-sso",
-      "destination": "/docs/using-yuno/settings/single-sign-on-sso/index"
+      "destination": "/docs/using-yuno/settings/single-sign-on-sso"
     },
     {
       "source": "/docs/microsoft-entra-id-sso-guide",
@@ -977,7 +977,7 @@
     },
     {
       "source": "/docs/installments",
-      "destination": "/docs/payment-features/installments/index"
+      "destination": "/docs/payment-features/installments"
     },
     {
       "source": "/docs/merchant-installments",
@@ -989,7 +989,7 @@
     },
     {
       "source": "/docs/subscriptions",
-      "destination": "/docs/payment-features/subscriptions/index"
+      "destination": "/docs/payment-features/subscriptions"
     },
     {
       "source": "/docs/retries",
@@ -1036,10 +1036,6 @@
       "destination": "/docs/payouts-and-disputes/reason-codes"
     },
     {
-      "source": "/docs/webhooks",
-      "destination": "/docs/webhooks/index"
-    },
-    {
       "source": "/docs/configure-webhooks",
       "destination": "/docs/webhooks/configure-webhooks"
     },
@@ -1050,10 +1046,6 @@
     {
       "source": "/docs/verify-webhook-signatures-hmac",
       "destination": "/docs/webhooks/verify-webhook-signatures-hmac"
-    },
-    {
-      "source": "/docs/wallets",
-      "destination": "/docs/wallets/index"
     },
     {
       "source": "/docs/prerequisites-apple-pay",
@@ -1149,7 +1141,7 @@
     },
     {
       "source": "/docs/vtex",
-      "destination": "/docs/plugins/vtex/index"
+      "destination": "/docs/plugins/vtex"
     },
     {
       "source": "/docs/configure-yuno-as-provider",
@@ -1349,7 +1341,7 @@
     },
     {
       "source": "/reference/status-and-response-codes",
-      "destination": "/reference/payments/status-and-response-codes/index"
+      "destination": "/reference/payments/status-and-response-codes"
     },
     {
       "source": "/reference/payment",
@@ -1365,7 +1357,7 @@
     },
     {
       "source": "/reference/payment-examples",
-      "destination": "/reference/payments/payment-examples/index"
+      "destination": "/reference/payments/payment-examples"
     },
     {
       "source": "/reference/bank-transfer-copy",
@@ -1525,7 +1517,7 @@
     },
     {
       "source": "/reference/get-transfers",
-      "destination": "/reference/recipients-for-marketplace/get-transfers/index"
+      "destination": "/reference/recipients-for-marketplace/get-transfers"
     },
     {
       "source": "/reference/get-transfer-by-id",
@@ -1664,10 +1656,6 @@
       "destination": "/reference/ai-caller/initiate-recovery-outreach-for-abandoned-user-flows"
     },
     {
-      "source": "/reference/communications-campaigns",
-      "destination": "/reference/communications-campaigns/index"
-    },
-    {
       "source": "/reference/create-campaign",
       "destination": "/reference/communications-campaigns/create-campaign"
     },
@@ -1706,10 +1694,6 @@
     {
       "source": "/reference/get-conversion-rate",
       "destination": "/reference/conversion-rate/get-conversion-rate"
-    },
-    {
-      "source": "/reference/banking-connectivity",
-      "destination": "/reference/banking-connectivity/index"
     },
     {
       "source": "/reference/create-entity",
