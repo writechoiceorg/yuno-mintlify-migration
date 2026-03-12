@@ -16,7 +16,7 @@ Yuno provides a [TypeScript library](https://www.npmjs.com/package/@yuno-payment
 
 ## Step 1: Include the library in your project
 
-Before proceeding with the secure-fields implementation, see the [SDK Integration overview](../overview/quickstart) for detailed instructions on how to properly integrate the SDK into your project.
+Before proceeding with the secure-fields implementation, see the [SDK Integration overview](/docs/sdks/overview/quickstart) for detailed instructions on how to properly integrate the SDK into your project.
 
 The integration guide provides three flexible methods:
 
@@ -48,7 +48,7 @@ Configure the secure fields with the following options:
 
 | Parameter           | Description                                                                                                                                                                                                                                                                                   |
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `countryCode`       | This parameter specifies the country for which the payment process is being set up. Use an `ENUM` value representing the desired country code. You can find the full list of supported countries and their corresponding codes on the [Country Coverage](../resources/country-coverage) page. |
+| `countryCode`       | This parameter specifies the country for which the payment process is being set up. Use an `ENUM` value representing the desired country code. You can find the full list of supported countries and their corresponding codes on the [Country Coverage](/docs/sdks/resources/country-coverage) page. |
 | `checkoutSession`   | Refers to the current payment's [checkout session](/reference/checkout-sessions/create-checkout-session). `Example: '438413b7-4921-41e4-b8f3-28a5a0141638'`                                                                                                                                                            |
 | `installmentEnable` | This parameter is optional and is set false by default. If set True, the installments set for the account will be shown as a secure field.                                                                                                                                                    |
 
@@ -60,7 +60,7 @@ const secureFields = yuno.secureFields({
 });
 ```
 
-Payments can be customer-initiated (CIT) or merchant-initiated (MIT). See [Stored credentials](stored-credentials). These steps cover customer-initiated transactions (one-time; no recurrence).
+Payments can be customer-initiated (CIT) or merchant-initiated (MIT). See [Stored credentials](/docs/payment-features/stored-credentials). These steps cover customer-initiated transactions (one-time; no recurrence).
 
 ## Step 4: Mount the secure-fields
 
@@ -316,4 +316,4 @@ if (payment.checkout.sdk_action_required) {
 
 ## Complementary features
 
-For styling, themes, form options, and additional configurations, see [SDK customizations](sdk-customizations-web).
+For styling, themes, form options, and additional configurations, see [SDK customizations](/docs/sdks/resources/references/web).

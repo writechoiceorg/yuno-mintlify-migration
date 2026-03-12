@@ -6,7 +6,7 @@ metadata:
   robots: index
 ---
 
-Parameters, customizations, and advanced features for all Android SDK flows. Setup: [Payment flows (Android)](../../full-checkout/android-payments), [Enrollment flows (Android)](../../card-enrollment/android-enrollment), [integration modes](../../overview/choose-integration).
+Parameters, customizations, and advanced features for all Android SDK flows. Setup: [Payment flows (Android)](/docs/sdks/full-checkout/android-payments), [Enrollment flows (Android)](/docs/sdks/card-enrollment/android-enrollment), [integration modes](/docs/sdks/overview/choose-integration).
 
 ## Key parameters (checkout session creation)
 
@@ -19,7 +19,7 @@ When creating a checkout session on your backend for payment flows, the followin
 
 ## Payment parameters (full reference)
 
-Parameters for payment flows. All parameters used in [Payment flows (Android)](../../full-checkout/android-payments) are listed here with full detail.
+Parameters for payment flows. All parameters used in [Payment flows (Android)](/docs/sdks/full-checkout/android-payments) are listed here with full detail.
 
 | Parameter               | Type     | Required | Description                                                                                                                                                                                                                                                                 |
 | ----------------------- | -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -30,19 +30,19 @@ Parameters for payment flows. All parameters used in [Payment flows (Android)](.
 
 ## YunoConfig options (initialize)
 
-Runtime behavior and appearance are configured via the `YunoConfig` data class when calling `Yuno.initialize(context, publicApiKey, config)`. All parameters used across Android payment and enrollment flows are listed below. For visual styling (fonts, colors, buttons), see [SDK customizations (Android)](../customization/android).
+Runtime behavior and appearance are configured via the `YunoConfig` data class when calling `Yuno.initialize(context, publicApiKey, config)`. All parameters used across Android payment and enrollment flows are listed below. For visual styling (fonts, colors, buttons), see [SDK customizations (Android)](/docs/sdks/customization/android).
 
 | Parameter          | Type    | Required | Description                                                                                                                                                                                                                                                                 |
 | ------------------ | ------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `saveCardEnabled`  | boolean | No       | When `true`, allows the user to save or enroll the card during payment. Requires backend support for vaulting (e.g. `payment_method.vault_on_success` in checkout session).                                                                                               |
 | `cardFormDeployed` | boolean | No       | When `true`, the card form is deployed in a specific way (e.g. embedded vs modal). Behavior may vary by SDK version.                                                                                                                                                        |
-| `language`         | string  | No       | Language code for the SDK UI (e.g. `en`, `es`). Use a code from [Supported languages](../languages-supported) when available.                                                                                                                                                   |
-| `styles`           | object  | No       | Custom styles applied to SDK UI elements. Define in your app's styles and reference here, or use theme overrides. See [SDK customizations (Android)](../customization/android) for font, button, and color options.                                                       |
+| `language`         | string  | No       | Language code for the SDK UI (e.g. `en`, `es`). Use a code from [Supported languages](/docs/sdks/resources/languages-supported) when available.                                                                                                                     |
+| `styles`           | object  | No       | Custom styles applied to SDK UI elements. Define in your app's styles and reference here, or use theme overrides. See [SDK customizations (Android)](/docs/sdks/customization/android) for font, button, and color options.                                                       |
 | `placeholders`    | object  | No       | Custom placeholder text for form fields (e.g. card number, cardholder name). Keys depend on SDK version.                                                                                                                                                                      |
 
 ## Enrollment parameters (full reference)
 
-Parameters for enrollment flows. All parameters used in [Enrollment flows (Android)](../../card-enrollment/android-enrollment) are listed here with full detail.
+Parameters for enrollment flows. All parameters used in [Enrollment flows (Android)](/docs/sdks/card-enrollment/android-enrollment) are listed here with full detail.
 
 | Parameter                | Type     | Required | Description                                                                                                                                                                                                                                                                 |
 | ------------------------ | -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -54,4 +54,4 @@ Parameters for enrollment flows. All parameters used in [Enrollment flows (Andro
 
 ## Enrolling payment methods
 
-You can enroll payment methods (store cards for future use) during the payment flow or via dedicated enrollment flows. For payment flows, enable save card in `YunoConfig` and set `payment_method.vault_on_success` (or equivalent) when creating the checkout session where supported. For dedicated enrollment, see [Enrollment flows (Android)](../../card-enrollment/android-enrollment).
+You can enroll payment methods (store cards for future use) during the payment flow or via dedicated enrollment flows. For payment flows, enable save card in `YunoConfig` and set `payment_method.vault_on_success` (or equivalent) when creating the checkout session where supported. For dedicated enrollment, see [Enrollment flows (Android)](/docs/sdks/card-enrollment/android-enrollment).

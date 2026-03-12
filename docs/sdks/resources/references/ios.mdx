@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-Parameters, customizations, and advanced features for all Yuno iOS SDK flows. For integration setup, see [Payment flows (iOS)](../../full-checkout/ios-payments), [Enrollment flows (iOS)](../../card-enrollment/ios-enrollment), and [integration modes](../../overview/choose-integration).
+Parameters, customizations, and advanced features for all Yuno iOS SDK flows. For integration setup, see [Payment flows (iOS)](/docs/sdks/full-checkout/ios-payments), [Enrollment flows (iOS)](/docs/sdks/card-enrollment/ios-enrollment), and [integration modes](/docs/sdks/overview/choose-integration).
 
 ## Key parameters (checkout session creation)
 
@@ -18,24 +18,24 @@ When creating a checkout session on your backend for payment flows, the followin
 
 ## Payment parameters (full reference)
 
-Parameters for payment flows. All parameters used in [Payment flows (iOS)](../full-checkout/ios-payments) are listed here with full detail.
+Parameters for payment flows. All parameters used in [Payment flows (iOS)](/docs/sdks/full-checkout/ios-payments) are listed here with full detail.
 
 | Parameter                  | Type             | Required | Description                                                                                                                                                                                                                                                                |
 | -------------------------- | ---------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `checkoutSession`          | string           | Yes      | Checkout session ID from your backend (Create checkout session API). Required for all payment flows.                                                                                                                                                                       |
 | `countryCode`              | string           | Yes      | ISO country code where the payment runs (e.g. `BR`, `US`). Determines available payment methods and compliance.                                                                                                                                                            |
-| `language`                 | string           | No       | Language code for the SDK UI (e.g. `en`, `pt-BR`). Optional. See [Supported languages](../languages-supported) when available.                                                                                                                                                |
+| `language`                 | string           | No       | Language code for the SDK UI (e.g. `en`, `pt-BR`). Optional. See [Supported languages](/docs/sdks/resources/languages-supported) when available.                                                                                                                                                |
 | `viewController`           | UIViewController | Yes*     | The view controller that presents the payment flow. The SDK uses it to present modals and capture result.                                                                                                                                                                 |
 | `yunoCreatePayment(with:)` | delegate         | Yes      | Delegate method: create the payment on your backend using the one-time token provided by the SDK. After creating the payment via the API, inform the SDK so it can continue the flow.                                                                                      |
 | `yunoPaymentResult(_:)`    | delegate         | No       | Delegate method: invoked when the payment flow finishes. Receives a `Yuno.Result` enum value (`.succeeded`, `.fail`, `.processing`, `.reject`, `.userCancelled`, `.internalError`). These values map to [payment statuses](/reference/getting-started/response-codes). Use for UI updates or navigation. |
 
 ## YunoConfig options (initialize)
 
-Runtime behavior and appearance are configured via `YunoConfig` when calling `Yuno.initialize(apiKey:config:)`. All parameters used across iOS payment and enrollment flows are listed below. For visual styling (fonts, colors, buttons), see [SDK customizations (iOS)](../customization/ios).
+Runtime behavior and appearance are configured via `YunoConfig` when calling `Yuno.initialize(apiKey:config:)`. All parameters used across iOS payment and enrollment flows are listed below. For visual styling (fonts, colors, buttons), see [SDK customizations (iOS)](/docs/sdks/customization/ios).
 
 | Parameter               | Type       | Required | Description                                                                                                                                                                                                                                     |
 | ----------------------- | ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `appearance`            | Appearance | No       | Custom appearance (fonts, colors, buttons). Use `Yuno.Appearance(...)` to set `fontFamily`, `accentColor`, `buttonBackgroundColor`, `buttonTitleColor`, and related fields. See [SDK customizations (iOS)](../customization/ios) for all options. |
+| `appearance`            | Appearance | No       | Custom appearance (fonts, colors, buttons). Use `Yuno.Appearance(...)` to set `fontFamily`, `accentColor`, `buttonBackgroundColor`, `buttonTitleColor`, and related fields. See [SDK customizations (iOS)](/docs/sdks/customization/ios) for all options. |
 | `saveCardEnabled`       | boolean    | No       | When `true`, allows the user to save or enroll the card during payment. Requires backend support for vaulting.                                                                                                                                  |
 | `keepLoader`            | boolean    | No       | When `true`, keeps the loader visible until explicitly dismissed or until the flow completes. Use to control loading UX.                                                                                                                        |
 | `hideCardholderName`    | boolean    | No       | When `true`, hides the cardholder name field in the card form. Default `false`.                                                                                                                                                                 |
@@ -43,7 +43,7 @@ Runtime behavior and appearance are configured via `YunoConfig` when calling `Yu
 
 ## Enrollment parameters (full reference)
 
-Parameters for enrollment flows. All parameters used in [Enrollment flows (iOS)](../../card-enrollment/ios-enrollment) are listed here with full detail.
+Parameters for enrollment flows. All parameters used in [Enrollment flows (iOS)](/docs/sdks/card-enrollment/ios-enrollment) are listed here with full detail.
 
 | Parameter                  | Type             | Required | Description                                                                                                                                                                                      |
 | -------------------------- | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -56,4 +56,4 @@ Parameters for enrollment flows. All parameters used in [Enrollment flows (iOS)]
 
 ## Enrolling payment methods
 
-You can enroll payment methods (store cards for future use) during the payment flow or via dedicated enrollment flows. For payment flows, enable save card in `YunoConfig` and set `payment_method.vault_on_success` (or equivalent) when creating the checkout session where supported. For dedicated enrollment, see [Enrollment flows (iOS)](../../card-enrollment/ios-enrollment).
+You can enroll payment methods (store cards for future use) during the payment flow or via dedicated enrollment flows. For payment flows, enable save card in `YunoConfig` and set `payment_method.vault_on_success` (or equivalent) when creating the checkout session where supported. For dedicated enrollment, see [Enrollment flows (iOS)](/docs/sdks/card-enrollment/ios-enrollment).

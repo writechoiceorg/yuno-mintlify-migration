@@ -9,15 +9,15 @@ The iOS SDK makes it easy to integrate payment flows into your iOS app.
 
 ## Additional resources
 
-* See [Choose the right integration for you](../overview/choose-integration) if you're unsure which flow to follow.
-* Access the [Release notes](../resources/release-notes/ios) or the [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) to verify the latest SDK version available.
+* See [Choose the right integration for you](/docs/sdks/overview/choose-integration) if you're unsure which flow to follow.
+* Access the [Release notes](/docs/sdks/resources/release-notes/ios) or the [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) to verify the latest SDK version available.
 
 ## Requirements
 
 * [CocoaPods](https://guides.cocoapods.org/using/using-cocoapods.html) or [Swift Package Manager](https://www.swift.org/package-manager/)
 * iOS 14.0 or above
 * Active Yuno account; API credentials (obtain from the [Yuno Dashboard](https://dashboard.y.uno/) → **Developers** > **Credentials**)
-* Create `checkout_session` and payment via the API; create a customer using the [Create customer endpoint](/reference) before creating a payment
+* Create `checkout_session` and payment via the API; create a customer using the [Create customer endpoint](/reference/customers/create-customer) before creating a payment
 
 The first step is including the library in your project. You can add the Yuno iOS SDK using CocoaPods or Swift Package Manager.
 
@@ -49,7 +49,7 @@ Once Step 1 is complete, continue with the full-checkout integration.
 
 ## Parameters
 
-For the full list of parameters and YunoConfig, see the [iOS SDK Common Reference](../resources/references/ios).
+For the full list of parameters and YunoConfig, see the [iOS SDK Common Reference](/docs/sdks/resources/references/ios).
 
 | Parameter                  | Description                                                                                                                                                            |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -172,8 +172,8 @@ class ViewController: UIViewController, YunoPaymentDelegate {
 | Parameter                              | Description                                                                                                                                     |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `checkoutSession`                      | The unique identifier for the checkout session.                                                                                                 |
-| `countryCode`                          | Country code where the payment is performed. See [Country Coverage](../resources/country-coverage) for supported countries.                                  |
-| `language`                             | Language code for the payment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](../resources/languages-supported).                             |
+| `countryCode`                          | Country code where the payment is performed. See [Country Coverage](/docs/sdks/resources/country-coverage) for supported countries.                                  |
+| `language`                             | Language code for the payment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](/docs/sdks/resources/languages-supported).                             |
 | `viewController`                       | The `UIViewController` used to present the payment flow. Required for proper UI presentation.                                                   |
 | `yunoCreatePayment(with:)`             | Called when a one-time token is generated. Create the payment on your backend.                                                                  |
 | `yunoCreatePayment(with:information:)` | Alternative callback that includes additional token information. Use only one version.                                                          |
@@ -263,7 +263,7 @@ A loader can be shown while the one-time token is generated. Use Yuno's default 
 
 ### Step 8: Create the payment
 
-After receiving the one-time token from [Step 7](#step-7-get-the-one-time-token-ott), create the payment using the [Create payment endpoint](https://docs.y.uno/reference/create-payment). Use the `checkout_session` from [Step 3](#step-3-create-the-checkout-session) and the one-time token to create the payment.
+After receiving the one-time token from [Step 7](#step-7-get-the-one-time-token-ott), create the payment using the [Create payment endpoint](/reference/payments/create-payment). Use the `checkout_session` from [Step 3](#step-3-create-the-checkout-session) and the one-time token to create the payment.
 
 ```swift
 func yunoCreatePayment(with token: String) {
@@ -303,7 +303,7 @@ The response from the Create payment endpoint will include the parameter `sdk_ac
 
 ### Step 9: Continue payment
 
-Yuno requires integrating the SDK's `continuePayment` method after the payment is created, as certain asynchronous payment methods require additional customer actions to complete. The response from the [Create payment endpoint](https://docs.y.uno/reference/create-payment), from Step 8, will include a `sdk_action_required` field. If it returns `TRUE`, you need to call the `continuePayment()` function to show additional screens that allow the customer to complete the payment. Otherwise, this step is not necessary.
+Yuno requires integrating the SDK's `continuePayment` method after the payment is created, as certain asynchronous payment methods require additional customer actions to complete. The response from the [Create payment endpoint](/reference/payments/create-payment), from Step 8, will include a `sdk_action_required` field. If it returns `TRUE`, you need to call the `continuePayment()` function to show additional screens that allow the customer to complete the payment. Otherwise, this step is not necessary.
 
 ```swift
 Yuno.continuePayment()
@@ -410,9 +410,9 @@ This ensures merchants receive accurate status information when a payment method
 
 ### Complementary features
 
-For styling, themes, form options, and additional configurations, see [SDK customizations](../customization/ios).
+For styling, themes, form options, and additional configurations, see [SDK customizations](/docs/sdks/customization/ios).
 
 
 ## Common reference
 
-For full parameter and customization details, see the [iOS SDK Common Reference](../resources/references/ios).
+For full parameter and customization details, see the [iOS SDK Common Reference](/docs/sdks/resources/references/ios).
