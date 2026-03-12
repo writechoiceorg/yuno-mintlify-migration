@@ -22,4 +22,4 @@ Implement Secure Fields on Web:
 * **Tokenization**: Convert sensitive data into secure tokens for processing
 * **Flexibility**: Integrate with your existing design system and user experience
 
-For a comprehensive overview of all Web SDK payment and enrollment parameters, see [Web SDK Common Reference](../../Overview/References/web).
+For a comprehensive overview of all Web SDK payment and enrollment parameters, see [Web SDK Common Reference](../../Resources/References/web).

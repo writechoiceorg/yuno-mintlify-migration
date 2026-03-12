@@ -13,7 +13,7 @@ Include the library in your project by following the same steps as in [Full Chec
 ## Additional resources
 
 - See [Choose the right integration for you](../Overview/choose-integration) if you're unsure which flow to follow.
-- Access the [Release notes](../Overview/Release Notes/ios) or the [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) to verify the latest SDK version available.
+- Access the [Release notes](../Resources/Release Notes/ios) or the [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) to verify the latest SDK version available.
 
 - [Full Checkout Enrollment (iOS)](#full-checkout-enrollment-ios): Automatic enrollment with pre-built UI components
 
@@ -26,7 +26,7 @@ Include the library in your project by following the same steps as in [Full Chec
 
 ## Parameters
 
-For the full list of parameters, see the [iOS SDK Common Reference](../Overview/References/ios).
+For the full list of parameters, see the [iOS SDK Common Reference](../Resources/References/ios).
 
 | Parameter | Description |
 |-----------|-------------|
@@ -82,7 +82,7 @@ dependencies: [
 ]
 ```
 
-Check the [Release notes](../Overview/Release Notes/ios) or [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) for the current SDK version.
+Check the [Release notes](../Resources/Release Notes/ios) or [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) for the current SDK version.
 
 ### Step 3: Initialize SDK with the public key
 
@@ -156,8 +156,8 @@ class ViewController: UIViewController, YunoEnrollmentDelegate {
 | Parameter | Description |
 |-----------|-------------|
 | `customerSession` | The unique identifier for the customer session. |
-| `countryCode` | Country code where the enrollment is performed. See [Country Coverage](country-coverage) for supported countries. |
-| `language` | Language code for the enrollment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](languages-supported). |
+| `countryCode` | Country code where the enrollment is performed. See [Country Coverage](Resources/country-coverage) for supported countries. |
+| `language` | Language code for the enrollment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](Resources/languages-supported). |
 | `viewController` | The `UIViewController` used to present the enrollment flow. Required for proper UI presentation. |
 | `yunoEnrollmentResult(_:)` | Called when the enrollment process completes with the final result. |
 
@@ -248,4 +248,4 @@ For styling, themes, form options, and additional configurations, see [SDK custo
 
 ## Common reference
 
-For full parameter and customization details, see the [iOS SDK Common Reference](../Overview/References/ios).
+For full parameter and customization details, see the [iOS SDK Common Reference](../Resources/References/ios).

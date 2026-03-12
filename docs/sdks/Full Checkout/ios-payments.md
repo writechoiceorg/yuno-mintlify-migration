@@ -10,7 +10,7 @@ The iOS SDK makes it easy to integrate payment flows into your iOS app.
 ## Additional resources
 
 * See [Choose the right integration for you](../Overview/choose-integration) if you're unsure which flow to follow.
-* Access the [Release notes](../Overview/Release Notes/ios) or the [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) to verify the latest SDK version available.
+* Access the [Release notes](../Resources/Release Notes/ios) or the [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) to verify the latest SDK version available.
 
 ## Requirements
 
@@ -49,7 +49,7 @@ Once Step 1 is complete, continue with the Full Checkout integration.
 
 ## Parameters
 
-For the full list of parameters and YunoConfig, see the [iOS SDK Common Reference](../Overview/References/ios).
+For the full list of parameters and YunoConfig, see the [iOS SDK Common Reference](../Resources/References/ios).
 
 | Parameter                  | Description                                                                                                                                                            |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -172,8 +172,8 @@ class ViewController: UIViewController, YunoPaymentDelegate {
 | Parameter                              | Description                                                                                                                                     |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `checkoutSession`                      | The unique identifier for the checkout session.                                                                                                 |
-| `countryCode`                          | Country code where the payment is performed. See [Country Coverage](country-coverage) for supported countries.                                  |
-| `language`                             | Language code for the payment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](languages-supported).                             |
+| `countryCode`                          | Country code where the payment is performed. See [Country Coverage](Resources/country-coverage) for supported countries.                                  |
+| `language`                             | Language code for the payment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](Resources/languages-supported).                             |
 | `viewController`                       | The `UIViewController` used to present the payment flow. Required for proper UI presentation.                                                   |
 | `yunoCreatePayment(with:)`             | Called when a one-time token is generated. Create the payment on your backend.                                                                  |
 | `yunoCreatePayment(with:information:)` | Alternative callback that includes additional token information. Use only one version.                                                          |
@@ -407,4 +407,4 @@ For styling, themes, form options, and additional configurations, see [SDK custo
 
 ## Common reference
 
-For full parameter and customization details, see the [iOS SDK Common Reference](../Overview/References/ios).
+For full parameter and customization details, see the [iOS SDK Common Reference](../Resources/References/ios).

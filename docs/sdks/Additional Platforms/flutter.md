@@ -334,7 +334,7 @@ For the full list of parameters and options, see the subsections that follow.
 | Parameter     | Description                                                                     |
 | :------------ | :------------------------------------------------------------------------------ |
 | `apiKey`      | Your Yuno public API key.                                                       |
-| `countryCode` | Country where the payment is performed. See [Country coverage](country-coverage). |
+| `countryCode` | Country where the payment is performed. See [Country coverage](Resources/country-coverage). |
 | `yunoConfig`  | SDK configuration options. See `YunoConfig` below.                              |
 | `iosConfig`   | iOS appearance configuration. See `IosConfig` below.                            |
 
@@ -391,7 +391,7 @@ For the full list of parameters and options, see the subsections that follow.
 | :------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customerSession`   | The `customer_session` ID created in your backend using the [Create customer session](ref:create-customer-session) endpoint. This session is used to associate the enrolled payment method with a specific customer. |
 | `showPaymentStatus` | Controls whether the SDK displays its built-in enrollment status screens after enrollment completion. Set to `false` if you want to handle status display in your own UI. Default: `true`.                           |
-| `countryCode`       | Optional country code override for this enrollment. If not provided, the SDK uses the country code from `Yuno.init()`. See [Country coverage](country-coverage) for supported countries.                               |
+| `countryCode`       | Optional country code override for this enrollment. If not provided, the SDK uses the country code from `Yuno.init()`. See [Country coverage](Resources/country-coverage) for supported countries.                               |
 
 ## Customizations
 

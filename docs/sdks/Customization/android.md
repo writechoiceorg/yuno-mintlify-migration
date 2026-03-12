@@ -6,7 +6,7 @@ metadata:
   robots: index
 ---
 
-Modify Yuno Android SDK styles (colors, text, buttons) to align payment forms and checkout with your brand. Element structure stays uniform. For all Android SDK parameters and config options, see [Android SDK Common Reference](../Overview/References/android).
+Modify Yuno Android SDK styles (colors, text, buttons) to align payment forms and checkout with your brand. Element structure stays uniform. For all Android SDK parameters and config options, see [Android SDK Common Reference](../Resources/References/android).
 
 ## General guidelines
 

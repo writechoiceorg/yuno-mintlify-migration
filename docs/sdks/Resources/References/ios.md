@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-Parameters, customizations, and advanced features for all Yuno iOS SDK flows. For integration setup, see [Payment flows (iOS)](../../Full Checkout/ios-payments), [Enrollment flows (iOS)](../../Card Enrollment/ios-enrollment), and [integration modes](../choose-integration).
+Parameters, customizations, and advanced features for all Yuno iOS SDK flows. For integration setup, see [Payment flows (iOS)](../../Full Checkout/ios-payments), [Enrollment flows (iOS)](../../Card Enrollment/ios-enrollment), and [integration modes](../../Overview/choose-integration).
 
 ## Key parameters (checkout session creation)
 
@@ -24,7 +24,7 @@ Parameters for payment flows. All parameters used in [Payment flows (iOS)](payme
 | -------------------------- | ---------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `checkoutSession`          | string           | Yes      | Checkout session ID from your backend (Create checkout session API). Required for all payment flows.                                                                                                                                                                       |
 | `countryCode`              | string           | Yes      | ISO country code where the payment runs (e.g. `BR`, `US`). Determines available payment methods and compliance.                                                                                                                                                            |
-| `language`                 | string           | No       | Language code for the SDK UI (e.g. `en`, `pt-BR`). Optional. See [Supported languages](languages-supported) when available.                                                                                                                                                |
+| `language`                 | string           | No       | Language code for the SDK UI (e.g. `en`, `pt-BR`). Optional. See [Supported languages](../languages-supported) when available.                                                                                                                                                |
 | `viewController`           | UIViewController | Yes*     | The view controller that presents the payment flow. The SDK uses it to present modals and capture result.                                                                                                                                                                 |
 | `yunoCreatePayment(with:)` | delegate         | Yes      | Delegate method: create the payment on your backend using the one-time token provided by the SDK. After creating the payment via the API, inform the SDK so it can continue the flow.                                                                                      |
 | `yunoPaymentResult(_:)`    | delegate         | No       | Delegate method: invoked when the payment flow finishes. Receives a `Yuno.Result` enum value (`.succeeded`, `.fail`, `.processing`, `.reject`, `.userCancelled`, `.internalError`). These values map to [payment statuses](ref:payment). Use for UI updates or navigation. |

@@ -6,7 +6,7 @@ metadata:
   robots: index
 ---
 
-Parameters, customizations, and advanced features for all Android SDK flows. Setup: [Payment flows (Android)](../../Full Checkout/android-payments), [Enrollment flows (Android)](../../Card Enrollment/android-enrollment), [integration modes](../choose-integration).
+Parameters, customizations, and advanced features for all Android SDK flows. Setup: [Payment flows (Android)](../../Full Checkout/android-payments), [Enrollment flows (Android)](../../Card Enrollment/android-enrollment), [integration modes](../../Overview/choose-integration).
 
 ## Key parameters (checkout session creation)
 
@@ -36,7 +36,7 @@ Runtime behavior and appearance are configured via the `YunoConfig` data class w
 | ------------------ | ------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `saveCardEnabled`  | boolean | No       | When `true`, allows the user to save or enroll the card during payment. Requires backend support for vaulting (e.g. `payment_method.vault_on_success` in checkout session).                                                                                               |
 | `cardFormDeployed` | boolean | No       | When `true`, the card form is deployed in a specific way (e.g. embedded vs modal). Behavior may vary by SDK version.                                                                                                                                                        |
-| `language`         | string  | No       | Language code for the SDK UI (e.g. `en`, `es`). Use a code from [Supported languages](languages-supported) when available.                                                                                                                                                   |
+| `language`         | string  | No       | Language code for the SDK UI (e.g. `en`, `es`). Use a code from [Supported languages](../languages-supported) when available.                                                                                                                                                   |
 | `styles`           | object  | No       | Custom styles applied to SDK UI elements. Define in your app's styles and reference here, or use theme overrides. See [SDK customizations (Android)](android-customizations) for font, button, and color options.                                                       |
 | `placeholders`    | object  | No       | Custom placeholder text for form fields (e.g. card number, cardholder name). Keys depend on SDK version.                                                                                                                                                                      |
 

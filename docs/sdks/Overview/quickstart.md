@@ -344,7 +344,7 @@ Primary parameters used in this quickstart:
 | --------- | ----------- |
 | `publicKey` / `apiKey` | Your Yuno public API key (frontend). From [Yuno Dashboard](https://dashboard.y.uno/) → **Developers** > **Credentials**. |
 | `checkoutSession` | Checkout session ID returned by your backend (create session endpoint). Required to start payment. |
-| `countryCode` | ISO country code for the payment (e.g. `US`, `CO`). See [Country coverage](country-coverage). |
+| `countryCode` | ISO country code for the payment (e.g. `US`, `CO`). See [Country coverage](Resources/country-coverage). |
 | `elementSelector` (Web) | CSS selector for the element where the payment form is mounted (e.g. `#payment-form`). |
 
 Full parameter reference: [Payment flows (Web)](../Full Checkout/web-payments), [Payment flows (iOS)](../Full Checkout/ios-payments), [Payment flows (Android)](../Full Checkout/android-payments).

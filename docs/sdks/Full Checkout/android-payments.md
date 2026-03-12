@@ -10,7 +10,7 @@ The Android SDK makes it easy to integrate payment flows into your Android app.
 ## Additional resources
 
 * See [Choose the right integration for you](../Overview/choose-integration) if you're unsure which flow to follow.
-* Access the [Release notes](../Overview/Release Notes/android) or the [Yuno Android SDK repository](https://github.com/yuno-payments/yuno-sdk-android) to verify the latest SDK version available.
+* Access the [Release notes](../Resources/Release Notes/android) or the [Yuno Android SDK repository](https://github.com/yuno-payments/yuno-sdk-android) to verify the latest SDK version available.
 
 ## Requirements
 
@@ -43,7 +43,7 @@ Once Step 1 is complete, continue with the Full Checkout integration.
 
 ## Parameters
 
-For the full list of parameters and YunoConfig details, see the [Android SDK Common Reference](../Overview/References/android).
+For the full list of parameters and YunoConfig details, see the [Android SDK Common Reference](../Resources/References/android).
 
 | Parameter                 | Description                                                                                                  |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -390,4 +390,4 @@ For styling, themes, form options, and additional configurations (including Clic
 
 ## Common reference
 
-For full parameter and customization details, see the [Android SDK Common Reference](../Overview/References/android).
+For full parameter and customization details, see the [Android SDK Common Reference](../Resources/References/android).

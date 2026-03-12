@@ -50,7 +50,7 @@ Configure the secure fields with the following options:
 
 | Parameter         | Description                                                                                                                                                                                                                                                                                   |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `countryCode`     | This parameter specifies the country for which the payment process is being set up. Use an `ENUM` value representing the desired country code. You can find the full list of supported countries and their corresponding codes on the [Country Coverage](country-coverage) page. |
+| `countryCode`     | This parameter specifies the country for which the payment process is being set up. Use an `ENUM` value representing the desired country code. You can find the full list of supported countries and their corresponding codes on the [Country Coverage](Resources/country-coverage) page. |
 | `customerSession` | Refers to the current enrollment's customer session. `Example: '438413b7-4921-41e4-b8f3-28a5a0141638'`                                                                                                                                                                                        |
 
 ```javascript

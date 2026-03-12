@@ -13,7 +13,7 @@ Include the library in your project by following the same steps as in [Full Chec
 ## Additional resources
 
 - See [Choose the right integration for you](../Overview/choose-integration) if you're unsure which flow to follow.
-- Access the [Release notes](../Overview/Release Notes/android) or the [Yuno Android SDK repository](https://github.com/yuno-payments/yuno-sdk-android) to verify the latest SDK version available.
+- Access the [Release notes](../Resources/Release Notes/android) or the [Yuno Android SDK repository](https://github.com/yuno-payments/yuno-sdk-android) to verify the latest SDK version available.
 
 - [Full Checkout Enrollment (Android)](#full-checkout-enrollment-android): Automatic enrollment with pre-built UI components
 
@@ -32,7 +32,7 @@ Include the library in your project by following the same steps as in [Full Chec
 
 ## Parameters
 
-For the full list of parameters, see the [Android SDK Common Reference](../Overview/References/android).
+For the full list of parameters, see the [Android SDK Common Reference](../Resources/References/android).
 
 | Parameter | Description |
 |-----------|-------------|
@@ -150,11 +150,11 @@ fun Activity.startEnrollment(
 | Parameter                 | Description                                                                                                                                                                                                                                                                                                      |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customerSession`         | The session customer associated with the current enrollment process.                                                                                                                                                                                                                                             |
-| `countryCode`             | Country code where the payment is performed. See [Country coverage](country-coverage) for a complete list of supported countries and their codes.                                                                                                                                                   |
+| `countryCode`             | Country code where the payment is performed. See [Country coverage](Resources/country-coverage) for a complete list of supported countries and their codes.                                                                                                                                                   |
 | `showEnrollmentStatus`    | Indicates whether the enrollment status should be shown. This parameter is optional and defaults to `true`.                                                                                                                                                                                                      |
 | `callbackEnrollmentState` | A function that returns the current state of the enrollment process. This parameter is optional and defaults to `null`. To register this callback, you must call `initEnrollment` method in the `onCreate` method of the activity. Check the possible states that can be returned. |
 | `requestCode`             | It is an optional parameter you must inform if you are going to use the `onActivityResult` method to capture the enrollment states.                                                                                                                                                                            |
 
 ## Common reference
 
-For full parameter and customization details, see the [Android SDK Common Reference](../Overview/References/android).
+For full parameter and customization details, see the [Android SDK Common Reference](../Resources/References/android).

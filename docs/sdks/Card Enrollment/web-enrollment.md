@@ -24,7 +24,7 @@ Include the library in your project by following the same steps as in [payment f
 
 ## Parameters
 
-For the full list of parameters and callbacks, see the [Web SDK Common Reference](../Overview/References/web).
+For the full list of parameters and callbacks, see the [Web SDK Common Reference](../Resources/References/web).
 
 | Parameter              | Description                                                                    |
 | ---------------------- | ------------------------------------------------------------------------------ |
@@ -124,8 +124,8 @@ Use `yuno.mountEnrollment` with the parameters below.
 | Parameter                         | Description                                                                                                                                                                                                                                       |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customerSession`                 | Refers to the current enrollment's [customer session](ref:create-customer-session). Example: `e15648b0-fcd5-4799-a14c-cc463ae8a133`.                                                                                                              |
-| `countryCode`                     | Country for the payment process. Use an `ENUM` value; see [Country Coverage](country-coverage).                                                                                                                                                   |
-| `language`                        | Language for payment forms. Use any code listed in [Supported languages](languages-supported). Example: `en-US`. Defaults to browser language when available.                                                                                     |
+| `countryCode`                     | Country for the payment process. Use an `ENUM` value; see [Country Coverage](Resources/country-coverage).                                                                                                                                                   |
+| `language`                        | Language for payment forms. Use any code listed in [Supported languages](Resources/languages-supported). Example: `en-US`. Defaults to browser language when available.                                                                                     |
 | `showLoading`                     | Controls visibility of the Yuno loading/spinner page during the payment process.                                                                                                                                                                  |
 | `onLoading`                       | Required to receive notifications about server calls or loading events.                                                                                                                                                                           |
 | `elementSelector`                 | HTML element where the Yuno SDK is mounted.                                                                                                                                                                                                       |
@@ -141,7 +141,7 @@ The next code block presents an example of the Enrollment parameter configuratio
 yuno.mountEnrollment({
   customerSession: 'e15648b0-fcd5-4799-a14c-cc463ae8a133',
   /**
-   * The complete list of country codes is available on https://docs.y.uno/docs/country-coverage
+   * The complete list of country codes is available on https://docs.y.uno/docs/Resources/country-coverage
    */
   countryCode: country,
   /**
@@ -257,4 +257,4 @@ yuno.mountEnrollment({
 
 ## Common reference
 
-For full parameter and customization details, see the [Web SDK Common Reference](../Overview/References/web).
+For full parameter and customization details, see the [Web SDK Common Reference](../Resources/References/web).

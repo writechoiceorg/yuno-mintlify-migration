@@ -48,7 +48,7 @@ Once Step 1 is complete, continue with the Full Checkout integration.
 
 ## Parameters
 
-These are the parameters covered in this guide. For the full list of parameters and callbacks, see the [Web SDK Common Reference](../Overview/References/web).
+These are the parameters covered in this guide. For the full list of parameters and callbacks, see the [Web SDK Common Reference](../Resources/References/web).
 
 | Parameter                         | Description                                                                                                   |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -202,4 +202,4 @@ For styling, themes, form options, and additional configurations, see [SDK custo
 
 ## Common reference
 
-For full parameter and customization details, see the [Web SDK Common Reference](../Overview/References/web).
+For full parameter and customization details, see the [Web SDK Common Reference](../Resources/References/web).
