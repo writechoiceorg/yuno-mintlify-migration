@@ -18,7 +18,7 @@ When creating a checkout session on your backend for payment flows, the followin
 
 ## Payment parameters (full reference)
 
-Parameters for payment flows. All parameters used in [Payment flows (iOS)](payment-flows-ios) are listed here with full detail.
+Parameters for payment flows. All parameters used in [Payment flows (iOS)](../full-checkout/ios-payments) are listed here with full detail.
 
 | Parameter                  | Type             | Required | Description                                                                                                                                                                                                                                                                |
 | -------------------------- | ---------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -31,11 +31,11 @@ Parameters for payment flows. All parameters used in [Payment flows (iOS)](payme
 
 ## YunoConfig options (initialize)
 
-Runtime behavior and appearance are configured via `YunoConfig` when calling `Yuno.initialize(apiKey:config:)`. All parameters used across iOS payment and enrollment flows are listed below. For visual styling (fonts, colors, buttons), see [SDK customizations (iOS)](ios-customizations).
+Runtime behavior and appearance are configured via `YunoConfig` when calling `Yuno.initialize(apiKey:config:)`. All parameters used across iOS payment and enrollment flows are listed below. For visual styling (fonts, colors, buttons), see [SDK customizations (iOS)](../customization/ios).
 
 | Parameter               | Type       | Required | Description                                                                                                                                                                                                                                     |
 | ----------------------- | ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `appearance`            | Appearance | No       | Custom appearance (fonts, colors, buttons). Use `Yuno.Appearance(...)` to set `fontFamily`, `accentColor`, `buttonBackgroundColor`, `buttonTitleColor`, and related fields. See [SDK customizations (iOS)](ios-customizations) for all options. |
+| `appearance`            | Appearance | No       | Custom appearance (fonts, colors, buttons). Use `Yuno.Appearance(...)` to set `fontFamily`, `accentColor`, `buttonBackgroundColor`, `buttonTitleColor`, and related fields. See [SDK customizations (iOS)](../customization/ios) for all options. |
 | `saveCardEnabled`       | boolean    | No       | When `true`, allows the user to save or enroll the card during payment. Requires backend support for vaulting.                                                                                                                                  |
 | `keepLoader`            | boolean    | No       | When `true`, keeps the loader visible until explicitly dismissed or until the flow completes. Use to control loading UX.                                                                                                                        |
 | `hideCardholderName`    | boolean    | No       | When `true`, hides the cardholder name field in the card form. Default `false`.                                                                                                                                                                 |

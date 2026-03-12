@@ -7,7 +7,7 @@ metadata:
 ---
 The Web SDK makes it easy to implement enrollment flows for saving payment methods to a customer account.
 
-Include the library in your project by following the same steps as in [payment flows](payment-flows-web#include-the-library-in-your-project). This lets you complete [step 1](#step-1-include-the-library-in-your-project) and continue with the enrollment flow below.
+Include the library in your project by following the same steps as in [payment flows](../full-checkout/web-payments#include-the-library-in-your-project). This lets you complete [step 1](#step-1-include-the-library-in-your-project) and continue with the enrollment flow below.
 
 ## Additional resources
 
@@ -45,11 +45,11 @@ Use full-checkout for a seamless integration with pre-built UI. Implement enroll
 
 ### Step 1: Include the library in your project
 
-Including the library in your project is done in the same way as in [payment flows](payment-flows-web#include-the-library-in-your-project).
+Including the library in your project is done in the same way as in [payment flows](../full-checkout/web-payments#include-the-library-in-your-project).
 
 ### Step 2: Initialize the SDK
 
-See [Quickstart guide](quickstart-guide#web-sdk-integration) for initialization.
+See [Quickstart guide](../overview/quickstart#web-sdk-integration) for initialization.
 
 ### Step 3: Create a customer session and an enrollment payment method object
 
@@ -124,8 +124,8 @@ Use `yuno.mountEnrollment` with the parameters below.
 | Parameter                         | Description                                                                                                                                                                                                                                       |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customerSession`                 | Refers to the current enrollment's [customer session](ref:create-customer-session). Example: `e15648b0-fcd5-4799-a14c-cc463ae8a133`.                                                                                                              |
-| `countryCode`                     | Country for the payment process. Use an `ENUM` value; see [Country Coverage](resources/country-coverage).                                                                                                                                                   |
-| `language`                        | Language for payment forms. Use any code listed in [Supported languages](resources/languages-supported). Example: `en-US`. Defaults to browser language when available.                                                                                     |
+| `countryCode`                     | Country for the payment process. Use an `ENUM` value; see [Country Coverage](../resources/country-coverage).                                                                                                                                                   |
+| `language`                        | Language for payment forms. Use any code listed in [Supported languages](../resources/languages-supported). Example: `en-US`. Defaults to browser language when available.                                                                                     |
 | `showLoading`                     | Controls visibility of the Yuno loading/spinner page during the payment process.                                                                                                                                                                  |
 | `onLoading`                       | Required to receive notifications about server calls or loading events.                                                                                                                                                                           |
 | `elementSelector`                 | HTML element where the Yuno SDK is mounted.                                                                                                                                                                                                       |

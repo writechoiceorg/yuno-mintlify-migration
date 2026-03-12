@@ -60,7 +60,7 @@ The response includes a `customer_session` ID that you'll use in the next step.
 
 ### Step 2: Include the library in your project
 
-Including the library in your project is done in the same way as in payment flows. Follow the steps in [Include the library in your project](payment-flows-ios#include-the-library-in-your-project) there.
+Including the library in your project is done in the same way as in payment flows. Follow the steps in [Include the library in your project](../full-checkout/ios-payments#include-the-library-in-your-project) there.
 
 #### CocoaPods
 
@@ -156,8 +156,8 @@ class ViewController: UIViewController, YunoEnrollmentDelegate {
 | Parameter | Description |
 |-----------|-------------|
 | `customerSession` | The unique identifier for the customer session. |
-| `countryCode` | Country code where the enrollment is performed. See [Country Coverage](resources/country-coverage) for supported countries. |
-| `language` | Language code for the enrollment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](resources/languages-supported). |
+| `countryCode` | Country code where the enrollment is performed. See [Country Coverage](../resources/country-coverage) for supported countries. |
+| `language` | Language code for the enrollment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](../resources/languages-supported). |
 | `viewController` | The `UIViewController` used to present the enrollment flow. Required for proper UI presentation. |
 | `yunoEnrollmentResult(_:)` | Called when the enrollment process completes with the final result. |
 
