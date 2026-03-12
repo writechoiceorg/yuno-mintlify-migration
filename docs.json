@@ -551,90 +551,78 @@
                 ]
               }
             ]
-          }
-        ]
-      },
-      {
-        "tab": "SDKs",
-        "pages": [
-          {
-            "group": "Overview",
-            "pages": [
-              "docs/sdks/overview/quickstart",
-              "docs/sdks/overview/choose-integration",
-              "docs/sdks/overview/understanding-flows"
-            ]
           },
           {
-            "group": "Full Checkout",
-            "pages": [
-              "docs/sdks/full-checkout/web-payments",
-              "docs/sdks/full-checkout/android-payments",
-              "docs/sdks/full-checkout/ios-payments"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "docs/sdks/customization/android",
-              "docs/sdks/customization/ios",
-              {
-                "group": "Secure Fields",
-                "pages": [
-                  "docs/sdks/customization/secure-fields/index",
-                  "docs/sdks/customization/secure-fields/payment-secure-fields",
-                  "docs/sdks/customization/secure-fields/enrollment-secure-fields"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Card Enrollment",
-            "pages": [
-              "docs/sdks/card-enrollment/web-enrollment",
-              "docs/sdks/card-enrollment/android-enrollment",
-              "docs/sdks/card-enrollment/ios-enrollment"
-            ]
-          },
-          {
-            "group": "Resources",
+            "anchor": "SDKs",
+            "icon": "code",
             "pages": [
               {
-                "group": "Release Notes",
+                "group": "Overview",
                 "pages": [
-                  "docs/sdks/resources/release-notes/web",
-                  "docs/sdks/resources/release-notes/android",
-                  "docs/sdks/resources/release-notes/ios"
+                  "docs/sdks/overview/quickstart",
+                  "docs/sdks/overview/choose-integration",
+                  "docs/sdks/overview/understanding-flows"
                 ]
               },
               {
-                "group": "References",
+                "group": "Full Checkout",
                 "pages": [
-                  "docs/sdks/resources/references/web",
-                  "docs/sdks/resources/references/android",
-                  "docs/sdks/resources/references/ios"
+                  "docs/sdks/full-checkout/web-payments",
+                  "docs/sdks/full-checkout/android-payments",
+                  "docs/sdks/full-checkout/ios-payments"
                 ]
               },
-              "docs/sdks/resources/country-coverage",
-              "docs/sdks/resources/languages-supported"
-            ]
-          },
-          {
-            "group": "Additional Platforms",
-            "pages": [
-              "docs/sdks/additional-platforms/flutter",
               {
-                "group": "React Native",
+                "group": "Customization",
                 "pages": [
-                  "docs/sdks/additional-platforms/react-native/index",
-                  "docs/sdks/additional-platforms/react-native/code-examples-react-native",
-                  "docs/sdks/additional-platforms/react-native/advanced-features-react-native"
+                  "docs/sdks/customization/android",
+                  "docs/sdks/customization/ios",
+                  {
+                    "group": "Secure Fields",
+                    "pages": [
+                      "docs/sdks/customization/secure-fields/index",
+                      "docs/sdks/customization/secure-fields/payment-secure-fields",
+                      "docs/sdks/customization/secure-fields/enrollment-secure-fields"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Card Enrollment",
+                "pages": [
+                  "docs/sdks/card-enrollment/web-enrollment",
+                  "docs/sdks/card-enrollment/android-enrollment",
+                  "docs/sdks/card-enrollment/ios-enrollment"
+                ]
+              },
+              {
+                "group": "Resources",
+                "pages": [
+                  {
+                    "group": "Release Notes",
+                    "pages": [
+                      "docs/sdks/resources/release-notes/web",
+                      "docs/sdks/resources/release-notes/android",
+                      "docs/sdks/resources/release-notes/ios"
+                    ]
+                  },
+                  {
+                    "group": "References",
+                    "pages": [
+                      "docs/sdks/resources/references/web",
+                      "docs/sdks/resources/references/android",
+                      "docs/sdks/resources/references/ios"
+                    ]
+                  },
+                  "docs/sdks/resources/country-coverage",
+                  "docs/sdks/resources/languages-supported"
                 ]
               }
             ]
           }
         ]
       },
+
       {
         "tab": "Changelog",
         "groups": [

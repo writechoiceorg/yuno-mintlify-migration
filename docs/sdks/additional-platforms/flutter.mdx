@@ -82,7 +82,7 @@ No additional iOS-specific configuration is required beyond the Flutter package 
 
 Before initiating a payment through the SDK, create a customer and checkout session using Yuno's server-side API. The customer represents the person making the payment; the checkout session contains transaction details such as amount, currency, and available payment methods. Create these in your backend to ensure security and prevent client-side tampering.
 
-Create a customer using the [Create customer endpoint](ref:create-customer). This customer is required for checkout sessions and saved cards.
+Create a customer using the [Create customer endpoint](/reference). This customer is required for checkout sessions and saved cards.
 
 Create a new `checkout_session` using the [Create checkout session](/reference/checkout-sessions/create-checkout-session) endpoint. Keep the returned `checkout_session` ID for use in Step 4.
 

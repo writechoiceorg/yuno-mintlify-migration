@@ -22,7 +22,7 @@ Include the library in your project by following the same steps as in [full-chec
 * CocoaPods or [Swift Package Manager](https://www.swift.org/package-manager/)
 * iOS 14.0 or later
 * Active Yuno account; API credentials (obtain from the [Yuno Dashboard](https://dashboard.y.uno/) → **Developers** > **Credentials**)
-* Create a customer using the [Create customer endpoint](ref:create-customer) before enrolling
+* Create a customer using the [Create customer endpoint](/reference) before enrolling
 
 ## Parameters
 
@@ -43,7 +43,7 @@ The Yuno full-checkout iOS SDK provides enrollment with pre-built UI, card enrol
 
 ### Step 1: Create a customer and customer session
 
-Create a customer in Yuno's system using the [Create customer endpoint](ref:create-customer) before enrolling payment methods. This endpoint will return a `customer_id` that you'll use to associate enrolled payment methods with the specific customer.
+Create a customer in Yuno's system using the [Create customer endpoint](/reference) before enrolling payment methods. This endpoint will return a `customer_id` that you'll use to associate enrolled payment methods with the specific customer.
 
 Then create a customer session using the [Create Customer Session](/reference/customer-sessions-enrollment/create-customer-session) endpoint. The session information will be used when calling the enrollment methods.
 
