@@ -17,11 +17,11 @@ We are introducing an update to optimize how network tokens are generated in Yun
 **When the network tokens feature is enabled, Yuno will continue to generate network tokens for all cards enrolled and securely stored in our Vault**. This approach is fully aligned with how network tokenization is intended to work, as defined by Visa and Mastercard after the card validation — ensuring better performance, security, and reliability in recurring and future transactions.\
 Cards not stored in Yuno — such as one-time use cards — are naturally excluded from this process, since network tokenization is not applicable in those cases.
 
-For more information on how Network Tokens work, please refer to the [Network tokens](https://docs.y.uno/docs/network-tokens) documentation in the guides section.
+For more information on how Network Tokens work, please refer to the [Network tokens](/docs/network-tokens) documentation in the guides section.
 
 ## Subscription billing date
 
-We've added a new capability to the [Subscription](https://docs.y.uno/docs/subscriptions) feature called Billing date. By specifying the `billing_date` object, the merchant can define the logic behind the exact date for the billing of the subscription. Mutually exclusive with the frequency object.
+We've added a new capability to the [Subscription](/docs/subscriptions) feature called Billing date. By specifying the `billing_date` object, the merchant can define the logic behind the exact date for the billing of the subscription. Mutually exclusive with the frequency object.
 
 | Field         | Type   | Description                                                                                                                                               |
 | :------------ | :----- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -29,7 +29,7 @@ We've added a new capability to the [Subscription](https://docs.y.uno/docs/subsc
 | type          | number | The type of billing\_date the subscription will have in time. PREPAID, POSTDATE, DAY. If not set, the creation date for the plan will be set  by default. |
 | day           | number | The day of the month to charge the subscription if the type is set to DAY. Always 1 by default.                                                           |
 
-For more information, please refer to the [subscriptions](https://docs.y.uno/docs/subscriptions#new-concepts) documentation in the guides section.
+For more information, please refer to the [subscriptions](/docs/subscriptions#new-concepts) documentation in the guides section.
 
 ## Expiration date
 
@@ -55,7 +55,7 @@ We've added a new capability to the Payments API, which allows you to view and s
 Only available when the provider associated to the payment supports it. Please feel free to reach out to your technical account manager for further questions.
 </Note>
 
-Please refer to the payments [API reference](https://docs.y.uno/reference/create-payment) for more information.
+Please refer to the payments [API reference](/reference/create-payment) for more information.
 
 ## Geolocation
 
@@ -89,7 +89,7 @@ We've added a new capability to the Payments API, which allows you to define the
 [...]
 ```
 
-Please refer to the payments [API reference](https://docs.y.uno/reference/create-payment) for more information.
+Please refer to the payments [API reference](/reference/create-payment) for more information.
 
 ## Cancel for APM Payments
 
@@ -97,7 +97,7 @@ We've added a new capability to the Payments API, which allows you cancel a PEND
 
 This feature is **only available when the provider associated to the payment supports it**. Please feel free to reach out to your technical account manager for more information in case you need to use it.
 
-Please refer to the [cancel payments endpoint](https://docs.y.uno/reference/cancel-payment) for more information.
+Please refer to the [cancel payments endpoint](/reference/cancel-payment) for more information.
 
 ## Subscriptions for Webhooks
 
@@ -105,4 +105,4 @@ We've added a new capability to Yuno, which allows you define a webhook\_url in 
 
 Depending on the type of event, you will receive a different type of webhook and event.
 
-For more information on how webhooks work, how are they configured in Yuno and see examples, please refer to the [Webhooks documentation](https://docs.y.uno/docs/configure-webhooks) in the guides section.
+For more information on how webhooks work, how are they configured in Yuno and see examples, please refer to the [Webhooks documentation](/docs/configure-webhooks) in the guides section.

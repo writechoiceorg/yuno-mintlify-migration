@@ -5,12 +5,12 @@ openapi: "/openapi.json POST /v1/customers/sessions/{customer_session}/payment-m
 
 This request enrolls a payment method for a customer. With the information provided by Yuno after the customer selects the payment method to enroll, you will be able to save it for future purchases in the payment method object created.
 
-Note that this request requires an `X-Idempotency-Key`. Check the [Authentication](https://docs.y.uno/reference/authentication#idempotency).
+Note that this request requires an `X-Idempotency-Key`. Check the [Authentication](/reference/authentication#idempotency).
 
 <Note>
 **Webhooks**
 
-We recommend listening to [Webhooks](https://docs.y.uno/docs/configure-webhooks) to stay up to date with the state of the enrolled payment methods of your customers.
+We recommend listening to [Webhooks](/docs/configure-webhooks) to stay up to date with the state of the enrolled payment methods of your customers.
 </Note>
 
 In case a customer enrolls the same card twice but with new expiration date or cardholder info, we will unenroll the previously enrolled card and keep the new one.
@@ -34,5 +34,5 @@ The following payment methods can be enrolled using this endpoint:
 <Note>
 **Payment Method Availability**
 
-When you retrieve the payment methods available to enroll, only the ones which you have connected, created a route, and added to your checkout will be present. For more information about enrollment workflows, see the [Enroll Payment Methods](https://docs.y.uno/docs/enroll-payment-methods) guide.
+When you retrieve the payment methods available to enroll, only the ones which you have connected, created a route, and added to your checkout will be present. For more information about enrollment workflows, see the [Enroll Payment Methods](/docs/enroll-payment-methods) guide.
 </Note>

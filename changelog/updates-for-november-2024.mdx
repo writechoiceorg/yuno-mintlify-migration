@@ -47,7 +47,7 @@ We've added two more fields to the Payment response called `expiration_year` and
 
 ## Recipients for Split Marketplace
 
-We've added a new capability to the [split payments marketplace](https://docs.y.uno/docs/split-payments-marketplace) requests called Recipients. In case you use more than one payment provider for the split payments, we recommend using the [recipients object](https://docs.y.uno/reference/create-recipients), as it lets you define more than one provider for each recipient.
+We've added a new capability to the [split payments marketplace](/docs/split-payments-marketplace) requests called Recipients. In case you use more than one payment provider for the split payments, we recommend using the [recipients object](/reference/create-recipients), as it lets you define more than one provider for each recipient.
 
 ### Recipient creation
 
@@ -113,7 +113,7 @@ We've added a new capability to the [split payments marketplace](https://docs.y.
 [...]
 ```
 
-For more information, please refer to the [split payments marketplace](https://docs.y.uno/docs/split-payments-marketplace) request in the API guides section.
+For more information, please refer to the [split payments marketplace](/docs/split-payments-marketplace) request in the API guides section.
 
 ## Receipts for Refund Transactions
 
@@ -132,13 +132,13 @@ We've added a new capability to the refund requests called Receipts. This capabi
 }
 ```
 
-Once the REFUND is created, you can do a [get of the payment](https://docs.y.uno/reference/retrieve-payment-by-id) to find the receipt created in the "receipt\_url" field in the `payment.transaction` object.
+Once the REFUND is created, you can do a [get of the payment](/reference/retrieve-payment-by-id) to find the receipt created in the "receipt\_url" field in the `payment.transaction` object.
 
-For more information, please refer to the [refund](https://docs.y.uno/reference/refund-payment) request in the API reference section.
+For more information, please refer to the [refund](/reference/refund-payment) request in the API reference section.
 
 ## Items for Subscriptions
 
-We've added a new capability to the [Subscription](https://docs.y.uno/docs/subscriptions) feature called Additional data. Now Yuno lets you specify information about the items related to the subscription so we can send that information to the providers.
+We've added a new capability to the [Subscription](/docs/subscriptions) feature called Additional data. Now Yuno lets you specify information about the items related to the subscription so we can send that information to the providers.
 
 ```json
 {
@@ -182,11 +182,11 @@ We've added a new capability to the [Subscription](https://docs.y.uno/docs/subsc
 '
 ```
 
-For more information, please refer to the [Subscriptions API](https://docs.y.uno/reference/create-subscription) reference section.
+For more information, please refer to the [Subscriptions API](/reference/create-subscription) reference section.
 
 ## Payouts with vaulted tokens
 
-We've added a new capability to the [Payouts product](https://docs.y.uno/reference/create-payout), which allows you to create requests directly to an enrolled credit/debit card in Yuno if supported by the provider.
+We've added a new capability to the [Payouts product](/reference/create-payout), which allows you to create requests directly to an enrolled credit/debit card in Yuno if supported by the provider.
 
 ```json
 [...],
@@ -200,5 +200,5 @@ We've added a new capability to the [Payouts product](https://docs.y.uno/referen
 
 For more information, please refer to the:
 
-* [Enrollment guide](https://docs.y.uno/docs/enroll-payment-methods) section for the enrollment process.
-* [Payouts API](https://docs.y.uno/reference/create-payout) reference section for payouts creation.
+* [Enrollment guide](/docs/enroll-payment-methods) section for the enrollment process.
+* [Payouts API](/reference/create-payout) reference section for payouts creation.

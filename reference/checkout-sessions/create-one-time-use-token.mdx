@@ -11,4 +11,4 @@ Create a one-time-use token from the customer's card data as part of the `DIRECT
 
 For `DIRECT` integrations, this endpoint allows PCI-compliant merchants to tokenize card data directly while maintaining security throughout the process — without the need to use Yuno’s SDK. Unlike the regular workflow, which involves creating a checkout\_session and using the SDK to generate a one-time-use token, the `DIRECT` flow offers an alternative approach for those who prefer to manage the entire process directly from their backend.
 
-Use the returned token to [create a payment](https://docs.y.uno/reference/create-payment) with workflow `DIRECT` by setting `payment_method.type = "CARD"` and `payment_method.token` to the token.
+Use the returned token to [create a payment](/reference/create-payment) with workflow `DIRECT` by setting `payment_method.type = "CARD"` and `payment_method.token` to the token.

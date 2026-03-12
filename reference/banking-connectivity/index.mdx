@@ -8,11 +8,11 @@ Yuno Banking Connectivity provides a unified API to create bank accounts, proces
 
 Follow these steps to go from entity creation to fund transfers:
 
-1. **Create an entity**: Register an individual or business using [Create Entity](https://docs.y.uno/reference/create-entity).
-2. **Onboard the entity**: Submit KYC/KYB documentation through [Create Entity Onboarding](https://docs.y.uno/reference/create-entity-onboarding).
-3. **Wait for onboarding approval**: Monitor the onboarding status via [Get Entity Onboarding Status](https://docs.y.uno/reference/get-entity-onboarding-status) or listen for webhook events.
-4. **Create a bank account**: Once onboarding succeeds, open an account with [Create Account](https://docs.y.uno/reference/create-account-banking).
-5. **Initiate transfers**: Send funds using [Initiate Entity Transfer](https://docs.y.uno/reference/initiate-entity-transfer).
+1. **Create an entity**: Register an individual or business using [Create Entity](/reference/create-entity).
+2. **Onboard the entity**: Submit KYC/KYB documentation through [Create Entity Onboarding](/reference/create-entity-onboarding).
+3. **Wait for onboarding approval**: Monitor the onboarding status via [Get Entity Onboarding Status](/reference/get-entity-onboarding-status) or listen for webhook events.
+4. **Create a bank account**: Once onboarding succeeds, open an account with [Create Account](/reference/create-account-banking).
+5. **Initiate transfers**: Send funds using [Initiate Entity Transfer](/reference/initiate-entity-transfer).
 
 ## Entity types
 
@@ -78,7 +78,7 @@ Available payment rails depend on the provider's region:
 
 ## Account identifiers by region
 
-Responses from [Create Account](https://docs.y.uno/reference/create-account-banking) include region-specific banking identifiers:
+Responses from [Create Account](/reference/create-account-banking) include region-specific banking identifiers:
 
 | Region    | Fields returned                       |
 | --------- | ------------------------------------- |
@@ -106,7 +106,7 @@ All file uploads use base64 encoding with `file_name`, `content_type`, and `cont
 
 ## Webhook events
 
-Yuno sends webhook notifications to your configured endpoint for the following events. For general webhook setup, delivery behavior, and retry logic, see [Webhooks Overview](https://docs.y.uno/docs/webhooks#banking-connectivity-webhook-events).
+Yuno sends webhook notifications to your configured endpoint for the following events. For general webhook setup, delivery behavior, and retry logic, see [Webhooks Overview](/docs/webhooks#banking-connectivity-webhook-events).
 
 ### Entity events
 
@@ -146,7 +146,7 @@ Yuno sends webhook notifications to your configured endpoint for the following e
 * `banking.transfer.incoming.pending`: Incoming transfer pending settlement
 * `banking.transfer.incoming.completed`: Incoming transfer settled
 
-Incoming transfer notifications are sent to your endpoint at `{merchant_base_URL}/v1/banking/transfers`. See [Webhook Notifications](https://docs.y.uno/reference/webhook-notifications-banking) for the payload structure.
+Incoming transfer notifications are sent to your endpoint at `{merchant_base_URL}/v1/banking/transfers`. See [Webhook Notifications](/reference/webhook-notifications-banking) for the payload structure.
 
 ## Error codes
 

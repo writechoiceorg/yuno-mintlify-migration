@@ -7,20 +7,20 @@ This guide describes how to integrate Apple Pay directly with Yuno's API. Direct
 Our Apple Pay Direct integration supports one-time and recurring payments (useful for subscriptions and other regular transactions).
 
 <Note>
-  Before implementing Apple Pay payments, ensure you have completed the [Apple Pay prerequisites](https://docs.y.uno/docs/prerequisites-apple-pay).
+  Before implementing Apple Pay payments, ensure you have completed the [Apple Pay prerequisites](/docs/prerequisites-apple-pay).
 </Note>
 
 ## Apple Pay overview
 
 1. Customer initiates payment on their iOS device
 2. Receive `payment_token` via Apple SDK
-3. [Create a payment](https://docs.y.uno/reference/create-payment) with Yuno including the stringified token
+3. [Create a payment](/reference/create-payment) with Yuno including the stringified token
 4. Yuno processes with your configured provider(s) and returns a response
-5. Monitor response status via [webhooks](https://docs.y.uno/docs/webhooks)
+5. Monitor response status via [webhooks](/docs/webhooks)
 
 ## One-time payments
 
-To integrate a single transaction, such as an online purchase, use Yuno's API to [create a payment](https://docs.y.uno/reference/create-payment). This requires you to obtain certain information from the Apple SDK's response, which is generated when the customer authorizes the payment.
+To integrate a single transaction, such as an online purchase, use Yuno's API to [create a payment](/reference/create-payment). This requires you to obtain certain information from the Apple SDK's response, which is generated when the customer authorizes the payment.
 
 ### Example Apple Pay response
 
@@ -97,7 +97,7 @@ Recurring Apple Pay payments with Direct integration require implementation of C
 
 ### Customer Initiated Transaction (CIT)
 
-When a customer authorizes the subscription and you have a response from the Apple SDK, use the stringified `payment_token` in Yuno's [create payment API](https://docs.y.uno/reference/create-payment) to create the CIT.
+When a customer authorizes the subscription and you have a response from the Apple SDK, use the stringified `payment_token` in Yuno's [create payment API](/reference/create-payment) to create the CIT.
 
 ```json
 curl --location 'https://api-sandbox.y.uno/v1/payments' \
@@ -221,8 +221,8 @@ curl --location 'https://api-sandbox.y.uno/v1/payments' \
 
 ## Related documentation
 
-* [Prerequisites for Apple Pay](https://docs.y.uno/docs/prerequisites-apple-pay)
-* [Apple Pay SDK integration](https://docs.y.uno/docs/apple-pay-sdk-integration)
-* [Create payment API](https://docs.y.uno/reference/create-payment)
-* [Subscription management](https://docs.y.uno/docs/subscriptions)
-* [Webhooks](https://docs.y.uno/docs/webhooks)
+* [Prerequisites for Apple Pay](/docs/prerequisites-apple-pay)
+* [Apple Pay SDK integration](/docs/apple-pay-sdk-integration)
+* [Create payment API](/reference/create-payment)
+* [Subscription management](/docs/subscriptions)
+* [Webhooks](/docs/webhooks)

@@ -70,9 +70,9 @@ For other providers, contact your Yuno account manager to discuss availability a
 
 Google Pay with PIX follows the same integration patterns as Google Pay with card payments. Choose the integration method that fits your architecture:
 
-* **[SDK integration](https://docs.y.uno/docs/google-pay-sdk-integration)**: Yuno's SDK handles the full flow, including presenting PIX as an option within Google Pay.
-* **[Direct integration](https://docs.y.uno/docs/google-pay-direct-integration)**: You manage the Google Pay frontend and pass the PIX payment token to Yuno.
-* **[Provider integration](https://docs.y.uno/docs/integration-via-provider-google-pay)**: Your payment provider handles the Google Pay + PIX flow.
+* **[SDK integration](/docs/google-pay-sdk-integration)**: Yuno's SDK handles the full flow, including presenting PIX as an option within Google Pay.
+* **[Direct integration](/docs/google-pay-direct-integration)**: You manage the Google Pay frontend and pass the PIX payment token to Yuno.
+* **[Provider integration](/docs/integration-via-provider-google-pay)**: Your payment provider handles the Google Pay + PIX flow.
 
 When creating the payment, set the `payment_method.type` to `GOOGLE_PAY_PIX`. This tells Yuno the payment is a PIX transaction initiated through Google Pay.
 
@@ -150,7 +150,7 @@ Monitor these events:
 * **Payment succeeded**: The PIX transfer was completed. Update your order status and confirm to the customer.
 * **Payment expired**: The PIX deadline passed without a transfer. Stop displaying the QR code or PIX instructions and prompt the customer to start a new payment.
 
-See [Webhooks](https://docs.y.uno/docs/webhooks) for configuration details.
+See [Webhooks](/docs/webhooks) for configuration details.
 
 ## Differences from card payments
 
@@ -167,7 +167,7 @@ See [Webhooks](https://docs.y.uno/docs/webhooks) for configuration details.
 
 ## Related documentation
 
-* [Google Pay overview](https://docs.y.uno/docs/google-pay)
-* [Google Pay SDK integration](https://docs.y.uno/docs/google-pay-sdk-integration)
-* [Google Pay Direct integration](https://docs.y.uno/docs/google-pay-direct-integration)
-* [Google Pay via provider](https://docs.y.uno/docs/integration-via-provider-google-pay)
+* [Google Pay overview](/docs/google-pay)
+* [Google Pay SDK integration](/docs/google-pay-sdk-integration)
+* [Google Pay Direct integration](/docs/google-pay-direct-integration)
+* [Google Pay via provider](/docs/integration-via-provider-google-pay)

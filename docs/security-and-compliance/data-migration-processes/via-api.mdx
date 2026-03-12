@@ -9,7 +9,7 @@ This guide provides a step-by-step process for migrating tokens using the Yuno A
 Before proceeding with the steps in this guide, ensure you have:
 
 * Completed the three steps related to the [importing cards from a gateway account](docs:token-migration-process-copy#importing-cards-from-a-gateway-account) process.
-* Accessed your [API credentials](https://docs.y.uno/docs/developers-credentials) on the Yuno Dashboard, which include:
+* Accessed your [API credentials](/docs/developers-credentials) on the Yuno Dashboard, which include:
   * `public-api-key`
   * `private-secret-key`
   * `account_id`
@@ -20,7 +20,7 @@ Make sure you have completed these steps and have the necessary data before cont
 
 ### Step 1: Create customers
 
-To begin the token migration process, you will use the [Create Customer](https://docs.y.uno/reference/create-customer) endpoint to add customers to the Yuno system. It is important to note that payment methods cannot be enrolled for customers who do not exist in the Yuno system. If the customers are already present in Yuno, you may skip this step.
+To begin the token migration process, you will use the [Create Customer](/reference/create-customer) endpoint to add customers to the Yuno system. It is important to note that payment methods cannot be enrolled for customers who do not exist in the Yuno system. If the customers are already present in Yuno, you may skip this step.
 
 To register new customers, provide their personal information. Additionally, you must supply the `merchant_customer_id`, which is a unique identifier for the customer used in your system.
 
@@ -36,13 +36,13 @@ Upon completing the customer creation process, you will receive an `id` that ide
 
 ### Step 2: Check the customer data (optional)
 
-In this step, you have the option to verify the information of each registered customer. Use the [Retrieve Customer](https://docs.y.uno/reference/create-customer) endpoint to access the customer data. To do this, provide the `id` that was generated when the customer was initially created.
+In this step, you have the option to verify the information of each registered customer. Use the [Retrieve Customer](/reference/create-customer) endpoint to access the customer data. To do this, provide the `id` that was generated when the customer was initially created.
 
 ### Step 3: Enroll a payment method
 
 To complete the migration process, you need to enroll payment methods for each customer using the third-party vault or gateway data.
 
-Utilize the [Enroll Payment Method](https://docs.y.uno/reference/enroll-payment-method-api) endpoint to register the payment methods. Remember, the `customer_id` required for this request is the `id` obtained during the customer creation in [Step 1](https://docs.y.uno/docs/via-api#step-1-create-customers). Additionally, include the `provider_data` object containing the external provider's token, as shown in the code snippet below:
+Utilize the [Enroll Payment Method](/reference/enroll-payment-method-api) endpoint to register the payment methods. Remember, the `customer_id` required for this request is the `id` obtained during the customer creation in [Step 1](/docs/via-api#step-1-create-customers). Additionally, include the `provider_data` object containing the external provider's token, as shown in the code snippet below:
 
 ```sh Request
 curl --request POST \
@@ -71,4 +71,4 @@ In the response from the endpoint, you will receive a `vaulted_token` that ident
 
 ### Step 4: Check the enrolled payment method (optional)
 
-Once the payment method is enrolled, you can verify its successful enrollment using the [retrieve enrolled payment methods](https://docs.y.uno/reference/retrieve-enrolled-payment-methods-api) endpoint. Remember, the `customer_id` needed for this request is the `id` obtained during the customer creation in [Step 1](https://docs.y.uno/docs/via-api#step-1-create-customers).
+Once the payment method is enrolled, you can verify its successful enrollment using the [retrieve enrolled payment methods](/reference/retrieve-enrolled-payment-methods-api) endpoint. Remember, the `customer_id` needed for this request is the `id` obtained during the customer creation in [Step 1](/docs/via-api#step-1-create-customers).

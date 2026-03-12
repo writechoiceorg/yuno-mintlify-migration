@@ -61,7 +61,7 @@ If you are creating a payment for an existing user who was previously created an
 
 With a customer registered, you can create a checkout session. The checkout is when the customer finalizes their order and proceeds to pay for the products or services they wish to acquire. Therefore, at this stage, you will provide information regarding the payment amount and the location where it is being created.
 
-Use the [Create Checkout Session](https://docs.y.uno/reference/create-checkout-session) endpoint. Notice that the `customer_id` required to perform the request is the `id` you received when creating the customer in [Step 1](https://docs.y.uno/docs/create-payment-basic#1-create-a-customer).
+Use the [Create Checkout Session](/reference/create-checkout-session) endpoint. Notice that the `customer_id` required to perform the request is the `id` you received when creating the customer in [Step 1](/docs/create-payment-basic#1-create-a-customer).
 
 From the request response to the  [Create Checkout Session](/reference/checkout-sessions/create-checkout-session) endpoint, you will receive the `checkout_session` information. It will be used to create the one-time token (OTT) and the payment on the next steps.
 

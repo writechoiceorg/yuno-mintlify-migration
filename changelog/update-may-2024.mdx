@@ -9,7 +9,7 @@ There have been some updates on Payments object and transaction requests. Please
 
 ### Simplified mode
 
-In Yuno we let merchants [retry capture](https://docs.y.uno/docs/transaction-retries) transactions with an error response status just by setting an additional field in the [Capture request](https://docs.y.uno/reference/capture-authorization) . The feature is designed to enhance transaction success rates and improve user experience. By setting the "simplified\_mode" field to true in capture requests, the system will automatically retry failed transactions up to 5 times within a 24-hour period.
+In Yuno we let merchants [retry capture](/docs/transaction-retries) transactions with an error response status just by setting an additional field in the [Capture request](/reference/capture-authorization) . The feature is designed to enhance transaction success rates and improve user experience. By setting the "simplified\_mode" field to true in capture requests, the system will automatically retry failed transactions up to 5 times within a 24-hour period.
 
 *Example*
 
@@ -27,4 +27,4 @@ In Yuno we let merchants [retry capture](https://docs.y.uno/docs/transaction-ret
 
 ### Benefity Type
 
-We've added a new field to the [Payment object](https://docs.y.uno/reference/the-payment-object) called `benefity_type`. It is a field that represents the user's benefity type for the payment method Pluxee for Chile. Necessary for DIRECT workflow.
+We've added a new field to the [Payment object](/reference/the-payment-object) called `benefity_type`. It is a field that represents the user's benefity type for the payment method Pluxee for Chile. Necessary for DIRECT workflow.

@@ -7,23 +7,23 @@ In this guide, you will find step-by-step instructions on manually canceling a p
 <Note>
 **Automatic Delayed Cancel**
 
-If you prefer to have Yuno automatically cancel authorizations after a specified delay, you can configure `delayed_cancel_settings` when creating the payment. This helps improve customer experience by automatically releasing held funds. Learn more in the [Cancel and Capture Flow](https://docs.y.uno/docs/cancel-and-capture-flow) guide.
+If you prefer to have Yuno automatically cancel authorizations after a specified delay, you can configure `delayed_cancel_settings` when creating the payment. This helps improve customer experience by automatically releasing held funds. Learn more in the [Cancel and Capture Flow](/docs/payment-features/Cancel-and-capture-flow) guide.
 </Note>
 
 <Warning>
 **Cancellable Payments**
 
-Only payments with **PENDING** status can be canceled. Check the [Payment status](https://docs.y.uno/docs/payments-1) page for further details regarding the possible payment status.
+Only payments with **PENDING** status can be canceled. Check the [Payment status](/docs/payments-1) page for further details regarding the possible payment status.
 </Warning>
 
 ## Requirements
 
 To cancel a payment, you need to:
 
-* Access your [API credentials](https://docs.y.uno/docs/developers-credentials) on the Yuno Dashboard, which consist of:
+* Access your [API credentials](/docs/developers-credentials) on the Yuno Dashboard, which consist of:
   * `public-api-key`
   * `private-secret-key`
-* Have the payment identification data received after creating the payment using the [Create Payment endpoint](https://docs.y.uno/reference/create-payment):
+* Have the payment identification data received after creating the payment using the [Create Payment endpoint](/reference/create-payment):
   * `id`: The unique identifier of the payment, obtained from the parameter `id` after creating the payment.
   * `transaction_id`: The unique identifier of the transaction obtained from the parameter `transaction.id` after creating the payment.
 
@@ -35,9 +35,9 @@ Yuno provides [Postman Collections](/reference/postman-collections) that you can
 
 ## Cancel a payment
 
-You can cancel a payment only if it has the PENDING status. Use the [Cancel Payment endpoint](https://docs.y.uno/reference/cancel-payment) to cancel the payment. To identify the payment to be canceled, you need to provide its `id` and the `transaction_id`.
+You can cancel a payment only if it has the PENDING status. Use the [Cancel Payment endpoint](/reference/cancel-payment) to cancel the payment. To identify the payment to be canceled, you need to provide its `id` and the `transaction_id`.
 
-To confirm you have successfully canceled the payment, check if the parameters from the [Cancel Payment endpoint](https://docs.y.uno/reference/cancel-payment) response contain the following values:
+To confirm you have successfully canceled the payment, check if the parameters from the [Cancel Payment endpoint](/reference/cancel-payment) response contain the following values:
 
 * `type = CANCEL`
 * `status = SUCCEEDED`
@@ -50,5 +50,5 @@ If the response contains the above values, the cancellation was successful.
 
 If, for some reason, you need to confirm the payment cancelation:
 
-* Use the [Retrieve Payment by ID](https://docs.y.uno/reference/retrieve-payment-by-id) or [Retrieve Payment by merchant\_order\_id](https://docs.y.uno/reference/retrieve-payment-by-merchant-order-id) to get detailed information about the payment.
-* Alternatively, set up webhooks to receive notifications for each event. Refer to the [Webhooks](https://docs.y.uno/docs/configure-webhooks) guide to learn how to configure webhooks in Yuno.
+* Use the [Retrieve Payment by ID](/reference/retrieve-payment-by-id) or [Retrieve Payment by merchant\_order\_id](/reference/retrieve-payment-by-merchant-order-id) to get detailed information about the payment.
+* Alternatively, set up webhooks to receive notifications for each event. Refer to the [Webhooks](/docs/configure-webhooks) guide to learn how to configure webhooks in Yuno.

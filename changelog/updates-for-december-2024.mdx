@@ -62,11 +62,11 @@ Account Funding Transactions (AFT) are financial transactions that facilitate fu
 [...]
 ```
 
-For more information, please refer to the [AFT](https://docs.y.uno/docs/account-funding-transactions-afts) guides section in the documentation.
+For more information, please refer to the [AFT](/docs/account-funding-transactions-afts) guides section in the documentation.
 
 ## Network Transaction ID
 
-We've added the possibility to send in the [Payments API](https://docs.y.uno/reference/create-payment) the `network_transaction_id` recommended for subscription payments with enrolled payment methods.
+We've added the possibility to send in the [Payments API](/reference/create-payment) the `network_transaction_id` recommended for subscription payments with enrolled payment methods.
 
 The Network Transaction ID Is a unique identifier assigned to a transaction by the card network. It tracks and references specific transactions, particularly in recurring payment scenarios, ensuring consistency and traceability across the payment lifecycle.
 
@@ -86,11 +86,11 @@ The Network Transaction ID Is a unique identifier assigned to a transaction by t
     }
 ```
 
-For more information, please refer to the [Stored credentials](https://docs.y.uno/docs/stored-credentials) guides section in the documentation.
+For more information, please refer to the [Stored credentials](/docs/stored-credentials) guides section in the documentation.
 
 ### Smart routing flag
 
-We've added a new field to the [Payment object](https://docs.y.uno/reference/the-payment-object) response called `smart_routing`. It's a field inside the routing rules object specifying whether a transaction went through the smart routing feature.
+We've added a new field to the [Payment object](/reference/the-payment-object) response called `smart_routing`. It's a field inside the routing rules object specifying whether a transaction went through the smart routing feature.
 
 ```json Example
 [...], 
@@ -105,11 +105,11 @@ We've added a new field to the [Payment object](https://docs.y.uno/reference/the
 [...]
 ```
 
-For more information, please refer to the [payments](https://docs.y.uno/reference/create-payment) API reference section.
+For more information, please refer to the [payments](/reference/create-payment) API reference section.
 
 ## Trial period for subscriptions
 
-We've added the possibility of defining a trial period for [Subscriptions](https://docs.y.uno/reference/create-subscription) in Yuno. This new feature lets you define a period where your customers can benefit from a reduced amount. Could be partial or total (in case you want to define a free trial for example), you need to determine the value to be reduced from the total amount of each subscription charge and the billing cycles it should apply to.
+We've added the possibility of defining a trial period for [Subscriptions](/reference/create-subscription) in Yuno. This new feature lets you define a period where your customers can benefit from a reduced amount. Could be partial or total (in case you want to define a free trial for example), you need to determine the value to be reduced from the total amount of each subscription charge and the billing cycles it should apply to.
 
 ```json
 [...],
@@ -123,4 +123,4 @@ We've added the possibility of defining a trial period for [Subscriptions](https
 [...]
 ```
 
-For more information, please refer to the [Subscriptions](https://docs.y.uno/docs/subscriptions) guides section in the documentation.
+For more information, please refer to the [Subscriptions](/docs/subscriptions) guides section in the documentation.

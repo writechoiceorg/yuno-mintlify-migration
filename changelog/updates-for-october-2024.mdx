@@ -14,7 +14,7 @@ There have been some updates on Yuno. Please check the updates below.
 
 ## Subscription retries
 
-We've added a new capability to the [Subscription](https://docs.y.uno/docs/subscriptions) feature called Smart Retries. Employ advanced machine learning techniques to identify the optimal timing for retrying a declined recurring credit card payment. By analyzing extensive data points and transaction attributes, it improves the probability of payment success, ensuring a steady flow of revenue and reducing involuntary subscriber churn.
+We've added a new capability to the [Subscription](/docs/subscriptions) feature called Smart Retries. Employ advanced machine learning techniques to identify the optimal timing for retrying a declined recurring credit card payment. By analyzing extensive data points and transaction attributes, it improves the probability of payment success, ensuring a steady flow of revenue and reducing involuntary subscriber churn.
 
 Now Yuno implements a retry scheme for every declined transaction if the merchant wants to forget about that logic.
 
@@ -28,11 +28,11 @@ Now Yuno implements a retry scheme for every declined transaction if the merchan
 | Sixth try   | 48 hours                     |
 | Seventh try | 96 hours                     |
 
-For more information, please refer to the [smart retries](https://docs.y.uno/reference/retries) documentation in the guides section.
+For more information, please refer to the [smart retries](/reference/retries) documentation in the guides section.
 
 ## Parent payment method type
 
-We've added a new field to the Payment object called `parent_payment_method_type`. The field (inside`transactions.payment_method`) represents the wallet provider used while creating a payment. When using a wallet for payments through a [direct integration](https://docs.y.uno/docs/apple-pay-direct-integration), this field indicates the provider from which the card information was obtained. Enum: APPLE\_PAY, GOOGLE\_PAY or CLICK\_TO\_PAY.
+We've added a new field to the Payment object called `parent_payment_method_type`. The field (inside`transactions.payment_method`) represents the wallet provider used while creating a payment. When using a wallet for payments through a [direct integration](/docs/apple-pay-direct-integration), this field indicates the provider from which the card information was obtained. Enum: APPLE\_PAY, GOOGLE\_PAY or CLICK\_TO\_PAY.
 
 ```json
 [...]
@@ -53,7 +53,7 @@ We've added a new field to the Payment object called `parent_payment_method_type
  [...]
 ```
 
-For more information, please refer to the [payment object](https://docs.y.uno/reference/the-payment-object) in the API reference section.
+For more information, please refer to the [payment object](/reference/the-payment-object) in the API reference section.
 
 ## Connection ID
 
@@ -69,7 +69,7 @@ We've added a new object to the Payment object called `connection_data`. The fie
 [...]
 ```
 
-For more information, please refer to the [payment object](https://docs.y.uno/reference/the-payment-object) in the API reference section.
+For more information, please refer to the [payment object](/reference/the-payment-object) in the API reference section.
 
 ## Receipts for Cancel Transactions
 
@@ -87,9 +87,9 @@ We've added a new capability to the cancel requests called Receipts. This capabi
 }
 ```
 
-Once the CANCEL is created, you can do a [get of the payment](https://docs.y.uno/reference/retrieve-payment-by-id) to find the receipt created in the "receipt\_url" field in the `payment.transaction` object.
+Once the CANCEL is created, you can do a [get of the payment](/reference/retrieve-payment-by-id) to find the receipt created in the "receipt\_url" field in the `payment.transaction` object.
 
-For more information, please refer to the [cancel](https://docs.y.uno/reference/cancel-payment) request in the API reference section.
+For more information, please refer to the [cancel](/reference/cancel-payment) request in the API reference section.
 
 ## Shipping
 
@@ -106,4 +106,4 @@ We've added a new object to the Payment object called `shipping`. The field spec
 [...]
 ```
 
-For more information, please refer to the [payment object](https://docs.y.uno/reference/the-payment-object) in the API reference section.
+For more information, please refer to the [payment object](/reference/the-payment-object) in the API reference section.

@@ -280,12 +280,12 @@ To test Card payments in general, Yuno provides the **Yuno Test Payment Gateway*
 
 ## Set up the Yuno Test Payment Gateway
 
-1. Complete the Test Payment Gateway [Integration configuration](https://docs.y.uno/docs/yuno-testing-gateway#integration-configuration).
+1. Complete the Test Payment Gateway [Integration configuration](/docs/yuno-testing-gateway#integration-configuration).
 2. After establishing the connection, you must designate the Yuno Test Payment Gateway as your card payment provider in your routing section. Access [Routing](https://dashboard.y.uno/routing) on the Yuno Dashboard, select **Not published**, find the **Card** option, and click **Set Up**.
 
 <Frame><img src="/images/reference/yuno-testing-gateway/image1.png" /></Frame>
 
-3. Create a new route for **Card**. If you are unsure how to create it, check the [Configure dynamic routing](https://docs.y.uno/docs/routing#configuring-the-dynamic-routing).
+3. Create a new route for **Card**. If you are unsure how to create it, check the [Configure dynamic routing](/docs/routing#configuring-the-dynamic-routing).
    1. On the Routing dashboard, add conditions to trigger the card payment. You can use card brand or country as trigger conditions, for example.
    2. For the created condition, add the Yuno Test Payment Gateway.
    3. For the **All other payments** options, select the **Cancel** option. The below image presents an example of a routing configuration where the card brand condition was used, accepting payments with Visa and Mastercard brands.
@@ -296,40 +296,40 @@ To test Card payments in general, Yuno provides the **Yuno Test Payment Gateway*
 
 <Frame><img src="/images/reference/yuno-testing-gateway/image3.png" /></Frame>
 
-Use the [Create payment](https://docs.y.uno/docs/create-payment-basic) guide to learn how to test card payments.
+Use the [Create payment](/docs/create-payment-basic) guide to learn how to test card payments.
 
 ## Test card payments with Yuno Testing Gateway
 
-On this page, you will find a walk-through guide on creating a card payment using the [Yuno Testing Gateway](https://docs.y.uno/docs/yuno-testing-gateway).
+On this page, you will find a walk-through guide on creating a card payment using the [Yuno Testing Gateway](/docs/yuno-testing-gateway).
 
-[Yuno Testing Gateway](https://docs.y.uno/docs/yuno-testing-gateway) is a Yuno solution to test card payment in general. It works as a connection. However, it is only available in the sandbox environment.
+[Yuno Testing Gateway](/docs/yuno-testing-gateway) is a Yuno solution to test card payment in general. It works as a connection. However, it is only available in the sandbox environment.
 
 ### Requirements
 
 Before starting following the steps described in this guide, you need to:
 
-* Access your [API credentials](https://docs.y.uno/docs/developers-credentials) on the Yuno Dashboard, which are composed by:
+* Access your [API credentials](/docs/developers-credentials) on the Yuno Dashboard, which are composed by:
   * `public-api-key`
   * `private-secret-key`
   * `account_id`
-* Set up the Yuno Testing Gateway connection on your Yuno Dashboard account. You find a step-by-step guide on connecting it in the [Integration configuration section](https://docs.y.uno/docs/yuno-testing-gateway#integration-configuration).
-* [Build a route](https://docs.y.uno/docs/routing#configuring-the-dynamic-routing) for the Yuno Testing Gateway to define it as your card payment provider. You find a step-by-step guide on how to do it in the Set up the [Yuno Testing Gateway section](https://docs.y.uno/docs/yuno-testing-gateway#set-up-the-yuno-test-payment-gateway).
-* [Configure the checkout builder](https://docs.y.uno/docs/checkout-builder) to make the Yuno Testing Gateway available.
+* Set up the Yuno Testing Gateway connection on your Yuno Dashboard account. You find a step-by-step guide on connecting it in the [Integration configuration section](/docs/yuno-testing-gateway#integration-configuration).
+* [Build a route](/docs/routing#configuring-the-dynamic-routing) for the Yuno Testing Gateway to define it as your card payment provider. You find a step-by-step guide on how to do it in the Set up the [Yuno Testing Gateway section](/docs/yuno-testing-gateway#set-up-the-yuno-test-payment-gateway).
+* [Configure the checkout builder](/docs/checkout-builder) to make the Yuno Testing Gateway available.
 
 ### Steps summary
 
 The create payment process normally requires finishing the four steps listed below.
 
-1. [Create a customer](https://docs.y.uno/reference/create-customer)
-2. [Create a checkout session](https://docs.y.uno/reference/create-checkout-session)
+1. [Create a customer](/reference/create-customer)
+2. [Create a checkout session](/reference/create-checkout-session)
 3. [Create a One-Time Token](#3-create-a-one-time-token-ott)
-4. [Create the payment](https://docs.y.uno/reference/create-payment)
+4. [Create the payment](/reference/create-payment)
 
 ### Create a payment
 
 #### 1. Create a customer
 
-Use the [Create Customer](https://docs.y.uno/reference/create-customer) to register the customer info. You will need to provide personal customer information. In addition, you also need to supply the `merchant_customer_id`, a unique identifier for the customer used on your system.
+Use the [Create Customer](/reference/create-customer) to register the customer info. You will need to provide personal customer information. In addition, you also need to supply the `merchant_customer_id`, a unique identifier for the customer used on your system.
 
 <Note>
 **Customer Complementary Information**
@@ -351,19 +351,19 @@ With a customer registered, you can create a checkout session. The checkout is w
 When creating the route, you can define conditions that work as filters. If you have used country as a condition, check if the provided country when creating the checkout session is on the condition list. Otherwise, the card payment may not be processed by the Yuno Testing Gateway.
 </Warning>
 
-Use the [Create Checkout Session](https://docs.y.uno/reference/create-checkout-session) endpoint. Notice that the `customer_id` required to perform the request is the `id` you received when creating the customer in [Step 1](https://docs.y.uno/docs/yuno-testing-gateway#1-create-a-customer).
+Use the [Create Checkout Session](/reference/create-checkout-session) endpoint. Notice that the `customer_id` required to perform the request is the `id` you received when creating the customer in [Step 1](/docs/yuno-testing-gateway#1-create-a-customer).
 
-From the request response to the  [Create Checkout Session](https://docs.y.uno/reference/create-checkout-session) endpoint, you will receive the `checkout_session` information. It will be used to create the one-time token (OTT) and the payment on the next steps.
+From the request response to the  [Create Checkout Session](/reference/create-checkout-session) endpoint, you will receive the `checkout_session` information. It will be used to create the one-time token (OTT) and the payment on the next steps.
 
 #### 3. Create a one-time token (OTT)
 
 An OTT is a unique identifier Yuno generates to protect your customer privacy and security. It serves as an identifier for payments detail and prevents sensitive data from being stored on your servers. Therefore, you can use OTTs to make it simple for your customers to repeat payments without re-entering their payment information, making the process more secure and convenient.
 
-You will always get the OTT from the Yuno SDK on your production application. However, to make it easier for you to test the payment creation process, Yuno provides the [Create OTT]() endpoint. You will need to provide the  `checkout_session` received in [Step 2](https://docs.y.uno/docs/yuno-testing-gateway#2-create-a-checkout-session) and define the payment type as `CARD` through the `type` parameter.  In the response, you will receive the `one-time-token`, which you will use to create the payment.
+You will always get the OTT from the Yuno SDK on your production application. However, to make it easier for you to test the payment creation process, Yuno provides the [Create OTT]() endpoint. You will need to provide the  `checkout_session` received in [Step 2](/docs/yuno-testing-gateway#2-create-a-checkout-session) and define the payment type as `CARD` through the `type` parameter.  In the response, you will receive the `one-time-token`, which you will use to create the payment.
 
 #### 4. Create a payment
 
-You will create a payment using the [Create Payment endpoint](https://docs.y.uno/reference/create-payment). Below you find a deeper description of how to create a payment.
+You will create a payment using the [Create Payment endpoint](/reference/create-payment). Below you find a deeper description of how to create a payment.
 
 #### 4.1 Provide the required attributes
 
@@ -376,7 +376,7 @@ Certain objects are not mandatory when creating a payment. However, if you provi
 Yuno provides two options for payment capture:
 
 * Single-step: Authorization and capture are performed simultaneously. You only need to create the payment. The authorization and capture are performed automatically. For the single-step option, you need to send the `capture` attribute as `true` on the request.
-* Two steps: Authorization and capture are performed at different moments. After creating the payment, you will need to perform an authorization request and a capture request.  if you wish to process the payment in Two Steps, send `capture` as `false` and after creating the payment, use the [Authorize Payment](https://docs.y.uno/reference/authorize-payment) and the [Capture Authorization](https://docs.y.uno/reference/capture-authorization) to complete the process.
+* Two steps: Authorization and capture are performed at different moments. After creating the payment, you will need to perform an authorization request and a capture request.  if you wish to process the payment in Two Steps, send `capture` as `false` and after creating the payment, use the [Authorize Payment](/reference/authorize-payment) and the [Capture Authorization](/reference/capture-authorization) to complete the process.
 
 #### 4.3 Define the payment workflow
 
@@ -388,7 +388,7 @@ When creating the payment, you need to inform which integration from Yuno you ar
 
 #### 4.4 Provide the payment method information
 
-Inform the payment method information through the object `payment_method`. Here, you will provide the `one-time-token` through the attribute `token` and select the payment `type` equal to `CARD`, the one informed in  [Step 3](https://docs.y.uno/docs/yuno-testing-gateway#3-create-a-one-time-token-ott), based on the [Payment type list](https://docs.y.uno/reference/payment-type-list). In addition, you need to add the card information on the object `detail.card`.
+Inform the payment method information through the object `payment_method`. Here, you will provide the `one-time-token` through the attribute `token` and select the payment `type` equal to `CARD`, the one informed in  [Step 3](/docs/yuno-testing-gateway#3-create-a-one-time-token-ott), based on the [Payment type list](/reference/payment-type-list). In addition, you need to add the card information on the object `detail.card`.
 
 You can use the payment description or specific card data to get the desired result when you test payment with Yuno Test Payment Gateway. The following sections describe in detail each approach.
 
@@ -400,7 +400,7 @@ Yuno system follows a sequential process, initially examining card data and subs
 
 ##### 4.4.1 - Payment Description
 
-To get the desired payment result using the payment description, you need to define the expected result as the description of the payment you create. For example, if you are testing a payment and expect a successful result, the payment description should be "SUCCEEDED". You will find all available options in the [Transaction Codes](https://docs.y.uno/reference/transaction#transaction-codes) section.
+To get the desired payment result using the payment description, you need to define the expected result as the description of the payment you create. For example, if you are testing a payment and expect a successful result, the payment description should be "SUCCEEDED". You will find all available options in the [Transaction Codes](/reference/transaction#transaction-codes) section.
 
 ##### 4.4.2 - Card detail
 
@@ -1054,6 +1054,6 @@ The same OTP codes are valid for Visa, Mastercard and Amex scenarios.
 
 #### 5. Check the payment status
 
-After performing the request to the [Create Payment](https://docs.y.uno/reference/create-payment), you can check the payment status by analyzing the `status` and `sub_status` from the response. Check the [Payment Status](https://docs.y.uno/reference/payment) page to see all the options you can receive in response to the payment creation request.
+After performing the request to the [Create Payment](/reference/create-payment), you can check the payment status by analyzing the `status` and `sub_status` from the response. Check the [Payment Status](/reference/payment) page to see all the options you can receive in response to the payment creation request.
 
-Depending on the processor and payment method, the status may take some time to update. Therefore, you may need to use endpoints to recover the payment status. To perform this task, you can use the [Retrieve Payment by ID](https://docs.y.uno/reference/retrieve-payment-by-id) or [Retrieve Payment by merchant\_order\_id](https://docs.y.uno/reference/retrieve-payment-by-merchant-order-id) endpoints. Another option is to use webhooks to receive notifications after each event. Yuno recommends you use webhooks to monitor asynchronous payments better. Check the [Webhooks](https://docs.y.uno/docs/configure-webhooks) guide to learn how to configure the webhooks solution provided by Yuno.
+Depending on the processor and payment method, the status may take some time to update. Therefore, you may need to use endpoints to recover the payment status. To perform this task, you can use the [Retrieve Payment by ID](/reference/retrieve-payment-by-id) or [Retrieve Payment by merchant\_order\_id](/reference/retrieve-payment-by-merchant-order-id) endpoints. Another option is to use webhooks to receive notifications after each event. Yuno recommends you use webhooks to monitor asynchronous payments better. Check the [Webhooks](/docs/configure-webhooks) guide to learn how to configure the webhooks solution provided by Yuno.

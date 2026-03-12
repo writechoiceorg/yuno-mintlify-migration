@@ -46,7 +46,7 @@ When customers choose Click to Pay on VTEX stores:
 * Customer information (CVV, email, address) is pre-filled in the SDK, eliminating redundant data entry
 * The checkout flow matches the streamlined experience available for non-VTEX merchants
 
-This feature requires the **Create customer** field to be set to **Yes** in the VTEX provider configuration. For more details, see [Configure Yuno as Provider](https://docs.y.uno/docs/configure-yuno-as-provider) in the VTEX integration documentation.
+This feature requires the **Create customer** field to be set to **Yes** in the VTEX provider configuration. For more details, see [Configure Yuno as Provider](/docs/configure-yuno-as-provider) in the VTEX integration documentation.
 
 ## SDK integration (Click to Pay Passkey)
 
@@ -102,7 +102,7 @@ The deeplink query string includes the information you need to continue:
 If the deeplink contains a `one_time_token`:
 
 1. Extract the `one_time_token`.
-2. Use it to create the payment with the [Create Payment endpoint](https://docs.y.uno/reference/create-payment).
+2. Use it to create the payment with the [Create Payment endpoint](/reference/create-payment).
 3. After creating the payment, call `continuePayment` in the SDK to finalize the flow.
 
 <Info>
@@ -117,6 +117,6 @@ For Android, include a `callback_url` that matches your app’s deeplink scheme 
 
 1. Check `has_error` to manage cancellations or failures.
 2. Extract `one_time_token` (and the optional `checkout_session`) from the URI.
-3. Send the OTT to your backend to call the [Create Payment endpoint](https://docs.y.uno/reference/create-payment), then invoke `continuePayment` in the SDK to resume the flow.
+3. Send the OTT to your backend to call the [Create Payment endpoint](/reference/create-payment), then invoke `continuePayment` in the SDK to resume the flow.
 
-See the full SDK guides for detailed samples: [Android Full Checkout](https://docs.y.uno/docs/android) and [iOS Full Checkout](https://docs.y.uno/docs/ios).
+See the full SDK guides for detailed samples: [Android Full Checkout](/docs/android) and [iOS Full Checkout](/docs/ios).

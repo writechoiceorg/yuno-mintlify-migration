@@ -3,13 +3,13 @@ title: "Create Entity Onboarding (Banking Connectivity)"
 openapi: "/openapi.json POST /v1/banking/entities/{entity_id}/onboardings"
 ---
 
-Onboard an existing [Entity](https://docs.y.uno/reference/create-entity) with a Banking Connectivity provider.
+Onboard an existing [Entity](/reference/create-entity) with a Banking Connectivity provider.
 
 ## Onboarding types
 
 * **`ONE_STEP`**: Submit all information, compliance declarations, risk assessment, and documents at once. The provider processes immediately.
 * **`PREVIOUSLY_ONBOARDED`**: Generate an internal Yuno onboarding ID without contacting the provider. Use when the entity was already onboarded externally.
 
-For `ONE_STEP`, include `compliance_declaration`, `risk_assessment`, `source_of_funds`, and `documentation`. See [Documentation types](https://docs.y.uno/reference/banking-connectivity#documentation-types) for the full list of supported document types.
+For `ONE_STEP`, include `compliance_declaration`, `risk_assessment`, `source_of_funds`, and `documentation`. See [Documentation types](/reference/banking-connectivity#documentation-types) for the full list of supported document types.
 
-Monitor progress via [Get Entity Onboarding Status](https://docs.y.uno/reference/get-entity-onboarding-status) or webhook events. See [Onboarding statuses](https://docs.y.uno/reference/banking-connectivity#onboarding-statuses) for the full status lifecycle.
+Monitor progress via [Get Entity Onboarding Status](/reference/get-entity-onboarding-status) or webhook events. See [Onboarding statuses](/reference/banking-connectivity#onboarding-statuses) for the full status lifecycle.

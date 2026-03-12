@@ -5,7 +5,7 @@ title: "SDK Integration"
 This guide covers how to integrate Google Pay™ with Yuno using the SDK. With this approach, Yuno's SDK manages the complete Google Pay experience: displaying the Google Pay button, presenting the payment sheet, and handling the payment token. You don't need to integrate directly with the Google Pay API.
 
 <Note>
-  Before implementing, review the [Google Pay requirements](https://docs.y.uno/docs/google-pay#requirements) and ensure Google Pay is available in your operating countries.
+  Before implementing, review the [Google Pay requirements](/docs/google-pay#requirements) and ensure Google Pay is available in your operating countries.
 </Note>
 
 ## Overview
@@ -15,20 +15,20 @@ This guide covers how to integrate Google Pay™ with Yuno using the SDK. With t
 3. The SDK displays the Google Pay button and handles the payment sheet.
 4. The customer authorizes the payment through Google Pay.
 5. Yuno receives the payment token and processes the transaction with your configured provider.
-6. Monitor the payment status via [webhooks](https://docs.y.uno/docs/webhooks).
+6. Monitor the payment status via [webhooks](/docs/webhooks).
 
 ## Requirements
 
 * A Yuno account with API credentials ([Dashboard](https://dashboard.y.uno/))
 * A payment provider connection configured in the Yuno dashboard that supports Google Pay
 * A routing rule that includes the Google Pay payment method
-* Yuno SDK integrated in your application ([Web](https://docs.y.uno/docs/web-sdk-reference), [Android](https://docs.y.uno/docs/android-sdk-reference), or [iOS](https://docs.y.uno/docs/ios-sdk-reference))
+* Yuno SDK integrated in your application ([Web](/docs/web-sdk-reference), [Android](/docs/android-sdk-reference), or [iOS](/docs/ios-sdk-reference))
 
 ## Integration steps
 
 ### Step 1: Create a checkout session
 
-Use the [create checkout session](https://docs.y.uno/reference/create-checkout-session) endpoint to start a payment session:
+Use the [create checkout session](/reference/create-checkout-session) endpoint to start a payment session:
 
 ```json
 {
@@ -51,9 +51,9 @@ Initialize Yuno's SDK with the checkout session. The SDK automatically detects a
 
 Refer to the SDK documentation for your platform:
 
-* [Web SDK integration](https://docs.y.uno/docs/web-sdk-full)
-* [Android SDK integration](https://docs.y.uno/docs/android-sdk-full)
-* [iOS SDK integration](https://docs.y.uno/docs/ios-sdk-full)
+* [Web SDK integration](/docs/web-sdk-full)
+* [Android SDK integration](/docs/android-sdk-full)
+* [iOS SDK integration](/docs/ios-sdk-full)
 
 ### Step 3: Customer completes payment
 
@@ -66,7 +66,7 @@ The SDK handles the rest. When the customer selects Google Pay:
 
 ### Step 4: Handle the response
 
-The SDK returns the payment result. You can also monitor payment status through [webhooks](https://docs.y.uno/docs/webhooks) for asynchronous confirmation.
+The SDK returns the payment result. You can also monitor payment status through [webhooks](/docs/webhooks) for asynchronous confirmation.
 
 ## Create a payment with the SDK workflow
 
@@ -104,7 +104,7 @@ If you need to call the payment API directly while using the SDK checkout flow, 
 
 To test Google Pay in sandbox:
 
-1. Integrate [Yuno's SDK](https://docs.y.uno/docs/android) into your app.
+1. Integrate [Yuno's SDK](/docs/android) into your app.
 2. Create a Google test account and sign in to the [Google Pay Business Console](https://pay.google.com/business/console).
 3. In the Google Wallet business console, navigate to the API section and select **Create a Pass** to enable **Demo mode**.
 
@@ -119,7 +119,7 @@ After testing, request [Google Production Access](https://developers.google.com/
 
 ## Related documentation
 
-* [Google Pay overview](https://docs.y.uno/docs/google-pay)
-* [Google Pay Direct integration](https://docs.y.uno/docs/google-pay-direct-integration)
-* [Google Pay via provider](https://docs.y.uno/docs/integration-via-provider-google-pay)
-* [Google Pay with PIX](https://docs.y.uno/docs/google-pay-with-pix)
+* [Google Pay overview](/docs/google-pay)
+* [Google Pay Direct integration](/docs/google-pay-direct-integration)
+* [Google Pay via provider](/docs/integration-via-provider-google-pay)
+* [Google Pay with PIX](/docs/google-pay-with-pix)
