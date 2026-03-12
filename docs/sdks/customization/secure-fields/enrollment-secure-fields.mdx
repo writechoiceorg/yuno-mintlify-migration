@@ -1,5 +1,5 @@
 ---
-title: Secure Fields (Enrollment)
+title: secure-fields (Enrollment)
 excerpt: ''
 deprecated: false
 hidden: false
@@ -10,13 +10,13 @@ metadata:
 next:
   description: ''
 ---
-Implement Yuno's Secure Fields enrollment in your application by following these steps.
+Implement Yuno's secure-fields enrollment in your application by following these steps.
 
 Yuno provides a [TypeScript library](https://www.npmjs.com/package/@yuno-payments/sdk-web-types) for all available methods.
 
 ## Step 1: Include the library in your project
 
-Before proceeding with the Secure Fields implementation, see the [SDK Integration overview](quickstart-guide) for detailed instructions on how to properly integrate the SDK into your project.
+Before proceeding with the secure-fields implementation, see the [SDK Integration overview](quickstart-guide) for detailed instructions on how to properly integrate the SDK into your project.
 
 The integration guide provides three flexible methods:
 
@@ -60,9 +60,9 @@ const secureFields = yuno.secureFields({
 });
 ```
 
-### Step 5: Mount the Secure Fields
+### Step 5: Mount the secure-fields
 
-After defining the parameters, define, configure, and mount the Secure Fields. For each field, set `name` and `options` in `secureFields.create`.
+After defining the parameters, define, configure, and mount the secure-fields. For each field, set `name` and `options` in `secureFields.create`.
 
 Configurations:
 
@@ -82,7 +82,7 @@ Configurations:
 
 Once you have set the parameter, you will render the created Secure Field with the `render` function by selecting an HTML element using a valid CSS selector (`#`, `.`, `[data-*]`).
 
-Example (three Secure Fields):
+Example (three secure-fields):
 
 ```javascript
 const secureNumber = secureFields.create({
