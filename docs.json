@@ -57,74 +57,6 @@
             ]
           },
           {
-            "anchor": "SDKs",
-            "icon": "code",
-            "pages": [
-              {
-                "group": "Overview",
-                "pages": [
-                  "docs/sdks/overview/quickstart",
-                  "docs/sdks/overview/choose-integration",
-                  "docs/sdks/overview/understanding-flows"
-                ]
-              },
-              {
-                "group": "Full Checkout",
-                "pages": [
-                  "docs/sdks/full-checkout/web-payments",
-                  "docs/sdks/full-checkout/android-payments",
-                  "docs/sdks/full-checkout/ios-payments"
-                ]
-              },
-              {
-                "group": "Customization",
-                "pages": [
-                  "docs/sdks/customization/android",
-                  "docs/sdks/customization/ios",
-                  {
-                    "group": "Secure Fields",
-                    "pages": [
-                      "docs/sdks/customization/secure-fields/index",
-                      "docs/sdks/customization/secure-fields/payment-secure-fields",
-                      "docs/sdks/customization/secure-fields/enrollment-secure-fields"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Card Enrollment",
-                "pages": [
-                  "docs/sdks/card-enrollment/web-enrollment",
-                  "docs/sdks/card-enrollment/android-enrollment",
-                  "docs/sdks/card-enrollment/ios-enrollment"
-                ]
-              },
-              {
-                "group": "Resources",
-                "pages": [
-                  {
-                    "group": "Release Notes",
-                    "pages": [
-                      "docs/sdks/resources/release-notes/web",
-                      "docs/sdks/resources/release-notes/android",
-                      "docs/sdks/resources/release-notes/ios"
-                    ]
-                  },
-                  {
-                    "group": "References",
-                    "pages": [
-                      "docs/sdks/resources/references/web",
-                      "docs/sdks/resources/references/android",
-                      "docs/sdks/resources/references/ios"
-                    ]
-                  },
-                  "docs/sdks/resources/country-coverage",
-                  "docs/sdks/resources/languages-supported"
-                ]
-              }
-            ]
-          },
-          {
             "anchor": "Using Yuno",
             "icon": "gauge-high",
             "pages": [
@@ -622,7 +554,73 @@
           }
         ]
       },
-
+      {
+        "tab": "SDKs",
+        "pages": [
+          {
+            "group": "Overview",
+            "pages": [
+              "docs/sdks/overview/quickstart",
+              "docs/sdks/overview/choose-integration",
+              "docs/sdks/overview/understanding-flows"
+            ]
+          },
+          {
+            "group": "Full Checkout",
+            "pages": [
+              "docs/sdks/full-checkout/web-payments",
+              "docs/sdks/full-checkout/android-payments",
+              "docs/sdks/full-checkout/ios-payments"
+            ]
+          },
+          {
+            "group": "Customization",
+            "pages": [
+              "docs/sdks/customization/android",
+              "docs/sdks/customization/ios",
+              {
+                "group": "Secure Fields",
+                "pages": [
+                  "docs/sdks/customization/secure-fields/index",
+                  "docs/sdks/customization/secure-fields/payment-secure-fields",
+                  "docs/sdks/customization/secure-fields/enrollment-secure-fields"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Card Enrollment",
+            "pages": [
+              "docs/sdks/card-enrollment/web-enrollment",
+              "docs/sdks/card-enrollment/android-enrollment",
+              "docs/sdks/card-enrollment/ios-enrollment"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              {
+                "group": "Release Notes",
+                "pages": [
+                  "docs/sdks/resources/release-notes/web",
+                  "docs/sdks/resources/release-notes/android",
+                  "docs/sdks/resources/release-notes/ios"
+                ]
+              },
+              {
+                "group": "References",
+                "pages": [
+                  "docs/sdks/resources/references/web",
+                  "docs/sdks/resources/references/android",
+                  "docs/sdks/resources/references/ios"
+                ]
+              },
+              "docs/sdks/resources/country-coverage",
+              "docs/sdks/resources/languages-supported"
+            ]
+          }
+        ]
+      },
       {
         "tab": "Changelog",
         "groups": [
@@ -721,7 +719,7 @@
     },
     {
       "source": "/docs/basic-concepts",
-      "destination": "/docs/basic-concepts/index"
+      "destination": "/docs/basic-concepts"
     },
     {
       "source": "/docs/customers",
@@ -789,7 +787,7 @@
     },
     {
       "source": "/docs/secure-fields",
-      "destination": "/docs/yuno-sdks/web-sdks/secure-fields/index"
+      "destination": "/docs/yuno-sdks/web-sdks/secure-fields"
     },
     {
       "source": "/docs/payment-secure-fields",
@@ -925,7 +923,7 @@
     },
     {
       "source": "/docs/single-sign-on-sso",
-      "destination": "/docs/using-yuno/settings/single-sign-on-sso/index"
+      "destination": "/docs/using-yuno/settings/single-sign-on-sso"
     },
     {
       "source": "/docs/microsoft-entra-id-sso-guide",
@@ -985,7 +983,7 @@
     },
     {
       "source": "/docs/installments",
-      "destination": "/docs/payment-features/installments/index"
+      "destination": "/docs/payment-features/installments"
     },
     {
       "source": "/docs/merchant-installments",
@@ -997,7 +995,7 @@
     },
     {
       "source": "/docs/subscriptions",
-      "destination": "/docs/payment-features/subscriptions/index"
+      "destination": "/docs/payment-features/subscriptions"
     },
     {
       "source": "/docs/retries",
@@ -1044,10 +1042,6 @@
       "destination": "/docs/payouts-and-disputes/reason-codes"
     },
     {
-      "source": "/docs/webhooks",
-      "destination": "/docs/webhooks/index"
-    },
-    {
       "source": "/docs/configure-webhooks",
       "destination": "/docs/webhooks/configure-webhooks"
     },
@@ -1058,10 +1052,6 @@
     {
       "source": "/docs/verify-webhook-signatures-hmac",
       "destination": "/docs/webhooks/verify-webhook-signatures-hmac"
-    },
-    {
-      "source": "/docs/wallets",
-      "destination": "/docs/wallets/index"
     },
     {
       "source": "/docs/prerequisites-apple-pay",
@@ -1157,7 +1147,7 @@
     },
     {
       "source": "/docs/vtex",
-      "destination": "/docs/plugins/vtex/index"
+      "destination": "/docs/plugins/vtex"
     },
     {
       "source": "/docs/configure-yuno-as-provider",
@@ -1357,7 +1347,7 @@
     },
     {
       "source": "/reference/status-and-response-codes",
-      "destination": "/reference/payments/status-and-response-codes/index"
+      "destination": "/reference/payments/status-and-response-codes"
     },
     {
       "source": "/reference/payment",
@@ -1373,7 +1363,7 @@
     },
     {
       "source": "/reference/payment-examples",
-      "destination": "/reference/payments/payment-examples/index"
+      "destination": "/reference/payments/payment-examples"
     },
     {
       "source": "/reference/bank-transfer-copy",
@@ -1533,7 +1523,7 @@
     },
     {
       "source": "/reference/get-transfers",
-      "destination": "/reference/recipients-for-marketplace/get-transfers/index"
+      "destination": "/reference/recipients-for-marketplace/get-transfers"
     },
     {
       "source": "/reference/get-transfer-by-id",
@@ -1672,10 +1662,6 @@
       "destination": "/reference/ai-caller/initiate-recovery-outreach-for-abandoned-user-flows"
     },
     {
-      "source": "/reference/communications-campaigns",
-      "destination": "/reference/communications-campaigns/index"
-    },
-    {
       "source": "/reference/create-campaign",
       "destination": "/reference/communications-campaigns/create-campaign"
     },
@@ -1714,10 +1700,6 @@
     {
       "source": "/reference/get-conversion-rate",
       "destination": "/reference/conversion-rate/get-conversion-rate"
-    },
-    {
-      "source": "/reference/banking-connectivity",
-      "destination": "/reference/banking-connectivity/index"
     },
     {
       "source": "/reference/create-entity",
