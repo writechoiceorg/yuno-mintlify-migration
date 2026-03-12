@@ -82,7 +82,7 @@ No additional iOS-specific configuration is required beyond the Flutter package 
 
 Before initiating a payment through the SDK, create a customer and checkout session using Yuno's server-side API. The customer represents the person making the payment; the checkout session contains transaction details such as amount, currency, and available payment methods. Create these in your backend to ensure security and prevent client-side tampering.
 
-Create a customer using the [Create customer endpoint](/reference). This customer is required for checkout sessions and saved cards.
+Create a customer using the [Create customer endpoint](/reference/customers/create-customer). This customer is required for checkout sessions and saved cards.
 
 Create a new `checkout_session` using the [Create checkout session](/reference/checkout-sessions/create-checkout-session) endpoint. Keep the returned `checkout_session` ID for use in Step 4.
 
@@ -323,7 +323,7 @@ If the enrollment flow uses a deep link to return to your app on iOS:
 await Yuno.receiveDeeplink(url: uri);
 ```
 
-For Android deep link configuration, see [Android deep linking documentation](android-sdks/payment-flows-android#step-3-create-the-checkout-session).
+For Android deep link configuration, see [Android deep linking documentation](/docs/sdks/full-checkout/android-payments#step-3-create-the-checkout-session).
 
 ## Parameters
 
@@ -334,7 +334,7 @@ For the full list of parameters and options, see the subsections that follow.
 | Parameter     | Description                                                                     |
 | :------------ | :------------------------------------------------------------------------------ |
 | `apiKey`      | Your Yuno public API key.                                                       |
-| `countryCode` | Country where the payment is performed. See [Country coverage](../resources/country-coverage). |
+| `countryCode` | Country where the payment is performed. See [Country coverage](/docs/sdks/resources/country-coverage). |
 | `yunoConfig`  | SDK configuration options. See `YunoConfig` below.                              |
 | `iosConfig`   | iOS appearance configuration. See `IosConfig` below.                            |
 
@@ -391,7 +391,7 @@ For the full list of parameters and options, see the subsections that follow.
 | :------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customerSession`   | The `customer_session` ID created in your backend using the [Create customer session](/reference/customer-sessions-enrollment/create-customer-session) endpoint. This session is used to associate the enrolled payment method with a specific customer. |
 | `showPaymentStatus` | Controls whether the SDK displays its built-in enrollment status screens after enrollment completion. Set to `false` if you want to handle status display in your own UI. Default: `true`.                           |
-| `countryCode`       | Optional country code override for this enrollment. If not provided, the SDK uses the country code from `Yuno.init()`. See [Country coverage](../resources/country-coverage) for supported countries.                               |
+| `countryCode`       | Optional country code override for this enrollment. If not provided, the SDK uses the country code from `Yuno.init()`. See [Country coverage](/docs/sdks/resources/country-coverage) for supported countries.                               |
 
 ## customizations
 
@@ -423,7 +423,7 @@ iOS appearance is fully customizable through the `IosConfig.appearance` paramete
 
 When using `Color(0xFF...)` for iOS appearance customization, add `import 'dart:ui';` at the top of your file.
 
-For more iOS customization options, see [SDK customizations (iOS)](../customization/ios).
+For more iOS customization options, see [SDK customizations (iOS)](/docs/sdks/customization/ios).
 
 ### Android customization
 
@@ -491,7 +491,7 @@ data class YunoButtonStyles(
 | `fontSize`        | TextUnit   | Font size for button text.                                               |
 | `fontStyle`       | FontStyle  | Font style (normal, italic, bold) for button text.                      |
 
-Configure styles in your `Application` class during SDK initialization in `MyApp.kt`. For more Android customization options including XML themes and drawable customization, see [SDK customizations (Android)](../customization/android).
+Configure styles in your `Application` class during SDK initialization in `MyApp.kt`. For more Android customization options including XML themes and drawable customization, see [SDK customizations (Android)](/docs/sdks/customization/android).
 
 ## Environment variables (recommended)
 

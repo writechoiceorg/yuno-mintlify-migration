@@ -1,0 +1,179 @@
+⠋ checking for broken links...
+[2K[1A[2K[G⠙ checking for broken links...
+[2K[1A[2K[G⠹ checking for broken links...
+[2K[1A[2K[G⠸ checking for broken links...
+[2K[1A[2K[G⠼ checking for broken links...
+[2K[1A[2K[G⠴ checking for broken links...
+[2K[1A[2K[G⠦ checking for broken links...
+[2K[1A[2K[G⠧ checking for broken links...
+[2K[1A[2K[G⠇ checking for broken links...
+[2K[1A[2K[G⠏ checking for broken links...
+[2K[1A[2K[G⠋ checking for broken links...
+[2K[1A[2K[G⠙ checking for broken links...
+[2K[1A[2K[G⠹ checking for broken links...
+[2K[1A[2K[G⠸ checking for broken links...
+[2K[1A[2K[G⠼ checking for broken links...
+[2K[1A[2K[G⠴ checking for broken links...
+[2K[1A[2K[G⠦ checking for broken links...
+[2K[1A[2K[G⠧ checking for broken links...
+[2K[1A[2K[G⠇ checking for broken links...
+[2K[1A[2K[G⠏ checking for broken links...
+[2K[1A[2K[G⠋ checking for broken links...
+[2K[1A[2K[G⠙ checking for broken links...
+[2K[1A[2K[G⠹ checking for broken links...
+[2K[1A[2K[G⠸ checking for broken links...
+[2K[1A[2K[G⠼ checking for broken links...
+[2K[1A[2K[Gfound 110 broken links in 20 files
+
+docs/additional-services/qr-and-instant-pay.mdx
+ ⎿  /reference/pix-automático-overview
+
+docs/payment-features/installments/merchant-installments.mdx
+ ⎿  routing
+
+docs/payment-features/installments/provider-installments.mdx
+ ⎿  routing
+
+docs/payment-features/payment-amount-details.mdx
+ ⎿  payment-amount-details#shipping-amount
+
+docs/security-and-compliance/data-migration-processes/network-token-migration-pr
+ocess.mdx
+ ⎿  via-api
+
+docs/security-and-compliance/data-migration-processes/token-migration-process.md
+x
+ ⎿  via-api
+
+docs/using-yuno/dashboard-overview/connections.mdx
+ ⎿  ../docs/routing
+ ⎿  ../docs/routing#smart-routing
+
+docs/using-yuno/dashboard-overview/routing.mdx
+ ⎿  ../docs/connections
+
+docs/using-yuno/settings/developers-credentials.mdx
+ ⎿  ../docs/account-management
+
+docs/using-yuno/settings/teams-and-roles.mdx
+ ⎿  ../docs/account-management
+
+docs/wallets/google-pay.mdx
+ ⎿  google-pay-sdk-integration
+ ⎿  google-pay-direct-integration
+ ⎿  integration-via-provider-google-pay
+ ⎿  google-pay-with-pix
+
+docs/webhooks/index.mdx
+ ⎿  ../docs/configure-webhooks#receipt-confirmation-process
+
+reference/checkout-sessions/the-checkout-session-object.mdx
+ ⎿  country-reference
+
+reference/customers/the-customer-object.mdx
+ ⎿  country-reference
+ ⎿  country-reference
+
+reference/getting-started/api-reference-overview.mdx
+ ⎿  /docs/quickstart-guide
+
+reference/payment-links/the-payment-link-object.mdx
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+
+reference/payment-methods-direct-workflow/the-payment-method-object-api.mdx
+ ⎿  country-reference
+ ⎿  country-reference
+
+reference/payments/the-payment-object.mdx
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  payment-type-list
+ ⎿  eci-indicators-list
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  airline-information
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  airline-information
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  items-category-list
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  shipping-reference
+ ⎿  shipping-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  industry-category-list
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  payment-type-list
+ ⎿  eci-indicators-list
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+
+reference/payouts/the-payout-object.mdx
+ ⎿  purposes-list
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  country-reference
+
+reference/subscriptions/the-subscription-object.mdx
+ ⎿  country-reference
+ ⎿  country-reference
+ ⎿  items-category-list
+

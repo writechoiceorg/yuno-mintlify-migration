@@ -8,12 +8,12 @@ metadata:
 
 The iOS SDK makes it easy to implement enrollment flows for saving payment methods to a customer account.
 
-Include the library in your project by following the same steps as in [full-checkout](../full-checkout/ios-payments#include-the-library-in-your-project).
+Include the library in your project by following the same steps as in [full-checkout](/docs/sdks/full-checkout/ios-payments#include-the-library-in-your-project).
 
 ## Additional resources
 
-- See [Choose the right integration for you](../overview/choose-integration) if you're unsure which flow to follow.
-- Access the [Release notes](../resources/release-notes/ios) or the [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) to verify the latest SDK version available.
+- See [Choose the right integration for you](/docs/sdks/overview/choose-integration) if you're unsure which flow to follow.
+- Access the [Release notes](/docs/sdks/resources/release-notes/ios) or the [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) to verify the latest SDK version available.
 
 - [full-checkout Enrollment (iOS)](#full-checkout-enrollment-ios): Automatic enrollment with pre-built UI components
 
@@ -22,11 +22,11 @@ Include the library in your project by following the same steps as in [full-chec
 * CocoaPods or [Swift Package Manager](https://www.swift.org/package-manager/)
 * iOS 14.0 or later
 * Active Yuno account; API credentials (obtain from the [Yuno Dashboard](https://dashboard.y.uno/) → **Developers** > **Credentials**)
-* Create a customer using the [Create customer endpoint](/reference) before enrolling
+* Create a customer using the [Create customer endpoint](/reference/customers/create-customer) before enrolling
 
 ## Parameters
 
-For the full list of parameters, see the [iOS SDK Common Reference](../resources/references/ios).
+For the full list of parameters, see the [iOS SDK Common Reference](/docs/sdks/resources/references/ios).
 
 | Parameter | Description |
 |-----------|-------------|
@@ -43,7 +43,7 @@ The Yuno full-checkout iOS SDK provides enrollment with pre-built UI, card enrol
 
 ### Step 1: Create a customer and customer session
 
-Create a customer in Yuno's system using the [Create customer endpoint](/reference) before enrolling payment methods. This endpoint will return a `customer_id` that you'll use to associate enrolled payment methods with the specific customer.
+Create a customer in Yuno's system using the [Create customer endpoint](/reference/customers/create-customer) before enrolling payment methods. This endpoint will return a `customer_id` that you'll use to associate enrolled payment methods with the specific customer.
 
 Then create a customer session using the [Create Customer Session](/reference/customer-sessions-enrollment/create-customer-session) endpoint. The session information will be used when calling the enrollment methods.
 
@@ -60,7 +60,7 @@ The response includes a `customer_session` ID that you'll use in the next step.
 
 ### Step 2: Include the library in your project
 
-Including the library in your project is done in the same way as in payment flows. Follow the steps in [Include the library in your project](../full-checkout/ios-payments#include-the-library-in-your-project) there.
+Including the library in your project is done in the same way as in payment flows. Follow the steps in [Include the library in your project](/docs/sdks/full-checkout/ios-payments#include-the-library-in-your-project) there.
 
 #### CocoaPods
 
@@ -82,7 +82,7 @@ dependencies: [
 ]
 ```
 
-Check the [Release notes](../resources/release-notes/ios) or [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) for the current SDK version.
+Check the [Release notes](/docs/sdks/resources/release-notes/ios) or [Yuno iOS SDK repository](https://github.com/yuno-payments/yuno-sdk-ios) for the current SDK version.
 
 ### Step 3: Initialize SDK with the public key
 
@@ -156,8 +156,8 @@ class ViewController: UIViewController, YunoEnrollmentDelegate {
 | Parameter | Description |
 |-----------|-------------|
 | `customerSession` | The unique identifier for the customer session. |
-| `countryCode` | Country code where the enrollment is performed. See [Country Coverage](../resources/country-coverage) for supported countries. |
-| `language` | Language code for the enrollment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](../resources/languages-supported). |
+| `countryCode` | Country code where the enrollment is performed. See [Country Coverage](/docs/sdks/resources/country-coverage) for supported countries. |
+| `language` | Language code for the enrollment forms (e.g., `"en"`, `"es"`, `"pt"`). See [Supported languages](/docs/sdks/resources/languages-supported). |
 | `viewController` | The `UIViewController` used to present the enrollment flow. Required for proper UI presentation. |
 | `yunoEnrollmentResult(_:)` | Called when the enrollment process completes with the final result. |
 
@@ -243,9 +243,9 @@ func yunoEnrollmentResult(_ result: Yuno.Result) {
 
 ### Complementary features
 
-For styling, themes, form options, and additional configurations, see [SDK customizations](../customization/ios).
+For styling, themes, form options, and additional configurations, see [SDK customizations](/docs/sdks/customization/ios).
 
 
 ## Common reference
 
-For full parameter and customization details, see the [iOS SDK Common Reference](../resources/references/ios).
+For full parameter and customization details, see the [iOS SDK Common Reference](/docs/sdks/resources/references/ios).

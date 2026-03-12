@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-Parameters, customizations, and advanced features for all Web SDK flows. See [Quickstart guide](../../overview/quickstart) and [Choose the Right Integration for You](../../overview/choose-integration) for introductory information.
+Parameters, customizations, and advanced features for all Web SDK flows. See [Quickstart guide](/docs/sdks/overview/quickstart) and [Choose the Right Integration for You](/docs/sdks/overview/choose-integration) for introductory information.
 
 ## TypeScript support
 
@@ -75,7 +75,7 @@ When creating a checkout session on your backend, the following parameters are c
 
 ## Payment and checkout parameters (full reference)
 
-Parameters for `yuno.startCheckout`, `yuno.mountCheckout`, and related payment flows. All parameters used in [Payment flows (Web)](../../full-checkout/web-payments) are listed here with full detail.
+Parameters for `yuno.startCheckout`, `yuno.mountCheckout`, and related payment flows. All parameters used in [Payment flows (Web)](/docs/sdks/full-checkout/web-payments) are listed here with full detail.
 
 ### Core parameters
 
@@ -84,7 +84,7 @@ Parameters for `yuno.startCheckout`, `yuno.mountCheckout`, and related payment f
 | `checkoutSession`   | string  | Yes      | Checkout session ID returned from your backend (Create checkout session API). Required for all payment flows.                                                                                                                                                      |
 | `elementSelector`   | string  | No*      | CSS selector for the element where the SDK mounts (e.g. `#root`). Deprecated when used alone; prefer `renderMode.elementSelector` object to control APM and action areas independently. *Required when `renderMode.type` is `'element'` and using the object form. |
 | `countryCode`       | string  | Yes      | ISO country code where the payment runs (e.g. `FR`, `US`). Determines available payment methods and compliance.                                                                                                                                                    |
-| `language`          | string  | No       | Language code for the UI (e.g. `fr-FR`, `en-US`). Defaults to browser language when available. See [Supported languages](../languages-supported).                                                                                                                     |
+| `language`          | string  | No       | Language code for the UI (e.g. `fr-FR`, `en-US`). Defaults to browser language when available. See [Supported languages](/docs/sdks/resources/languages-supported).                                                                                                                     |
 | `showLoading`       | boolean | No       | When `true`, shows the SDK loading spinner. Default `true`. Remains visible until `hideLoader()` or `continuePayment()` is called.                                                                                                                                 |
 | `showPaymentStatus` | boolean | No       | When `true`, shows the payment result screen after the flow completes. Optional.                                                                                                                                                                                   |
 | `issuersFormEnable` | boolean | No       | When `true`, shows the issuer (bank) list form. Default `true` in source. Optional.                                                                                                                                                                                |
@@ -126,12 +126,12 @@ Parameters for `yuno.startCheckout`, `yuno.mountCheckout`, and related payment f
 
 ## Enrollment parameters (full reference)
 
-Parameters for `yuno.mountEnrollment`. All parameters used in [Enrollment flows (Web)](../../card-enrollment/web-enrollment) are listed here with full detail.
+Parameters for `yuno.mountEnrollment`. All parameters used in [Enrollment flows (Web)](/docs/sdks/card-enrollment/web-enrollment) are listed here with full detail.
 
 | Parameter              | Type     | Required | Description                                                                                                                                                                                                                                     |
 | ---------------------- | -------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customerSession`      | string   | Yes      | Customer session ID from your backend (Create customer session API). Required. Associates the enrolled payment method with a specific customer.                                                                                                 |
-| `countryCode`          | string   | Yes      | ISO country code (e.g. `US`, `BR`). Determines available enrollment options. See [Country coverage](../country-coverage).                                                                                                                          |
+| `countryCode`          | string   | Yes      | ISO country code (e.g. `US`, `BR`). Determines available enrollment options. See [Country coverage](/docs/sdks/resources/country-coverage).                                                                                                                          |
 | `language`             | string   | No       | Language code for the UI (e.g. `en`, `en-US`). Defaults to browser language when available.                                                                                                                                                     |
 | `showLoading`          | boolean  | No       | When `true`, shows the loading spinner during enrollment. Default `true`.                                                                                                                                                                       |
 | `onLoading`            | function | No       | Callback when loading state changes during enrollment.                                                                                                                                                                                          |
@@ -185,7 +185,7 @@ yuno.unmountAllExternalButtons();
 
 ## Enrolling payment methods
 
-You can enroll payment methods (store cards for future use) directly during the payment flow by setting `payment_method.vault_on_success = true` in the [checkout session creation](https://docs.y.uno/reference/the-checkout-session-object).
+You can enroll payment methods (store cards for future use) directly during the payment flow by setting `payment_method.vault_on_success = true` in the [checkout session creation](/reference/checkout-sessions/the-checkout-session-object).
 
 When `vault_on_success` is set to `true`:
 
@@ -207,4 +207,4 @@ When `vault_on_success` is set to `true`:
 
 To generate and receive a `vaulted_token` when `vault_on_success = true`, the payment must reference an existing Yuno customer through `customer_payer.id` in the checkout session. Creating or sending the customer data inline inside the payment request does not create the customer on our side, so no vaulting will occur.
 
-For enrollment flows, see [Enrollment flows (Web)](../../card-enrollment/web-enrollment).
+For enrollment flows, see [Enrollment flows (Web)](/docs/sdks/card-enrollment/web-enrollment).

@@ -85,9 +85,9 @@ Choose your platform and follow the steps to start process your first payments w
 
     **Test with**: Card `4111 1111 1111 1111`, any future date, any CVV
 
-    For a comprehensive overview of all Web SDK parameters, see [Web SDK Common Reference](../resources/references/web).
+    For a comprehensive overview of all Web SDK parameters, see [Web SDK Common Reference](/docs/sdks/resources/references/web).
 
-    [Complete Web guide →](../full-checkout/web-payments)
+    [Complete Web guide →](/docs/sdks/full-checkout/web-payments)
 
     </Tab>
     <Tab title="iOS">
@@ -169,9 +169,9 @@ Choose your platform and follow the steps to start process your first payments w
 
     **Test with**: Card `4111 1111 1111 1111`, any future date, any CVV
 
-    For a comprehensive overview of all iOS SDK parameters, see [iOS SDK Common Reference](../resources/references/ios).
+    For a comprehensive overview of all iOS SDK parameters, see [iOS SDK Common Reference](/docs/sdks/resources/references/ios).
 
-    [Complete iOS guide →](../full-checkout/ios-payments)
+    [Complete iOS guide →](/docs/sdks/full-checkout/ios-payments)
 
     </Tab>
     <Tab title="Android">
@@ -281,9 +281,9 @@ Choose your platform and follow the steps to start process your first payments w
 
     **Test with**: Card `4111 1111 1111 1111`, any future date, any CVV
 
-    For a comprehensive overview of all Android SDK parameters, see [Android SDK Common Reference](../resources/references/android).
+    For a comprehensive overview of all Android SDK parameters, see [Android SDK Common Reference](/docs/sdks/resources/references/android).
 
-    [Complete Android guide →](../full-checkout/android-payments)
+    [Complete Android guide →](/docs/sdks/full-checkout/android-payments)
 
     </Tab>
 </Tabs>
@@ -299,7 +299,7 @@ Before displaying the payment UI, your backend creates a checkout session:
 - **Endpoint**: `POST https://api-sandbox.y.uno/v1/checkout/sessions`
 - **Required**: Customer ID, amount, country
 - **Returns**: `checkout_session` ID (used in SDK)
-- **Reference**: [Create checkout session API](https://docs.y.uno/reference/create-checkout-session)
+- **Reference**: [Create checkout session API](/reference/checkout-sessions/create-checkout-session)
 
 **Example request**:
 ```json
@@ -322,7 +322,7 @@ In the One-Time Token (OTT) callback, your backend creates the payment:
 - **Endpoint**: `POST https://api-sandbox.y.uno/v1/payments`
 - **Required**: One-time token (from SDK callback), checkout session
 - **Returns**: Payment status and `sdk_action_required` field
-- **Reference**: [Create payment API](https://docs.y.uno/reference/create-payment)
+- **Reference**: [Create payment API](/reference/payments/create-payment)
 
 **Example request**:
 ```json
@@ -346,16 +346,16 @@ Primary parameters used in this quickstart:
 | --------- | ----------- |
 | `publicKey` / `apiKey` | Your Yuno public API key (frontend). From [Yuno Dashboard](https://dashboard.y.uno/) → **Developers** > **Credentials**. |
 | `checkoutSession` | Checkout session ID returned by your backend (create session endpoint). Required to start payment. |
-| `countryCode` | ISO country code for the payment (e.g. `US`, `CO`). See [Country coverage](../resources/country-coverage). |
+| `countryCode` | ISO country code for the payment (e.g. `US`, `CO`). See [Country coverage](/docs/sdks/resources/country-coverage). |
 | `elementSelector` (Web) | CSS selector for the element where the payment form is mounted (e.g. `#payment-form`). |
 
-Full parameter reference: [Payment flows (Web)](../full-checkout/web-payments), [Payment flows (iOS)](../full-checkout/ios-payments), [Payment flows (Android)](../full-checkout/android-payments).
+Full parameter reference: [Payment flows (Web)](/docs/sdks/full-checkout/web-payments), [Payment flows (iOS)](/docs/sdks/full-checkout/ios-payments), [Payment flows (Android)](/docs/sdks/full-checkout/android-payments).
 
 ## secure-fields integration
 
 If you need more control over the UI than full-checkout provides, you can use **secure-fields**. This allows you to build your own payment forms while Yuno handles the secure data collection.
 
-[Learn more about secure-fields →](../customization/secure-fields/index)
+[Learn more about secure-fields →](/docs/sdks/customization/secure-fields/index)
 
 ## Test cards
 

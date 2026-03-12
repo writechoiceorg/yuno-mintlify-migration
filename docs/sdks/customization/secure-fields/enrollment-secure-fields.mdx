@@ -16,7 +16,7 @@ Yuno provides a [TypeScript library](https://www.npmjs.com/package/@yuno-payment
 
 ## Step 1: Include the library in your project
 
-Before proceeding with the secure-fields implementation, see the [SDK Integration overview](../overview/quickstart) for detailed instructions on how to properly integrate the SDK into your project.
+Before proceeding with the secure-fields implementation, see the [SDK Integration overview](/docs/sdks/overview/quickstart) for detailed instructions on how to properly integrate the SDK into your project.
 
 The integration guide provides three flexible methods:
 
@@ -34,7 +34,7 @@ Get a `Yuno` instance class in your JavaScript application with a valid `PUBLIC_
 const yuno = await Yuno.initialize(PUBLIC_API_KEY);
 ```
 
-See the [credentials page](https://docs.y.uno/reference/authentication) for more information.
+See the [credentials page](/reference/getting-started/authentication) for more information.
 
 ### Step 3: Create a customer session and an enrollment payment method object
 
@@ -50,7 +50,7 @@ Configure the secure fields with the following options:
 
 | Parameter         | Description                                                                                                                                                                                                                                                                                   |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `countryCode`     | This parameter specifies the country for which the payment process is being set up. Use an `ENUM` value representing the desired country code. You can find the full list of supported countries and their corresponding codes on the [Country Coverage](../resources/country-coverage) page. |
+| `countryCode`     | This parameter specifies the country for which the payment process is being set up. Use an `ENUM` value representing the desired country code. You can find the full list of supported countries and their corresponding codes on the [Country Coverage](/docs/sdks/resources/country-coverage) page. |
 | `customerSession` | Refers to the current enrollment's customer session. `Example: '438413b7-4921-41e4-b8f3-28a5a0141638'`                                                                                                                                                                                        |
 
 ```javascript
