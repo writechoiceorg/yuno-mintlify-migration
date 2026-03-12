@@ -55,7 +55,9 @@ The `national_entity` field determines the entity structure:
 | `CANCELLED`  | Transfer cancelled before processing               | Yes      |
 | `REVERSED`   | Completed transfer was reversed (e.g., ACH return) | Yes      |
 
-> **Note:** Instant payment rails (RTP, FPS, NPP) skip the `PROCESSING` state and go directly from `PENDING` to `COMPLETED` or `FAILED`.
+<Note>
+**Note:** Instant payment rails (RTP, FPS, NPP) skip the `PROCESSING` state and go directly from `PENDING` to `COMPLETED` or `FAILED`.
+</Note>
 
 ## Payment rails
 

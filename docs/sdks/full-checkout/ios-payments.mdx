@@ -179,9 +179,11 @@ class ViewController: UIViewController, YunoPaymentDelegate {
 | `yunoCreatePayment(with:information:)` | Alternative callback that includes additional token information. Use only one version.                                                          |
 | `yunoPaymentResult(_:)`                | Called when the payment process completes. Receives a `Yuno.Result` enum value. See [Payment Status reference](ref:payment) for status mapping. |
 
-> ❗ Important Note
->
-> Use either `yunoCreatePayment(with:)` **OR** `yunoCreatePayment(with:information:)` based on your needs—not both. Calling both may cause issues.
+<Danger>
+**Important Note**
+
+Use either `yunoCreatePayment(with:)` **OR** `yunoCreatePayment(with:information:)` based on your needs—not both. Calling both may cause issues.
+</Danger>
 
 ### Step 5: Mount the SDK with automatic payment method display
 
@@ -231,9 +233,11 @@ The SDK automatically returns the correct view type:
 * **UIKit**: Returns a `UIView`
 * **SwiftUI**: Returns a `some View`
 
-> ❗ Important
->
-> Always ensure the payment methods view container has proper constraints or layout configuration. The SDK will notify you of height changes through `yunoUpdatePaymentMethodsViewHeight(_:)` if needed.
+<Danger>
+**Important**
+
+Always ensure the payment methods view container has proper constraints or layout configuration. The SDK will notify you of height changes through `yunoUpdatePaymentMethodsViewHeight(_:)` if needed.
+</Danger>
 
 ### Step 6: Start the payment process
 
@@ -293,7 +297,9 @@ POST /v1/payments
 
 The response from the Create payment endpoint will include the parameter `sdk_action_required`, which defines if additional actions are required to finish the payment based on the payment type.
 
-> 🚧 **Required:** Integrate the `continuePayment` method after the payment is created. Some asynchronous payment methods require additional customer actions. When the API response sets `sdk_action_required` to `true`, call `Yuno.continuePayment()` to display the necessary screens.
+<Warning>
+**Required:** Integrate the `continuePayment` method after the payment is created. Some asynchronous payment methods require additional customer actions. When the API response sets `sdk_action_required` to `true`, call `Yuno.continuePayment()` to display the necessary screens.
+</Warning>
 
 ### Step 9: Continue payment
 
@@ -307,9 +313,11 @@ To show your payment status screens, handle status through the `yunoPaymentResul
 
 ### Step 10: Handle external browser return (Optional)
 
-> ❗ Deep Links and Mercado Pago Checkout Pro
->
-> This step is only required if you're using a payment method that relies on deep links or Mercado Pago Checkout Pro. If your payment methods don't use deep links, you can skip this step.
+<Danger>
+**Deep Links and Mercado Pago Checkout Pro**
+
+This step is only required if you're using a payment method that relies on deep links or Mercado Pago Checkout Pro. If your payment methods don't use deep links, you can skip this step.
+</Danger>
 
 Some payment methods take users out of your app to complete the transaction. Once the payment is finished, the user is redirected back using a deep link. Update your `AppDelegate` to pass the incoming URL to the Yuno SDK:
 

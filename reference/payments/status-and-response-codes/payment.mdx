@@ -292,11 +292,11 @@ The payments can have the following status and sub status.
   </tbody>
 </table>
 
-> Note
->
-> `PREVENTED` is a transaction status only for `type = CHARGEBACK` when the provider/network reports a [predispute deflection](https://docs.y.uno/docs/chargeback-management). In these scenarios, only the chargeback webhook is sent; no refund webhook is emitted.
->
-> `REVIEW_WON` is a chargeback transaction status only. When a chargeback is won, the payment returns to its previous status (for example, `SUCCEEDED` / `APPROVED`) and no new payment status is emitted.
+<Note>
+`PREVENTED` is a transaction status only for `type = CHARGEBACK` when the provider/network reports a [predispute deflection](https://docs.y.uno/docs/chargeback-management). In these scenarios, only the chargeback webhook is sent; no refund webhook is emitted.
+
+`REVIEW_WON` is a chargeback transaction status only. When a chargeback is won, the payment returns to its previous status (for example, `SUCCEEDED` / `APPROVED`) and no new payment status is emitted.
+</Note>
 
 ### Possible states for sync and async flows
 

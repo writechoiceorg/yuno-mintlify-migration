@@ -3,9 +3,9 @@ title: "Refund Payment"
 openapi: "/openapi.json POST /v1/payments/{id}/transactions/{transaction_id}/refund"
 ---
 
-> ⚠️
->
-> Do not execute a refund while another is in progress. Wait for the current operation to complete before starting a new one.
+<Warning>
+Do not execute a refund while another is in progress. Wait for the current operation to complete before starting a new one.
+</Warning>
 
 This endpoint allows you to issue a refund for an existing payment.
 
