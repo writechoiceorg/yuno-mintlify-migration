@@ -64,12 +64,12 @@ export const FeatureCards = () => {
                 </CardIcon>
                 <div className="text-xl font-semibold text-[#111827] dark:text-[#ededf0]">Get started with Yuno</div>
               </div>
-              <CardCta href="/docs/getting-started/introduction">Learn about Yuno</CardCta>
+              <CardCta href="/docs/how-yuno-works/what-is-yuno">Learn about Yuno</CardCta>
               <ul className="list-none p-0 m-0">
                 <FeatureItem
-                  href="/docs/core-concepts/payment-flow"
+                   href="/docs/how-yuno-works/how-yuno-payment-flow-works"
                   title="How the Yuno Payment Process Works"
-                  desc=" - ggLearn the step-by-step payment flow and key elements involved."
+                  desc=" - Learn the step-by-step payment flow and key elements involved."
                 />
                 <FeatureItem
                   href="/docs/getting-started/quickstart"
@@ -82,7 +82,7 @@ export const FeatureCards = () => {
                   desc=" - Follow our quickstart guide to process your first transaction."
                 />
                 <FeatureItem
-                  href="/docs/core-concepts/payments"
+                   href="/docs/basic-concepts/index"
                   title="Basic concepts"
                   desc=" - Understand customers, sessions, payments, and tokens."
                 />
@@ -97,25 +97,25 @@ export const FeatureCards = () => {
                 </CardIcon>
                 <div className="text-xl font-semibold text-[#111827] dark:text-[#ededf0]">Integration methods</div>
               </div>
-              <CardCta href="/docs/guides/integration-overview">Choose your integration</CardCta>
+               <CardCta href="/docs/sdks/overview/choose-integration">Choose your integration</CardCta>
               <ul className="list-none p-0 m-0">
-                <FeatureItem
-                  href="/docs/guides/sdk/overview"
+                 <FeatureItem
+                  href="/docs/sdks/overview/quickstart"
                   title="SDKs"
                   desc=" - Ready-made SDKs for Web, Android, and iOS platforms."
                 />
-                <FeatureItem
-                  href="/docs/guides/direct-api/overview"
+                 <FeatureItem
+                  href="/docs/direct-integration-use-cases/direct-flow"
                   title="Direct Flow Integration"
                   desc=" - Server-to-server API integration for custom implementations."
                 />
-                <FeatureItem
-                  href="/docs/guides/sdk/full-checkout"
+                 <FeatureItem
+                  href="/docs/sdks/customization/secure-fields/index"
                   title="Secure Fields"
                   desc=" - PCI-compliant payment forms with customizable styling."
                 />
-                <FeatureItem
-                  href="/docs/guides/testing/yuno-testing-gateway"
+                 <FeatureItem
+                  href="/docs/direct-integration-use-cases/yuno-testing-gateway"
                   title="Testing Gateway"
                   desc=" - Test your integration with Yuno's testing environment."
                 />
@@ -132,8 +132,8 @@ export const FeatureCards = () => {
               </div>
               <CardCta href="/reference">View API docs</CardCta>
               <ul className="list-none p-0 m-0">
-                <FeatureItem
-                  href="/docs/getting-started/authentication"
+                 <FeatureItem
+                  href="/reference/getting-started/authentication"
                   title="API Basics"
                   desc=" - Get started with API main concepts, authentication, and environments."
                 />
@@ -147,8 +147,8 @@ export const FeatureCards = () => {
                   title="Reference"
                   desc=" - Essential data to get the most of our APIs."
                 />
-                <FeatureItem
-                  href="/docs/guides/postman-collections"
+                 <FeatureItem
+                  href="/reference/getting-started/postman-collections"
                   title="Postman Collections"
                   desc=" - Ready-to-use Postman collections for testing and development."
                 />
@@ -163,30 +163,30 @@ export const FeatureCards = () => {
                 </CardIcon>
                 <div className="text-xl font-semibold text-[#111827] dark:text-[#ededf0]">Advanced features</div>
               </div>
-              <CardCta href="/docs/features">Explore capabilities</CardCta>
+               <CardCta href="/docs/payment-features/stored-credentials">Explore capabilities</CardCta>
               <ul className="list-none p-0 m-0">
                 <FeatureItem
-                  href="/docs/features/installments"
+                   href="/docs/payment-features/installments/index"
                   title="Installments"
                   desc=" - Offer flexible payment plans and recurring billing."
                 />
                 <FeatureItem
-                  href="/docs/features/split-payments"
+                   href="/docs/payment-features/split-payments-marketplace"
                   title="Split marketplace payments"
                   desc=" - Enable revenue sharing for marketplace platforms."
                 />
                 <FeatureItem
-                  href="/docs/features/disputes"
+                   href="/docs/payouts-and-disputes/chargeback-management"
                   title="Payouts & disputes"
                   desc=" - Manage payouts, handle disputes, and chargeback management."
                 />
                 <FeatureItem
-                  href="/docs/features/payment-links"
+                   href="/docs/using-yuno/dashboard-overview/payment-links"
                   title="Payment links"
                   desc=" - Create payment links and enroll payment methods for future use."
                 />
                 <FeatureItem
-                  href="/docs/guides/webhooks/setup"
+                   href="/docs/webhooks/index"
                   title="Webhooks & automation"
                   desc=" - Receive real-time notifications and automate workflows."
                 />
@@ -201,25 +201,25 @@ export const FeatureCards = () => {
                 </CardIcon>
                 <div className="text-xl font-semibold text-[#111827] dark:text-[#ededf0]">Digital wallets & APMs</div>
               </div>
-              <CardCta href="/docs/guides/payment-methods/cards">Setup wallets</CardCta>
+               <CardCta href="/docs/payment-features/enrollment/enroll-payment-methods">Setup wallets</CardCta>
               <ul className="list-none p-0 m-0">
                 <FeatureItem
-                  href="/docs/features/apple-pay"
+                   href="/docs/wallets/apple-pay/prerequisites-apple-pay"
                   title="Apple Pay integration"
                   desc=" - Enable secure Apple Pay payments in apps and websites."
                 />
                 <FeatureItem
-                  href="/docs/features/google-pay"
+                   href="/docs/wallets/google-pay/google-pay-sdk-integration"
                   title="Google Pay setup"
                   desc=" - Accept Google Pay on Android devices and web platforms."
                 />
                 <FeatureItem
-                  href="/docs/features/click-to-pay"
+                   href="/docs/wallets/click-to-pay"
                   title="Click to Pay"
                   desc=" - Provide faster checkout with secure card-on-file payments."
                 />
                 <FeatureItem
-                  href="/docs/features/nupay"
+                   href="/docs/wallets/nupay"
                   title="NuPay"
                   desc=" - Instant payment solution for seamless transactions."
                 />
@@ -237,24 +237,24 @@ export const FeatureCards = () => {
                 </CardIcon>
                 <div className="text-xl font-semibold text-white">AI optimization</div>
               </div>
-              <CardCta href="/docs/ai" ai>
+               <CardCta href="/docs/ai-capabilities/aida-ai-agent" ai>
                 Discover AI tools
               </CardCta>
               <ul className="list-none p-0 m-0">
                 <FeatureItem
-                  href="/docs/ai/aida"
+                   href="/docs/ai-capabilities/aida-ai-agent"
                   title="Aida AI Agent"
                   desc=" - Use AI-powered assistance to streamline payment operations."
                   ai
                 />
                 <FeatureItem
-                  href="/docs/ai/llm-mcp"
+                   href="/docs/ai-capabilities/building-ai-integrations-with-yunos-llms-and-mcp"
                   title="LLM & MCP integrations"
                   desc=" - Build smarter workflows with language model integrations."
                   ai
                 />
                 <FeatureItem
-                  href="/docs/ai/mcp-server"
+                   href="/docs/ai-capabilities/remote-yuno-mcp-server"
                   title="Remote Yuno MCP Server"
                   desc=" - AI-driven routing to optimize success rates and costs."
                   ai
@@ -270,30 +270,30 @@ export const FeatureCards = () => {
                 </CardIcon>
                 <div className="text-xl font-semibold text-[#111827] dark:text-[#ededf0]">Using Yuno</div>
               </div>
-              <CardCta href="/docs/platform">Learn more</CardCta>
+               <CardCta href="/docs/using-yuno/environments">Learn more</CardCta>
               <ul className="list-none p-0 m-0">
                 <FeatureItem
-                  href="/docs/getting-started/environments"
+                   href="/docs/using-yuno/environments"
                   title="Environments"
                   desc=" - Manage development, staging, and production environments."
                 />
                 <FeatureItem
-                  href="/docs/platform"
+                   href="/docs/using-yuno/dashboard-overview/your-payment-operative-system"
                   title="Dashboard overview"
                   desc=" - Monitor transactions, view analytics, and manage your account."
                 />
                 <FeatureItem
-                  href="/docs/platform/risk"
+                   href="/docs/using-yuno/dashboard-overview/risk-conditions"
                   title="Other tools"
                   desc=" - Access additional utilities and management features."
                 />
                 <FeatureItem
-                  href="/docs/security"
+                   href="/docs/using-yuno/settings/security"
                   title="Security settings"
                   desc=" - Configure security policies and access controls."
                 />
                 <FeatureItem
-                  href="/docs/guides/vtex"
+                   href="/docs/plugins/vtex/index"
                   title="VTEX"
                   desc=" - Integrate with VTEX and other e-commerce platforms."
                 />
@@ -308,25 +308,25 @@ export const FeatureCards = () => {
                 </CardIcon>
                 <div className="text-xl font-semibold text-[#111827] dark:text-[#ededf0]">Security & compliance</div>
               </div>
-              <CardCta href="/docs/security">View security features</CardCta>
+               <CardCta href="/docs/security-and-compliance/pci-compliance">View security features</CardCta>
               <ul className="list-none p-0 m-0">
                 <FeatureItem
-                  href="/docs/security/3d-secure"
+                   href="/docs/security-and-compliance/3d-secure"
                   title="3D Secure & fraud prevention"
                   desc=" - Add authentication layers and advanced fraud detection."
                 />
                 <FeatureItem
-                  href="/docs/security/pci-compliance"
+                   href="/docs/security-and-compliance/pci-compliance"
                   title="PCI compliance"
                   desc=" - Stay fully compliant with PCI DSS standards and regulations."
                 />
                 <FeatureItem
-                  href="/docs/security/network-tokens"
+                   href="/docs/security-and-compliance/network-tokens"
                   title="Network tokens"
                   desc=" - Process payments with secure, always up-to-date card data."
                 />
                 <FeatureItem
-                  href="/docs/security/token-migration"
+                   href="/docs/security-and-compliance/data-migration-processes/token-migration-process"
                   title="Data migration"
                   desc=" - Securely migrate tokens and customer data to Yuno."
                 />
@@ -344,12 +344,12 @@ export const FeatureCards = () => {
               <CardCta href="/changelog">View recent updates</CardCta>
               <ul className="list-none p-0 m-0">
                 <FeatureItem
-                  href="/changelog/release-notes-ios"
+                   href="/docs/sdks/resources/release-notes/ios"
                   title="iOS release notes"
                   desc=" - Detailed information about iOS SDK updates and platform changes."
                 />
                 <FeatureItem
-                  href="/changelog/release-notes-android"
+                   href="/docs/sdks/resources/release-notes/android"
                   title="Android release notes"
                   desc=" - Detailed information about Android SDK updates and platform changes."
                 />
