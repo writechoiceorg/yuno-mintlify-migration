@@ -89,7 +89,7 @@ The onboarding workflow follows a structured process that ensures submerchants a
 
 ## 2. Payment split integration
 
-In this section, we explore how the `split_marketplace` object is used to divide a [payment](/reference/create-payment) among multiple recipients. This object is an array where each entry specifies a recipient and their corresponding share of the payment.
+In this section, we explore how the `split_marketplace` object is used to divide a [payment](/reference/payments/create-payment) among multiple recipients. This object is an array where each entry specifies a recipient and their corresponding share of the payment.
 
 <Note>
   In this step, reference recipients created in Step 1 (Onboarding).
@@ -470,7 +470,7 @@ In this section, we outline the necessary validations to ensure successful split
 * In scenarios where a direct recipient ID is not needed for the marketplace owner (e.g., with Adyen), the `type` field can serve as a flag (e.g., `COMMISSION`) to denote the marketplace owner's share, making the `provider_recipient_id` optional for that specific split.
 * Either `recipient_id` or `provider_recipient_id` must be included for the split, but not both.
 * If any required fields are missing or invalid, the request will result in an error.
-* If using multiple payment providers for split payments, we recommend utilizing the [recipients object](/reference/create-recipients), as it allows defining more than one provider for each recipient.
+* If using multiple payment providers for split payments, we recommend utilizing the [recipients object](/reference/recipients-for-marketplace/create-recipient-1), as it allows defining more than one provider for each recipient.
 
 ## API endpoints involved
 

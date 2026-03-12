@@ -23,7 +23,7 @@ To capture a payment, you need to:
 * Access your [API credentials](/docs/developers-credentials) on the Yuno Dashboard, which consist of:
   * `public-api-key`
   * `private-secret-key`
-* Have the payment identification data received after creating the payment using the [Create Payment endpoint](/reference/create-payment):
+* Have the payment identification data received after creating the payment using the [Create Payment endpoint](/reference/payments/create-payment):
   * `id`: The unique identifier of the payment, obtained from the parameter `id` after creating the payment.
   * `transaction_id`: The unique identifier of the transaction obtained from the parameter `transaction.id` after creating the payment.
 
@@ -46,12 +46,12 @@ See the [Cancel and Capture Flow](/docs/payment-features/Cancel-and-capture-flow
 
 ## Capture a payment
 
-You can capture a payment only if it has the PENDING status. Use the [Capture Payment endpoint](/reference/capture-authorization) to capture the payment. To identify the payment to be captured, you need to provide its `id` and the `transaction_id`. In addition, you need to inform the amount to be captured using the object `amount` on the body request:
+You can capture a payment only if it has the PENDING status. Use the [Capture Payment endpoint](/reference/payments/capture-authorization) to capture the payment. To identify the payment to be captured, you need to provide its `id` and the `transaction_id`. In addition, you need to inform the amount to be captured using the object `amount` on the body request:
 
 * Complete refund: Leave the amount empty.
 * Partial refund: Provide the refund value using the parameter `amount`.
 
-To confirm you have successfully captured the payment, check if the parameters from the [Capture Payment](/docs/capture-authorization) endpoint response contain the following values:
+To confirm you have successfully captured the payment, check if the parameters from the [Capture Payment](/reference/payments/capture-authorization) endpoint response contain the following values:
 
 * `type = CAPTURE`
 * `status = SUCCEEDED`
