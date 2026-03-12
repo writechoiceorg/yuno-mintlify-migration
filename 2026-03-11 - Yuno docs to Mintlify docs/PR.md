@@ -1,11 +1,11 @@
-# PR — SDK Documentation Cleanup and Reorganization
+# PR — SDK Documentation Alignment and Cleanup
 
 ---
 
 ## Branch name
 
 ```
-docs/sdk-cleanup-mintlify-prep
+docs/sdk-alignment-mintlify
 ```
 
 ---
@@ -13,7 +13,7 @@ docs/sdk-cleanup-mintlify-prep
 ## PR title
 
 ```
-docs(sdks): Restructure SDK docs and prune legacy integrations
+docs(sdks): Align SDK docs with Mintlify environment and fix broken links
 ```
 
 ---
@@ -23,20 +23,21 @@ docs(sdks): Restructure SDK docs and prune legacy integrations
 ```markdown
 ## Summary
 
-This PR reorganizes the SDK documentation and prunes all legacy/out-of-scope integration references (Lite, Headless, Seamless, Direct API, React Native) to prepare the content for migration to Mintlify. It focuses exclusively on **Full Checkout** and **Secure Fields**.
+This PR aligns the newly migrated SDK documentation with the Mintlify environment, standardizing the folder structure and fixing critical navigation issues across the site.
 
 **Changes:**
-- **Restructuring**: Reorganized all platform-specific guides into `docs/SDKs/Full Checkout/` and `docs/SDKs/Card Enrollment/`.
-- **Legacy Pruning**: Excised all references to "Lite", "Headless", "Seamless", and "Direct API" integration modes.
-- **Platform Cleanup**: Removed the React Native quickstart guide.
-- **Reference Updates**: Audited and standardized `web.md`, `ios.md`, and `android.md` common references.
-- **Workspace Cleanup**: Deleted the legacy `Yuno SDKs` directory from the core repository.
-- **Global Sidebar**: Updated the root `_order.yaml` to reflect the new structure.
+- **Standardized Folder Structure**: Renamed all SDK subfolders to kebab-case (`full-checkout`, `card-enrollment`, `additional-platforms`, `resources`) to ensure URL consistency and compatibility.
+- **MDX Conversion**: Converted all `.md` files to `.mdx` to align with the repository standard and unlock Mintlify's advanced features.
+- **Definitve Path Migration**: Consistently moved all SDK guides to `docs/sdks/` and updated all internal references within the files.
+- **Navigation Overhaul**: Updated `docs.json` to reflect the new hierarchy, replacing the legacy "Yuno SDKs" anchor with a cleaner "SDKs" section.
+- **Homepage Restoration**: Audited and fixed broken links in `snippets/homepage/FeatureCards.jsx`, ensuring that all cards on the homepage point to correct migrated paths.
+- **Redundancy Removal**: Deleted the legacy `docs/yuno-sdks/` directory to prevent duplicate content and search indexing issues.
 
-**Key Pages:**
-- [SDK Overview](https://docs.y.uno/docs/choose-integration)
-- [Full Checkout (Web)](https://docs.y.uno/docs/payment-flows-web)
-- [Card Enrollment (Web)](https://docs.y.uno/docs/web-enrollment)
+**Key Pages Updated:**
+- [SDKs Navigation](docs/sdks/overview/choose-integration)
+- [Full Checkout Guide](docs/sdks/full-checkout/web-payments)
+- [Secure Fields (Customization)](docs/sdks/customization/secure-fields/index)
+- [Changelog References](docs/sdks/resources/release-notes/web)
 ```
 
 ---
