@@ -253,6 +253,7 @@
       },
       {
         "tab": "API Reference",
+        "url": "reference/getting-started/api-reference-overview",
         "dropdowns": [
           {
             "dropdown": "Getting Started",
