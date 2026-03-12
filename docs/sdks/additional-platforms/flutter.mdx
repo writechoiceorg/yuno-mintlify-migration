@@ -433,9 +433,11 @@ For Android, the Flutter SDK uses the native Android SDK's styling system. custo
 
 The Android SDK supports comprehensive styling through the `YunoConfig` data class:
 
-> 🚧 cardFlow removed from YunoConfig (Android 2.11.0+)
->
-> Card flow configuration is now handled exclusively through the **CheckoutBuilder** in the Dashboard. Omit `cardFlow` from `YunoConfig`.
+<Warning>
+**cardFlow removed from YunoConfig (Android 2.11.0+)**
+
+Card flow configuration is now handled exclusively through the **CheckoutBuilder** in the Dashboard. Omit `cardFlow` from `YunoConfig`.
+</Warning>
 
 ```kotlin
 data class YunoConfig(

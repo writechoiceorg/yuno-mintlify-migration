@@ -93,9 +93,11 @@ data class YunoConfig(
 )
 ```
 
-> 🚧 cardFlow removed from YunoConfig
->
-> Starting from version **2.11.0**, `cardFlow` is no longer part of `YunoConfig`. Card flow configuration is now handled exclusively through the **CheckoutBuilder**. If you are migrating from an earlier version, remove `cardFlow` from your `YunoConfig` and configure it in the CheckoutBuilder instead.
+<Warning>
+**cardFlow removed from YunoConfig**
+
+Starting from version **2.11.0**, `cardFlow` is no longer part of `YunoConfig`. Card flow configuration is now handled exclusively through the **CheckoutBuilder**. If you are migrating from an earlier version, remove `cardFlow` from your `YunoConfig` and configure it in the CheckoutBuilder instead.
+</Warning>
 
 ### YunoConfig options
 
@@ -244,9 +246,11 @@ Column(
 }
 ```
 
-> ❗ Important
->
-> Always wrap the component in a `Column` with `.verticalScroll(rememberScrollState())`. Without this, the list of payment methods may not render or scroll properly when there are multiple methods available.
+<Danger>
+**Important**
+
+Always wrap the component in a `Column` with `.verticalScroll(rememberScrollState())`. Without this, the list of payment methods may not render or scroll properly when there are multiple methods available.
+</Danger>
 
 ### Step 6: Initiate the payment process
 
@@ -365,9 +369,11 @@ After receiving the one-time token from [Step 7](#step-7-get-the-one-time-token-
 
 The response from the Create payment endpoint will include the parameter `sdk_action_required`, which defines if additional actions are required to finish the payment based on the payment type.
 
-> 🚧 Continue Payment Method Integration
->
-> Yuno **requires** you integrate the `continuePayment` method of the SDK after the payment is created because certain asynchronous payment methods require additional customer actions to complete. The API will inform you of this scenario via the `sdk_action_required` field of the response, which will be returned as true. The `yuno.continuePayment()` function will display additional screens to customers, where they can carry out the necessary actions to complete the payment without you needing to handle every scenario.
+<Warning>
+**Continue Payment Method Integration**
+
+Yuno **requires** you integrate the `continuePayment` method of the SDK after the payment is created because certain asynchronous payment methods require additional customer actions to complete. The API will inform you of this scenario via the `sdk_action_required` field of the response, which will be returned as true. The `yuno.continuePayment()` function will display additional screens to customers, where they can carry out the necessary actions to complete the payment without you needing to handle every scenario.
+</Warning>
 
 ### Step 9: Continue payment
 

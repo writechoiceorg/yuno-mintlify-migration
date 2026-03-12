@@ -112,10 +112,11 @@ data class YunoConfig(
     val styles: YunoStyles? = null
 )
 ```
+<Warning>
+**cardFlow removed from YunoConfig**
 
-> 🚧 cardFlow removed from YunoConfig
->
-> Starting from version **2.11.0**, `cardFlow` is no longer part of `YunoConfig`. Card flow configuration is now handled exclusively through the **CheckoutBuilder**.
+Starting from version **2.11.0**, `cardFlow` is no longer part of `YunoConfig`. Card flow configuration is now handled exclusively through the **CheckoutBuilder**.
+</Warning>
 
 ### Step 4: Enroll a new payment method
 
