@@ -253,7 +253,6 @@
       },
       {
         "tab": "API Reference",
-        "url": "reference/getting-started/api-reference-overview",
         "dropdowns": [
           {
             "dropdown": "Getting Started",
@@ -801,10 +800,6 @@
       "destination": "/docs/how-yuno-works/step-2-your-first-payment"
     },
     {
-      "source": "/docs/basic-concepts",
-      "destination": "/docs/basic-concepts"
-    },
-    {
       "source": "/docs/customers",
       "destination": "/docs/basic-concepts/customers"
     },
@@ -1279,46 +1274,6 @@
     {
       "source": "/reference/api-updates",
       "destination": "/reference/getting-started/api-updates"
-    },
-    {
-      "source": "/reference/reference-lists",
-      "destination": "/reference/reference-lists"
-    },
-    {
-      "source": "/reference/airline-information",
-      "destination": "/reference/airline-information"
-    },
-    {
-      "source": "/reference/country-reference",
-      "destination": "/reference/country-reference"
-    },
-    {
-      "source": "/reference/eci-indicators-list",
-      "destination": "/reference/eci-indicators-list"
-    },
-    {
-      "source": "/reference/industry-category-list",
-      "destination": "/reference/industry-category-list"
-    },
-    {
-      "source": "/reference/items-category-list",
-      "destination": "/reference/items-category-list"
-    },
-    {
-      "source": "/reference/payment-type-list",
-      "destination": "/reference/payment-type-list"
-    },
-    {
-      "source": "/reference/purposes-list",
-      "destination": "/reference/purposes-list"
-    },
-    {
-      "source": "/reference/transaction-category-list",
-      "destination": "/reference/transaction-category-list"
-    },
-    {
-      "source": "/reference/shipping-reference",
-      "destination": "/reference/shipping-reference"
     },
     {
       "source": "/reference/the-customer-object",
