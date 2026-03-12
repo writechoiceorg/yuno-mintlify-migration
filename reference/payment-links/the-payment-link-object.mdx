@@ -27,9 +27,9 @@ This object represents a payment link that can be associated with a customer.
 </ParamField>
 
 <ParamField body="country" type="enum">
-  Country where the transaction must be processed (MAX 2; MIN 2; <a href="country-reference">ISO 3166-1</a> ).
+  Country where the transaction must be processed (MAX 2; MIN 2; <a href="/reference/reference/country-reference">ISO 3166-1</a> ).
 
-  Possible enum values: Check the <a href="country-reference">Country reference</a>.
+  Possible enum values: Check the <a href="/reference/reference/country-reference">Country reference</a>.
 </ParamField>
 
 <ParamField body="status" type="enum">
@@ -59,7 +59,7 @@ This object represents a payment link that can be associated with a customer.
 <ParamField body="capture" type="boolean">
   Decides whether to authorize the payment or capture it. Authorizing a card payment allows you to reserve
           funds in a customer's bank account. If the field is not sent, we will take it as true. You can later capture the
-          payment vía Yuno's dashboard or <a href="capture-authorization">API method</a> .
+          payment vía Yuno's dashboard or <a href="/reference/payments/capture-authorization">API method</a> .
 
   Example: true
 </ParamField>
@@ -70,9 +70,9 @@ This object represents a payment link that can be associated with a customer.
   <Expandable title="properties">
 
     <ParamField body="currency" type="enum">
-      The currency used to make the payment (MAX 3; MIN 3; <a href="country-reference">ISO 4217</a> ).
+      The currency used to make the payment (MAX 3; MIN 3; <a href="/reference/reference/country-reference">ISO 4217</a> ).
 
-      Possible enum values: Check the <a href="country-reference">Country reference</a>.
+      Possible enum values: Check the <a href="/reference/reference/country-reference">Country reference</a>.
     </ParamField>
 
     <ParamField body="value" type="number">
@@ -133,9 +133,9 @@ This object represents a payment link that can be associated with a customer.
     </ParamField>
 
     <ParamField body="nationality" type="enum">
-      The customer's nationality (MAX 2; MIN 2; <a href="country-reference">ISO 3166-1</a> ).
+      The customer's nationality (MAX 2; MIN 2; <a href="/reference/reference/country-reference">ISO 3166-1</a> ).
 
-      Possible enum values: Check the <a href="country-reference">Country reference</a>.
+      Possible enum values: Check the <a href="/reference/reference/country-reference">Country reference</a>.
     </ParamField>
 
     <ParamField body="document" type="object">
@@ -437,7 +437,7 @@ This object represents a payment link that can be associated with a customer.
             <ParamField body="loyalty_tier" type="enum">
               Tier of passenger loyalty program (MAX 255; MIN 3).
 
-              Possible enum values: Check the <a href="airline-information">
+              Possible enum values: Check the <a href="/reference/reference/airline-information">
                                     Loyalty tier</a>.
             </ParamField>
 
@@ -456,7 +456,7 @@ This object represents a payment link that can be associated with a customer.
             <ParamField body="type" type="enum">
               The type of passenger (MAX 1; MIN 1).
 
-              Possible enum values: Check the <a href="airline-information">Passenger type list</a>.
+              Possible enum values: Check the <a href="/reference/reference/airline-information">Passenger type list</a>.
             </ParamField>
 
           </Expandable>
@@ -614,7 +614,7 @@ This object represents a payment link that can be associated with a customer.
             <ParamField body="category" type="string">
               The category of the item (MAX 255; MIN 3).
 
-              Possible values: Check the <a href="items-category-list">Item category list</a>.
+              Possible values: Check the <a href="/reference/reference/items-category-list">Item category list</a>.
             </ParamField>
 
             <ParamField body="brand" type="string">
@@ -679,7 +679,7 @@ This object represents a payment link that can be associated with a customer.
         <ParamField body="industry" type="enum">
           The seller's industry (MAX 255; MIN 3).
 
-          Possible enum values: Check the <a href="industry-category-list">Industry category</a>.
+          Possible enum values: Check the <a href="/reference/reference/industry-category-list">Industry category</a>.
         </ParamField>
 
         <ParamField body="country" type="enum">
@@ -860,7 +860,7 @@ This object represents a payment link that can be associated with a customer.
 </ParamField>
 
 <ParamField body="payment" type="array of objects">
-  Array of <a href="the-payment-object">Payment objects</a>
+  Array of <a href="/reference/payments/the-payment-object">Payment objects</a>
 </ParamField>
 
 <ParamField body="metadata" type="array of objects">
