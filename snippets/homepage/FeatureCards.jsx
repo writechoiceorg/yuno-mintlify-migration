@@ -72,12 +72,12 @@ export const FeatureCards = () => {
                   desc=" - Learn the step-by-step payment flow and key elements involved."
                 />
                 <FeatureItem
-                  href="/docs/getting-started/quickstart"
+                  href="/docs/sdks/overview/quickstart"
                   title="Set up your account"
                   desc=" - Create your Yuno account and configure your first environment."
                 />
                 <FeatureItem
-                  href="/docs/getting-started/quickstart"
+                  href="/docs/sdks/overview/quickstart"
                   title="Create your first payment"
                   desc=" - Follow our quickstart guide to process your first transaction."
                 />
@@ -130,7 +130,7 @@ export const FeatureCards = () => {
                 </CardIcon>
                 <div className="text-xl font-semibold text-[#111827] dark:text-[#ededf0]">API reference</div>
               </div>
-              <CardCta href="/reference">View API docs</CardCta>
+              <CardCta href="/reference/getting-started/api-reference-overview">View API docs</CardCta>
               <ul className="list-none p-0 m-0">
                  <FeatureItem
                   href="/reference/getting-started/authentication"
@@ -138,12 +138,12 @@ export const FeatureCards = () => {
                   desc=" - Get started with API main concepts, authentication, and environments."
                 />
                 <FeatureItem
-                  href="/reference"
+                  href="/reference/getting-started/api-reference-overview"
                   title="Discover all our APIs"
                   desc=" - Including payments, subscriptions, reports, and so much more."
                 />
                 <FeatureItem
-                  href="/reference"
+                  href="/reference/getting-started/api-reference-overview"
                   title="Reference"
                   desc=" - Essential data to get the most of our APIs."
                 />

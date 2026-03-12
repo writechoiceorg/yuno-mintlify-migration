@@ -71,7 +71,7 @@ The enrollment workflow varies by payment method type:
 
 * **Checkout workflow**: Requires customer session for most payment methods (Cards, Nupay, PayPal, Daviplata, dLocal methods, Astropay, Adyen PIX Biométrico)
 * **Direct workflow**: Available for Cards only (PCI compliant merchants). Proceed directly to Step 3 using the customer `id` generated in Step 1.
-* **SDK workflow**: Payment methods like Nequi and Bancolombia Tokenbox require SDK implementation. WALLET\_CONNECT (MercadoPago) supports both SDK and Checkout workflows. Consult the [SDK documentation](/docs/quickstart-guide) for details.
+* **SDK workflow**: Payment methods like Nequi and Bancolombia Tokenbox require SDK implementation. WALLET\_CONNECT (MercadoPago) supports both SDK and Checkout workflows. Consult the [SDK documentation](/docs/sdks/overview/quickstart) for details.
 * **SDK Seamless workflow**: You can enroll payment methods during the seamless payment flow by setting `vault_on_success: true` when creating the payment. The payment method will be automatically enrolled if the payment succeeds.
 </Warning>
 
@@ -99,7 +99,7 @@ Enroll the payment method using one of the following endpoints:
 
 * [**Checkout workflow**](/reference/enroll-payment-method-checkout): Pass the payment method `type` to the `payment_method_type` parameter. Supported types include: `CARD`, `NU_PAY_ENROLLMENT`, `PAYPAL_ENROLLMENT`, `DAVIPLATA_ENROLLMENT`, `WALLET_CONNECT`, `YAPE_ENROLLMENT`, `SMART_PIX`, `ASTROPAY_ENROLLABLE`, `PIX_BIOMETRICO`.
 * [**Direct workflow**](/reference/enroll-payment-method-api): Pass the payment method `type` to the `type` parameter. (Only available for `CARD` payment methods used by PCI compliant merchants)
-* [**SDK workflow**](/docs/quickstart): Payment methods like `NEQUI` and `BANCOLOMBIA_TOKENBOX` require SDK implementation. `WALLET_CONNECT` (MercadoPago) supports both SDK and Checkout workflows.
+* [**SDK workflow**](/docs/sdks/overview/quickstart): Payment methods like `NEQUI` and `BANCOLOMBIA_TOKENBOX` require SDK implementation. `WALLET_CONNECT` (MercadoPago) supports both SDK and Checkout workflows.
 
 Redirect the user to the payment provider page to complete enrollment. You'll receive this URL in Step 5.
 
