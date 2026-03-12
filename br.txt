@@ -1,33 +1,6 @@
 docs/additional-services/qr-and-instant-pay.mdx
  ⎿  /reference/pix-automático-overview
 
-docs/payment-features/payment-amount-details.mdx
- ⎿  payment-amount-details#shipping-amount
-
-docs/using-yuno/dashboard-overview/connections.mdx
- ⎿  ../docs/routing
- ⎿  ../docs/routing#smart-routing
-
-docs/using-yuno/dashboard-overview/routing.mdx
- ⎿  ../docs/connections
-
-docs/using-yuno/settings/developers-credentials.mdx
- ⎿  ../docs/account-management
-
-docs/using-yuno/settings/teams-and-roles.mdx
- ⎿  ../docs/account-management
-
-docs/webhooks/index.mdx
- ⎿  ../docs/configure-webhooks#receipt-confirmation-process
-
-
 reference/getting-started/api-reference-overview.mdx
  ⎿  /docs/quickstart-guide
-
-
-reference/payouts/the-payout-object.mdx
- ⎿  purposes-list
-
-reference/subscriptions/the-subscription-object.mdx
- ⎿  items-category-list
 
