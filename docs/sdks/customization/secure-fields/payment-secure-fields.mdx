@@ -34,7 +34,7 @@ In your JavaScript application, create an instance of the `Yuno` class by provid
 const yuno = await Yuno.initialize(PUBLIC_API_KEY);
 ```
 
-See the [credentials page](https://docs.y.uno/reference/authentication) for more information.
+See the [credentials page](/reference/getting-started/authentication) for more information.
 
 ## Step 3: Start the checkout process
 
@@ -275,7 +275,7 @@ const oneTimeTokenWithInformation = await secureFields.generateTokenWithInformat
 
 After receiving the one-time token, you can create the payment using one of the following options:
 
-* Create the payment using the [Create Payment endpoint](https://docs.y.uno/reference/create-payment).
+* Create the payment using the [Create Payment endpoint](/reference/payments/create-payment).
 * Use the `createPayment` function.
 
 Both options require you to provide the `oneTimeToken` and the `checkoutSession`. As creating the payment may raise errors, Yuno recommends you use a try/catch function here.
