@@ -513,43 +513,43 @@
   },
   {
     "source": "/reference/reference-lists",
-    "destination": "/reference/reference/reference-lists"
+    "destination": "/reference/reference-lists"
   },
   {
     "source": "/reference/airline-information",
-    "destination": "/reference/reference/airline-information"
+    "destination": "/reference/airline-information"
   },
   {
     "source": "/reference/country-reference",
-    "destination": "/reference/reference/country-reference"
+    "destination": "/reference/country-reference"
   },
   {
     "source": "/reference/eci-indicators-list",
-    "destination": "/reference/reference/eci-indicators-list"
+    "destination": "/reference/eci-indicators-list"
   },
   {
     "source": "/reference/industry-category-list",
-    "destination": "/reference/reference/industry-category-list"
+    "destination": "/reference/industry-category-list"
   },
   {
     "source": "/reference/items-category-list",
-    "destination": "/reference/reference/items-category-list"
+    "destination": "/reference/items-category-list"
   },
   {
     "source": "/reference/payment-type-list",
-    "destination": "/reference/reference/payment-type-list"
+    "destination": "/reference/payment-type-list"
   },
   {
     "source": "/reference/purposes-list",
-    "destination": "/reference/reference/purposes-list"
+    "destination": "/reference/purposes-list"
   },
   {
     "source": "/reference/transaction-category-list",
-    "destination": "/reference/reference/transaction-category-list"
+    "destination": "/reference/transaction-category-list"
   },
   {
     "source": "/reference/shipping-reference",
-    "destination": "/reference/reference/shipping-reference"
+    "destination": "/reference/shipping-reference"
   },
   {
     "source": "/reference/the-customer-object",

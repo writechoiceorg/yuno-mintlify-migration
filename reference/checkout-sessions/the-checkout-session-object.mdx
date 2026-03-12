@@ -45,9 +45,9 @@ This object represents a checkout session that can be created to make a payment.
 </ParamField>
 
 <ParamField body="country" type="enum">
-  Country where the transaction must be processed (MAX 2; MIN 2; <a href="/reference/reference/country-reference">ISO 3166-1</a> ).
+  Country where the transaction must be processed (MAX 2; MIN 2; <a href="/reference/country-reference">ISO 3166-1</a> ).
 
-  Possible enum values: Check the <a href="/reference/reference/country-reference">Country reference</a>.
+  Possible enum values: Check the <a href="/reference/country-reference">Country reference</a>.
 </ParamField>
 
 <ParamField body="created_at" type="timestamp">
@@ -62,9 +62,9 @@ This object represents a checkout session that can be created to make a payment.
   <Expandable title="properties">
 
     <ParamField body="currency" type="enum">
-      The currency used to make the payment (MAX 3; MIN 3; <a href="/reference/reference/country-reference">ISO 4217</a> ).
+      The currency used to make the payment (MAX 3; MIN 3; <a href="/reference/country-reference">ISO 4217</a> ).
 
-      Possible enum values: Check the <a href="/reference/reference/country-reference">Country reference</a>.
+      Possible enum values: Check the <a href="/reference/country-reference">Country reference</a>.
     </ParamField>
 
     <ParamField body="value" type="float">
@@ -112,7 +112,7 @@ This object represents a checkout session that can be created to make a payment.
     <ParamField body="plan_id" type="string">
       Specifies a plan id created in Yuno to show your customer in the checkout session. If not defined, we will use the ones created for the account, if applicable. (MAX 64 ; MIN 64).
 
-      Possible enum values: Check the <a href="country-reference">Country reference</a>.
+      Possible enum values: Check the <a href="/reference/country-reference">Country reference</a>.
     </ParamField>
 
     <ParamField body="plan" type="array of objects">
