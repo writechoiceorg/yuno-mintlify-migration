@@ -1,0 +1,116 @@
+---
+title: "Android SDK Changelog"
+description: "Release notes for the Yuno Android SDK"
+---
+
+## Overview
+
+Release history for the Yuno Android SDK. Add or update the dependency in your `build.gradle`:
+
+```groovy
+implementation 'com.yuno.payments:sdk-android:3.2.0'
+```
+
+---
+
+## v3.2.0 (February 2026)
+
+### New Features
+- **Improved 3DS challenge handling:** Native bottom sheet for 3DS challenges instead of external browser redirect
+- **Biometric authentication:** Support for fingerprint/face authentication during 3DS2 flows on supported devices
+- **Compose-first API:** New Jetpack Compose components for Full Checkout and Lite Checkout
+
+```kotlin
+@Composable
+fun YunoCheckout(
+    checkoutSession: String,
+    country: String,
+    onPaymentResult: (PaymentResult) -> Unit,
+)
+```
+
+### Improvements
+- Reduced SDK size by 12% (removed unused transitive dependencies)
+- Improved ProGuard/R8 compatibility with updated consumer rules
+- Added support for Android 15 (API 35) edge-to-edge rendering
+
+### Bug Fixes
+- Fixed crash when activity is recreated during 3DS challenge
+- Resolved dark mode color inconsistencies in payment method list
+
+---
+
+## v3.1.0 (December 2025)
+
+### New Features
+- **Target SDK 34:** Full compatibility with Android 14 behavioral changes
+- **Enrollment flow:** `YunoEnrollment` activity for card vaulting
+- **Custom fonts:** Load custom fonts from assets for checkout UI
+
+### Improvements
+- Improved error messages in `onPaymentError` callback with structured error objects
+- Added `@Parcelize` support for all public data classes
+
+### Bug Fixes
+- Fixed ANR when SDK initialization times out on slow networks
+- Resolved keyboard not dismissing after CVV input on Samsung devices
+
+---
+
+## v3.0.0 (September 2025)
+
+### Breaking Changes
+
+<Warning>
+v3.0.0 requires minimum SDK 24 (Android 7.0) and Kotlin 1.9+. Update your `minSdk` and Kotlin version before upgrading.
+</Warning>
+
+- **Minimum SDK raised** from 21 to 24
+- **Kotlin 1.9+ required** (coroutines-based API)
+- **New initialization:** `Yuno.initialize()` is now a suspend function
+- **Removed:** `YunoCallback` interface (replaced by Kotlin Flow and lambda callbacks)
+
+### Migration from v2.x
+
+```kotlin
+// v2.x (removed)
+Yuno.initialize(context, "public-key", object : YunoCallback {
+    override fun onPaymentSuccess(result: PaymentResult) { }
+    override fun onPaymentError(error: YunoError) { }
+})
+
+// v3.x (current)
+val yuno = Yuno.initialize(
+    context = applicationContext,
+    publicApiKey = "public-key",
+    checkoutSession = "session-id",
+    country = "BR",
+)
+yuno.startCheckout { result ->
+    when (result) {
+        is PaymentResult.Success -> handleSuccess(result)
+        is PaymentResult.Error -> handleError(result)
+    }
+}
+```
+
+### New Features
+- Kotlin coroutines and Flow support throughout
+- Structured concurrency for lifecycle-safe payment handling
+- Jetpack Compose support (experimental)
+
+---
+
+## v2.x (Legacy)
+
+<Note>
+v2.x is deprecated and will reach end-of-life in March 2026. Upgrade to v3.x using the migration guide above. v2.x continues to receive critical security patches only.
+</Note>
+
+## Requirements
+
+| Version | Min SDK | Kotlin | Gradle | Compile SDK |
+|---------|---------|--------|--------|-------------|
+| 3.2.0 | 24 | 1.9+ | 8.0+ | 35 |
+| 3.0.0 | 24 | 1.9+ | 8.0+ | 34 |
+| 2.x | 21 | 1.7+ | 7.0+ | 33 |

@@ -1,0 +1,45 @@
+---
+title: "Environments"
+description: "Sandbox and production environments for Yuno API"
+---
+
+## Overview
+
+Yuno provides two environments for API integration:
+
+| Environment | Base URL | Purpose |
+|-------------|----------|---------|
+| **Sandbox** | `https://api-sandbox.y.uno` | Testing and development |
+| **Production** | `https://api.y.uno` | Live transactions with real funds |
+
+## Sandbox Environment
+
+Use the sandbox for development and testing. Sandbox transactions do not process real payments.
+
+### Sandbox Limitations
+
+- Some payment methods may have limited availability in sandbox
+- Test provider credentials may behave differently from production providers
+- Certain features may require production enablement before they can be tested in sandbox
+
+<Warning>
+  **Currency conversion** (`GET /v1/currency-conversion`) may return 404 in sandbox. This feature requires enablement — contact Yuno support if you need to test currency conversion.
+</Warning>
+
+### Test Credentials
+
+Use sandbox-specific API keys from the [Yuno Dashboard](https://dashboard.y.uno). See the [Testing guide](/guides/testing/sandbox-guide) for test card numbers and payment method-specific test data.
+
+## Production Environment
+
+Production processes real transactions with real funds. Before going live:
+
+1. Complete your integration testing in sandbox
+2. Switch to production API keys from the Dashboard
+3. Update your base URL from `api-sandbox.y.uno` to `api.y.uno`
+4. Verify webhook endpoints are configured for production events
+5. Confirm payment methods are enabled for your target countries
+
+<Note>
+  API behavior is identical between sandbox and production, with the exception of sandbox-specific limitations noted above.
+</Note>

@@ -1,0 +1,91 @@
+---
+title: "Providers"
+description: "Payment provider abstraction, smart routing, and failover configuration"
+---
+
+## What is a Provider?
+
+A provider in Yuno is a payment processor, acquirer, or gateway that executes transactions. Yuno abstracts the complexity of individual provider APIs behind a unified interface, so you integrate once and route to any connected provider.
+
+Examples of providers include Stripe, Adyen, Mercado Pago, dLocal, PagSeguro, and dozens of regional acquirers across Latin America and globally.
+
+## Multi-Provider Architecture
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/multi-provider-architecture.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/multi-provider-architecture.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+You can connect multiple providers for the same payment method and country. Yuno selects the optimal provider for each transaction based on your routing rules.
+
+## Smart Routing
+
+Smart routing determines which provider processes each transaction. Configure routing rules in **Dashboard > Routing**.
+
+| Strategy | Description | Best For |
+|----------|-------------|----------|
+| **Priority-based** | Route to providers in a fixed order | Simple setups, single-provider preference |
+| **Cost optimization** | Route to the provider with lowest fees | Reducing processing costs |
+| **Approval rate** | Route based on historical success rates | Maximizing conversion |
+| **Geographic** | Route to local acquirers for domestic transactions | Improving approval rates in specific regions |
+| **Custom rules** | Route based on BIN, amount, payment method, or metadata | Advanced orchestration |
+
+<Note>
+  Smart routing decisions are made per-transaction, not per-payment. If a payment cascades to a second provider, the routing engine evaluates the best option for the retry independently.
+</Note>
+
+## Failover and Cascading
+
+When a provider declines or fails to respond, Yuno can automatically retry with the next provider in your routing configuration.
+
+```
+Transaction 1: Provider A  -->  DECLINED (insufficient funds)
+Transaction 2: Provider B  -->  SUCCEEDED
+```
+
+Configure cascading behavior:
+
+| Setting | Description |
+|---------|-------------|
+| **Max retries** | Maximum number of providers to try (e.g., 3) |
+| **Retry on** | Which decline codes trigger a retry (e.g., timeout, generic decline) |
+| **Exclude on** | Which decline codes should NOT retry (e.g., fraud, lost card) |
+
+<Warning>
+  Not all declines should trigger a cascade. Hard declines (stolen card, fraud) should not be retried with another provider. Configure your exclude rules to prevent unnecessary retries.
+</Warning>
+
+## Provider Configuration
+
+Set up providers in **Dashboard > Providers**:
+
+<Steps>
+  <Step title="Add a provider">
+    Navigate to **Dashboard > Providers > Add Provider** and select from the available integrations.
+  </Step>
+  <Step title="Enter credentials">
+    Provide the provider's API keys, merchant IDs, and any required configuration. Each provider has different credential requirements.
+  </Step>
+  <Step title="Enable payment methods">
+    Select which payment methods this provider should handle (cards, PIX, Boleto, etc.).
+  </Step>
+  <Step title="Configure routing">
+    Go to **Dashboard > Routing** to set priority, failover rules, and any conditional routing logic.
+  </Step>
+</Steps>
+
+## Provider Response Mapping
+
+Yuno normalizes provider responses into a standard format. The raw provider response is preserved in the [transaction](/core-concepts/transactions) for debugging:
+
+| Yuno Status | Typical Provider Meaning |
+|-------------|-------------------------|
+| `SUCCEEDED` | Approved, authorized |
+| `DECLINED` | Insufficient funds, do not honor, restricted card |
+| `REJECTED` | Invalid data, fraud suspicion |
+| `FAILED` | Timeout, network error, provider outage |

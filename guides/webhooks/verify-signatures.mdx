@@ -1,0 +1,236 @@
+---
+title: "Verify Webhook Signatures"
+description: "Validate webhook authenticity using HMAC-SHA256 to prevent spoofing"
+---
+
+## Overview
+
+Every webhook Yuno sends includes an HMAC-SHA256 signature in the request headers. Verifying this signature ensures the webhook originated from Yuno and has not been tampered with in transit.
+
+<Warning>
+Always verify webhook signatures before processing events. Unverified webhooks could be spoofed by malicious actors to trigger unauthorized actions in your system.
+</Warning>
+
+## How Signature Verification Works
+
+1. Yuno computes an HMAC-SHA256 hash of the raw request body using your signing secret
+2. The hash is included in the `x-yuno-signature` header
+3. Your server recomputes the hash and compares it to the header value
+4. If they match, the webhook is authentic
+
+## Retrieve Your Signing Secret
+
+Find your webhook signing secret in **Dashboard > Settings > Webhooks**. Click on your endpoint to reveal the secret. Store it securely as an environment variable.
+
+```bash
+YUNO_WEBHOOK_SECRET=whsec_your_signing_secret_here
+```
+
+## Implementation
+
+<CodeGroup>
+```javascript Node.js
+const crypto = require('crypto');
+
+function verifyWebhookSignature(req) {
+  const signature = req.headers['x-yuno-signature'];
+  const timestamp = req.headers['x-yuno-timestamp'];
+  const body = JSON.stringify(req.body);
+
+  // Construct the signed payload
+  const signedPayload = `${timestamp}.${body}`;
+
+  // Compute expected signature
+  const expectedSignature = crypto
+    .createHmac('sha256', process.env.YUNO_WEBHOOK_SECRET)
+    .update(signedPayload)
+    .digest('hex');
+
+  // Constant-time comparison to prevent timing attacks
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  );
+}
+
+// Express.js middleware
+app.post('/webhooks/yuno', express.json(), (req, res) => {
+  if (!verifyWebhookSignature(req)) {
+    console.error('Invalid webhook signature');
+    return res.status(401).send('Invalid signature');
+  }
+
+  // Signature valid, process the event
+  handleEvent(req.body);
+  res.status(200).send('OK');
+});
+```
+
+```python Python
+import hmac
+import hashlib
+import json
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+
+def verify_webhook_signature(request):
+    signature = request.headers.get('x-yuno-signature')
+    timestamp = request.headers.get('x-yuno-timestamp')
+    body = request.get_data(as_text=True)
+
+    # Construct the signed payload
+    signed_payload = f"{timestamp}.{body}"
+
+    # Compute expected signature
+    expected_signature = hmac.new(
+        key=YUNO_WEBHOOK_SECRET.encode('utf-8'),
+        msg=signed_payload.encode('utf-8'),
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+
+    # Constant-time comparison
+    return hmac.compare_digest(signature, expected_signature)
+
+@app.route('/webhooks/yuno', methods=['POST'])
+def webhook_handler():
+    if not verify_webhook_signature(request):
+        abort(401, 'Invalid signature')
+
+    event = request.get_json()
+    handle_event(event)
+    return 'OK', 200
+```
+
+```go Go
+package main
+
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
+    "io"
+    "net/http"
+    "os"
+)
+
+func verifyWebhookSignature(r *http.Request, body []byte) bool {
+    signature := r.Header.Get("x-yuno-signature")
+    timestamp := r.Header.Get("x-yuno-timestamp")
+
+    // Construct the signed payload
+    signedPayload := timestamp + "." + string(body)
+
+    // Compute expected signature
+    mac := hmac.New(sha256.New,
+        []byte(os.Getenv("YUNO_WEBHOOK_SECRET")))
+    mac.Write([]byte(signedPayload))
+    expectedSignature := hex.EncodeToString(mac.Sum(nil))
+
+    // Constant-time comparison
+    return hmac.Equal(
+        []byte(signature),
+        []byte(expectedSignature),
+    )
+}
+
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
+    body, _ := io.ReadAll(r.Body)
+
+    if !verifyWebhookSignature(r, body) {
+        http.Error(w, "Invalid signature", http.StatusUnauthorized)
+        return
+    }
+
+    // Signature valid, process the event
+    handleEvent(body)
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("OK"))
+}
+```
+
+```java Java
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+public class WebhookVerifier {
+
+    public static boolean verifySignature(
+            String signature, String timestamp,
+            String body, String secret) {
+
+        // Construct the signed payload
+        String signedPayload = timestamp + "." + body;
+
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec keySpec = new SecretKeySpec(
+                secret.getBytes(StandardCharsets.UTF_8),
+                "HmacSHA256");
+            mac.init(keySpec);
+            byte[] hash = mac.doFinal(
+                signedPayload.getBytes(StandardCharsets.UTF_8));
+
+            // Convert to hex string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                hexString.append(String.format("%02x", b));
+            }
+
+            // Constant-time comparison
+            return MessageDigest.isEqual(
+                signature.getBytes(StandardCharsets.UTF_8),
+                hexString.toString().getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
+```
+</CodeGroup>
+
+## Timestamp Validation
+
+In addition to signature verification, validate the timestamp to prevent replay attacks:
+
+```javascript
+function isTimestampValid(timestamp, toleranceSeconds = 300) {
+  const webhookTime = parseInt(timestamp, 10);
+  const currentTime = Math.floor(Date.now() / 1000);
+  return Math.abs(currentTime - webhookTime) <= toleranceSeconds;
+}
+```
+
+<Note>
+A tolerance of 5 minutes (300 seconds) is recommended. Webhooks older than this window should be rejected to prevent replay attacks.
+</Note>
+
+## Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Signature mismatch | Parsing body before verification | Verify against raw body, not parsed JSON |
+| Missing header | Incorrect endpoint configuration | Check Dashboard webhook URL matches |
+| Wrong secret | Using production secret in sandbox | Ensure environment-specific secrets |
+
+## Testing Signature Verification
+
+Generate a test signature locally to validate your implementation:
+
+```javascript
+const crypto = require('crypto');
+
+const secret = 'whsec_test_secret';
+const timestamp = Math.floor(Date.now() / 1000).toString();
+const body = JSON.stringify({ type: 'payment.succeeded', data: {} });
+const signedPayload = `${timestamp}.${body}`;
+const signature = crypto
+  .createHmac('sha256', secret)
+  .update(signedPayload)
+  .digest('hex');
+
+console.log('Signature:', signature);
+console.log('Timestamp:', timestamp);
+```

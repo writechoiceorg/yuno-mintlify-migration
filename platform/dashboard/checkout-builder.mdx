@@ -1,0 +1,111 @@
+---
+title: "Checkout Builder"
+description: "Customize your checkout experience visually with colors, layout, and branding"
+---
+
+## Overview
+
+The Checkout Builder is a no-code visual editor in the Yuno Dashboard that lets you customize the appearance of your Full Checkout and Lite Checkout experiences. Changes apply to all SDK integrations without code modifications.
+
+<Note>
+Checkout Builder settings apply as defaults. SDK-level theme configurations passed during initialization will override Checkout Builder settings. See [SDK Customization](/guides/sdk/customization) for programmatic theming.
+</Note>
+
+## Accessing the Checkout Builder
+
+Navigate to **Dashboard > Checkout Builder**. The editor displays a live preview on the right and configuration options on the left.
+
+## Customization Options
+
+<Steps>
+  <Step title="Brand Identity">
+    Upload your logo and configure brand elements:
+
+    | Setting | Description | Format |
+    |---------|-------------|--------|
+    | **Logo** | Displayed at the top of checkout | PNG, SVG (max 200x60px) |
+    | **Favicon** | Browser tab icon | ICO, PNG (32x32px) |
+    | **Business Name** | Shown in payment confirmation | Text |
+  </Step>
+
+  <Step title="Colors">
+    Configure the color palette for checkout elements:
+
+    | Element | Description |
+    |---------|-------------|
+    | **Primary** | Buttons, links, active states |
+    | **Secondary** | Secondary actions, borders |
+    | **Background** | Page and form background |
+    | **Text** | Primary text color |
+    | **Error** | Validation errors, decline messages |
+    | **Success** | Confirmation states |
+
+    Enter hex color codes or use the color picker.
+  </Step>
+
+  <Step title="Typography">
+    Select fonts and sizes:
+
+    | Setting | Options |
+    |---------|---------|
+    | **Font Family** | System fonts, Google Fonts, or custom |
+    | **Heading Size** | Small, Medium, Large |
+    | **Body Size** | 12px - 18px range |
+    | **Font Weight** | Regular, Medium, Bold |
+  </Step>
+
+  <Step title="Layout">
+    Configure structural elements:
+
+    | Setting | Options |
+    |---------|---------|
+    | **Border Radius** | Square (0px) to Rounded (16px) |
+    | **Spacing** | Compact, Normal, Spacious |
+    | **Payment Method Display** | List, Grid, Accordion |
+    | **Show Payment Icons** | Toggle payment method brand icons |
+  </Step>
+
+  <Step title="Preview and Publish">
+    Review changes in the live preview panel. The preview shows both desktop and mobile layouts.
+
+    Click **Publish** to apply changes. Published changes take effect within 2-3 minutes for all active SDK integrations.
+
+    <Warning>
+    Publishing changes affects all environments using this account's SDK integrations. Test in sandbox before publishing to production.
+    </Warning>
+  </Step>
+</Steps>
+
+## Dark Mode
+
+Toggle dark mode in the Checkout Builder to see how your checkout appears in dark themes. You can configure separate color schemes for light and dark modes.
+
+## Mobile Responsiveness
+
+The checkout UI is automatically responsive. The Checkout Builder preview includes device toggles to verify appearance on:
+
+- Desktop (1024px+)
+- Tablet (768px - 1023px)
+- Mobile (< 768px)
+
+## Reset to Defaults
+
+Click **Reset** in the Checkout Builder to revert all customizations to Yuno's default theme. This action requires confirmation and takes effect immediately upon publishing.
+
+## Exporting Configuration
+
+Export your Checkout Builder configuration as JSON to use programmatically in SDK initialization:
+
+```json
+{
+  "theme": {
+    "primary": "#0066FF",
+    "background": "#FFFFFF",
+    "text": "#1F2937",
+    "borderRadius": "8px",
+    "fontFamily": "Inter, sans-serif"
+  }
+}
+```
+
+Copy this into your SDK `theme` configuration for consistent branding across programmatic and Dashboard-managed integrations.

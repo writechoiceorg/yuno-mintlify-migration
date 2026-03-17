@@ -1,0 +1,206 @@
+---
+title: "Create One Time Use Token (Direct)"
+description: "Generate a one-time-use token from card data for the DIRECT workflow. Requires PCI compliance."
+api: "POST https://api-sandbox.y.uno/v1/tokens"
+---
+
+Creates a one-time-use token from the customer's card data as part of the `DIRECT` workflow. This endpoint is exclusively for **PCI-compliant merchants** who collect card data on their own servers.
+
+<Warning>
+  This endpoint requires PCI DSS certification. If you are not PCI certified, use the [SDK Checkout token flow](/api-reference/checkout-sessions/create-token-sdk) instead, which handles card data securely on the client side.
+</Warning>
+
+## Authentication
+
+Requires both `public-api-key` and `private-secret-key` headers.
+
+## Request Body
+
+<ParamField body="account_id" type="string" required>
+  The unique identifier of the account. Found in Yuno's Dashboard.
+
+  Constraints: MAX 64; MIN 36
+</ParamField>
+
+<ParamField body="card_data" type="object" required>
+  Card details to tokenize.
+
+  <Expandable title="card_data">
+    <ParamField body="number" type="string" required>
+      Card number without separators.
+
+      Constraints: MAX 19; MIN 8
+
+      Example: `4111111111111111`
+    </ParamField>
+    <ParamField body="expiration_month" type="integer" required>
+      Card expiration month in MM format.
+
+      Example: `12`
+    </ParamField>
+    <ParamField body="expiration_year" type="integer" required>
+      Card expiration year in YY or YYYY format.
+
+      Example: `25`
+    </ParamField>
+    <ParamField body="holder_name" type="string" required>
+      Cardholder full name as printed on the card.
+
+      Constraints: MAX 26; MIN 3
+
+      Example: `John Doe`
+    </ParamField>
+    <ParamField body="security_code" type="string">
+      Card security code (CVV/CVC).
+
+      Constraints: MAX 4; MIN 2
+
+      Example: `123`
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="country" type="string">
+  Customer's country. ISO 3166-1 alpha-2 code.
+
+  Example: `US`
+</ParamField>
+
+<ParamField body="customer_payer" type="object">
+  Optional customer information for fraud screening and 3DS.
+
+  <Expandable title="customer_payer">
+    <ParamField body="first_name" type="string">
+      Customer's first name.
+    </ParamField>
+    <ParamField body="last_name" type="string">
+      Customer's last name.
+    </ParamField>
+    <ParamField body="email" type="string">
+      Customer's email address.
+    </ParamField>
+    <ParamField body="document" type="object">
+      Customer's identification document.
+      <Expandable title="document">
+        <ParamField body="document_type" type="string">
+          Document type (e.g., `CPF`, `CNPJ`, `CC`, `DNI`).
+        </ParamField>
+        <ParamField body="document_number" type="string">
+          Document number.
+        </ParamField>
+      </Expandable>
+    </ParamField>
+    <ParamField body="phone" type="object">
+      Customer's phone.
+      <Expandable title="phone">
+        <ParamField body="country_code" type="string">
+          International dialing code.
+        </ParamField>
+        <ParamField body="number" type="string">
+          Phone number.
+        </ParamField>
+      </Expandable>
+    </ParamField>
+    <ParamField body="billing_address" type="object">
+      Billing address (address_line_1, address_line_2, city, state, zip_code, country).
+    </ParamField>
+    <ParamField body="shipping_address" type="object">
+      Shipping address (same structure as billing_address).
+    </ParamField>
+    <ParamField body="browser_info" type="object">
+      Browser metadata for 3DS (user agent, screen dimensions, JavaScript/Java enabled).
+    </ParamField>
+    <ParamField body="ip_address" type="string">
+      Customer's IP address.
+    </ParamField>
+    <ParamField body="device_fingerprints" type="array">
+      Array of provider-specific device fingerprint objects.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="stored_credentials" type="object">
+  Stored credential details for recurring or merchant-initiated transactions.
+
+  <Expandable title="stored_credentials">
+    <ParamField body="reason" type="string">
+      Reason for storing credentials.
+    </ParamField>
+    <ParamField body="usage" type="string">
+      Usage type for stored credentials.
+    </ParamField>
+    <ParamField body="subscription_agreement_id" type="string">
+      Subscription agreement identifier.
+    </ParamField>
+    <ParamField body="network_transaction_id" type="string">
+      Network transaction identifier from a previous transaction.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<RequestExample>
+```json Request
+{
+  "account_id": "fe14c7c6-c75e-43b7-bdbe-4c87ad52c482",
+  "card_data": {
+    "number": "4111111111111111",
+    "expiration_month": 12,
+    "expiration_year": 25,
+    "security_code": "123",
+    "holder_name": "John Doe"
+  }
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201
+{
+  "token": "9107a30f-564c-4469-bd7c-8e1f249fb016",
+  "card_data": {
+    "holder_name": "John Doe",
+    "iin": "41111111",
+    "lfd": "1111",
+    "brand": "VISA",
+    "type": "DEBIT",
+    "issuer_name": "CONOTOXIA SP Z O O"
+  }
+}
+```
+</ResponseExample>
+
+## Response Fields
+
+<ResponseField name="token" type="string">
+  The one-time-use token. Use this in the [Create Payment](/api-reference/payments/create) request as `payment_method.token`.
+</ResponseField>
+
+<ResponseField name="card_data" type="object">
+  Tokenized card metadata (no sensitive data).
+  <Expandable title="card_data">
+    <ResponseField name="holder_name" type="string">
+      Cardholder name.
+    </ResponseField>
+    <ResponseField name="iin" type="string">
+      Issuer Identification Number (first 6-8 digits).
+    </ResponseField>
+    <ResponseField name="lfd" type="string">
+      Last four digits of the card.
+    </ResponseField>
+    <ResponseField name="brand" type="string">
+      Card brand (e.g., `VISA`, `MASTERCARD`).
+    </ResponseField>
+    <ResponseField name="type" type="string">
+      Card type: `CREDIT`, `DEBIT`, or `PREPAID`.
+    </ResponseField>
+    <ResponseField name="issuer_name" type="string">
+      Name of the issuing bank.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Related Pages
+
+- [Create One Time Use Token (SDK Checkout)](/api-reference/checkout-sessions/create-token-sdk) — Token generation within a checkout session
+- [Create Payment](/api-reference/payments/create) — Use the token to create a payment
+- [Stored Credentials](/features/stored-credentials) — Using stored credentials for recurring payments

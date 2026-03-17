@@ -1,0 +1,82 @@
+---
+title: "Card Account Updater"
+description: "Automatically update expired or replaced card details for recurring billing and subscription services."
+---
+
+## Overview
+
+Card Account Updater (CAU) automatically maintains the integrity of stored credit and debit card information. When cards expire or are replaced, Yuno updates the stored card data without requiring manual intervention from you or your customers.
+
+<Info>
+  The `vaulted_token` and `fingerprint` for the enrolled card remain the same after an update — no changes are needed in your integration.
+</Info>
+
+## Key Benefits
+
+| Benefit | Description |
+|---------|-------------|
+| **Higher approval rates** | Automatically updating card information reduces failed transactions |
+| **Customer retention** | Customers avoid manual card updates, ensuring seamless service continuity |
+| **Cost reduction** | Automated processes decrease manual interventions and support inquiries |
+| **Revenue protection** | Fewer missed payments from outdated card details |
+| **PCI compliance** | Centralized vault management ensures secure data handling |
+
+## How It Works
+
+Card Account Updater operates asynchronously, independent of your payment flows. Yuno automatically updates card details when:
+
+1. A card's expiration date has passed.
+2. The associated account is closed, disabled, or flagged by the issuer.
+
+Depending on the card issuer's replacement approach, the system updates either all card information or just the expiration date.
+
+## Webhook Notifications
+
+After an update occurs, Yuno sends a webhook notification with the event type `enrollment.update`. The notification includes:
+
+- Latest expiry date, last four digits, and IIN
+- Reason for the update
+- Details of the replaced card
+
+```json Webhook Payload
+{
+  "type": "enrollment",
+  "type_event": "enrollment.update",
+  "account_id": "your-account-uuid",
+  "data": {
+    "payment_method": {
+      "detail": {
+        "card": {
+          "expiration_month": 3,
+          "expiration_year": 26,
+          "iin": "411111",
+          "lfd": "1234"
+        },
+        "card_data_history": [
+          {
+            "expiration_year": 24,
+            "provider_data": {
+              "status": "UPDATED"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+## Supported Networks
+
+Card Account Updater currently supports:
+
+- **Visa**
+- **Mastercard**
+
+## Activation
+
+To enable Card Account Updater on your Yuno account, contact the support team at [support@y.uno](mailto:support@y.uno). Registration occurs directly with card schemes and typically requires **up to 10 business days** for new customers.
+
+<Note>
+  CAU is particularly valuable for merchants with subscription-based business models or stored card workflows. It directly reduces involuntary churn caused by expired card details.
+</Note>

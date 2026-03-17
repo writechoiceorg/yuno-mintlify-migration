@@ -1,0 +1,226 @@
+---
+title: "PCI SAQ Completion Guide"
+description: "Complete your PCI DSS Self-Assessment Questionnaire using Yuno's compliance framework."
+---
+
+
+## Overview
+
+The Payment Card Industry Data Security Standard (PCI DSS) requires all organizations that store, process, or transmit cardholder data to validate their compliance annually. The Self-Assessment Questionnaire (SAQ) is the most common validation method for merchants processing fewer than 6 million transactions per year.
+
+This guide walks you through determining which SAQ applies to your Yuno integration, completing it section by section, and maintaining ongoing compliance.
+
+For an overview of PCI DSS and how Yuno reduces your compliance scope, see [PCI Compliance](/security/pci-compliance).
+
+## PCI DSS: Why It Matters
+
+PCI DSS protects cardholder data throughout the payment lifecycle. Non-compliance exposes your business to:
+
+| Risk | Impact |
+|------|--------|
+| **Data breach liability** | Financial responsibility for compromised card data, including forensic investigation costs ($50,000-$500,000+) |
+| **Card network fines** | $5,000-$100,000 per month of non-compliance |
+| **Increased processing fees** | Acquirers may impose higher rates on non-compliant merchants |
+| **Account termination** | Loss of ability to accept card payments |
+| **Reputational damage** | Customer trust erosion after a breach |
+
+<Info>
+  Yuno is PCI DSS Level 1 certified, the highest level of certification. By using Yuno's SDK or tokenization, you inherit Yuno's compliance controls and significantly reduce your own PCI scope.
+</Info>
+
+## SAQ Types: Which Applies to You
+
+Your SAQ type depends on how your integration handles cardholder data.
+
+| SAQ Type | Integration Method | Card Data on Your Servers | Questions | Complexity |
+|----------|-------------------|--------------------------|-----------|------------|
+| **SAQ A** | Yuno Checkout SDK (Full or Lite), iframe-based | Never | ~22 | Simplest |
+| **SAQ A-EP** | Secure Fields, tokenized Direct API, redirect | Never (but your site controls the payment page) | ~139 | Moderate |
+| **SAQ D** | Direct API with raw PAN handling | Yes | ~300+ | Most comprehensive |
+
+### How to Determine Your SAQ Type
+
+<Steps>
+  <Step title="Identify your integration method">
+    Check your implementation: do you use Yuno's Checkout SDK, Secure Fields, or Direct API?
+  </Step>
+  <Step title="Determine if card data touches your servers">
+    If you use the SDK or Secure Fields, card data is captured by Yuno's iframe and your servers never see raw PANs. If you send raw card numbers via the Direct API, your servers handle cardholder data.
+  </Step>
+  <Step title="Confirm with your acquirer">
+    Your acquiring bank has the final say on which SAQ type you must complete. Share your integration architecture with them for confirmation.
+  </Step>
+</Steps>
+
+<Warning>
+  If any part of your payment page (including the page hosting Yuno's iframe) is served from your domain, you likely qualify for SAQ A-EP rather than SAQ A. SAQ A applies only when the entire payment experience is hosted by the payment provider. Confirm with your acquirer.
+</Warning>
+
+## Using Yuno's Attestation of Compliance
+
+Yuno's PCI DSS Level 1 Attestation of Compliance (AOC) documents Yuno's compliance status and can be referenced in your own SAQ to demonstrate that your payment processing partner meets PCI requirements.
+
+### How to Obtain Yuno's AOC
+
+1. Navigate to **Dashboard > Settings > Compliance** or contact your Yuno account manager.
+2. Download the current AOC (updated annually after Yuno's QSA audit).
+3. Reference the AOC in your SAQ where asked about third-party service providers.
+
+### What Yuno's AOC Covers
+
+| Scope | Covered by Yuno's AOC |
+|-------|----------------------|
+| Cardholder data storage and encryption | Yes |
+| Tokenization infrastructure | Yes |
+| Payment processing servers and network | Yes |
+| 3DS authentication infrastructure | Yes |
+| SDK and hosted payment form security | Yes |
+| Your application servers | No (your responsibility) |
+| Your network infrastructure | No (your responsibility) |
+| Your employee access controls | No (your responsibility) |
+
+## SAQ A Completion Checklist
+
+SAQ A is the simplest questionnaire, applicable when all cardholder data functions are fully outsourced to Yuno via the Checkout SDK. Below is a section-by-section guide.
+
+### Section 1: Install and Maintain Network Security Controls
+
+| Requirement | What It Means | Your Action |
+|------------|---------------|-------------|
+| 1.1 | Processes for network security controls are defined and known | Document your firewall rules and review process |
+| 1.2 | Network security controls are configured and maintained | Ensure firewalls restrict traffic to necessary ports and protocols |
+
+**For SAQ A merchants:** Your network security scope is limited to the systems that host the page containing Yuno's payment iframe.
+
+<Note>
+  Even with SAQ A, you must ensure the page hosting Yuno's SDK is served over HTTPS (TLS 1.2+) and that your web server's firewall configuration is documented and reviewed periodically.
+</Note>
+
+### Section 2: Apply Secure Configurations to All System Components
+
+| Requirement | What It Means | Your Action |
+|------------|---------------|-------------|
+| 2.1 | Vendor-supplied defaults are changed | Change all default passwords on servers hosting payment pages |
+| 2.2 | System components are configured securely | Harden web servers: disable unnecessary services, apply secure headers |
+
+**Key actions:**
+- Remove or disable default accounts on your web server
+- Apply security headers: `Content-Security-Policy`, `X-Frame-Options`, `Strict-Transport-Security`
+- Document your server hardening configuration
+
+### Section 6: Develop and Maintain Secure Systems and Software
+
+| Requirement | What It Means | Your Action |
+|------------|---------------|-------------|
+| 6.1 | Identify and manage security vulnerabilities | Maintain an inventory of software components and monitor for vulnerabilities |
+| 6.2 | Develop software securely | Follow secure coding practices for your application |
+| 6.3 | Protect against web application attacks | Deploy a WAF or conduct regular vulnerability assessments |
+| 6.4 | Manage changes to system components | Use a formal change control process for production changes |
+
+**Key actions:**
+- Keep web server software, frameworks, and libraries updated with security patches
+- Conduct vulnerability scans on your web-facing assets quarterly
+- Ensure the page hosting Yuno's SDK does not include third-party scripts that could intercept card data
+
+<Warning>
+  Third-party JavaScript on your payment page is a significant risk vector. Scripts from analytics, advertising, or other providers could be compromised to skim card data entered into payment forms, even those rendered in iframes. Audit all scripts on pages that include Yuno's SDK.
+</Warning>
+
+### Section 9: Restrict Physical Access to Cardholder Data
+
+| Requirement | What It Means | Your Action |
+|------------|---------------|-------------|
+| 9.1 | Physical access to systems is restricted | Restrict access to servers and networking equipment |
+
+**For SAQ A merchants:** If your servers are cloud-hosted (AWS, GCP, Azure), your cloud provider handles physical security. Reference their compliance certifications (SOC 2, PCI DSS) in your documentation.
+
+### Section 12: Support Information Security with Organizational Policies
+
+| Requirement | What It Means | Your Action |
+|------------|---------------|-------------|
+| 12.1 | Information security policy is established and maintained | Create and maintain a written security policy |
+| 12.8 | Third-party service providers are managed | Maintain a list of service providers (including Yuno) with their compliance status |
+| 12.10 | Security incidents are detected and responded to | Implement an incident response plan (see [Incident Response](/security/incident-response)) |
+
+**Key actions:**
+- Maintain a written information security policy reviewed annually
+- Keep a registry of all third-party service providers that access or could impact cardholder data
+- Retain Yuno's AOC as evidence of your payment provider's compliance
+- Establish and test an incident response plan at least annually
+
+## Common Compliance Gaps and How to Fix Them
+
+| Gap | Risk | Fix |
+|-----|------|-----|
+| **No documented security policy** | Fails Section 12.1 | Create a written policy covering data security, access control, and incident response. Template-based policies are acceptable if customized to your environment. |
+| **Default credentials on servers** | Fails Section 2.1 | Audit all systems for default passwords and replace them. Use a password manager for secure credential storage. |
+| **Unpatched web server** | Fails Section 6.1 | Implement automated patch management. Apply critical security patches within 30 days of release. |
+| **Third-party scripts on payment page** | Fails Section 6.3 | Audit scripts on pages containing Yuno's SDK. Remove unnecessary scripts. Implement Subresource Integrity (SRI) for required scripts. |
+| **No vulnerability scanning** | Fails Section 6.2 | Engage an Approved Scanning Vendor (ASV) for quarterly external scans. Use internal scanning tools for ongoing monitoring. |
+| **No service provider inventory** | Fails Section 12.8 | Create a spreadsheet listing all service providers, their compliance certifications, and annual review dates. Include Yuno with their AOC. |
+| **No incident response plan** | Fails Section 12.10 | Develop an incident response plan following the structure in the [Incident Response Playbook](/security/incident-response). Test annually. |
+
+## Ongoing Monitoring Requirements
+
+PCI compliance is not a one-time event. Maintain these ongoing activities:
+
+| Activity | Frequency | Owner | Evidence |
+|----------|-----------|-------|----------|
+| **Vulnerability scans (external)** | Quarterly | Security / ASV vendor | ASV scan reports (passing) |
+| **Vulnerability scans (internal)** | Quarterly | Engineering | Internal scan reports |
+| **Security policy review** | Annually | Security / Management | Dated, signed policy document |
+| **Service provider review** | Annually | Security | Updated provider inventory with current AOCs |
+| **Penetration testing** | Annually (SAQ A-EP, SAQ D) | Security / Third-party firm | Penetration test report |
+| **Security awareness training** | Annually | HR / Security | Training completion records |
+| **Access review** | Quarterly | Security / Management | Access review documentation |
+| **Log review** | Daily (SAQ D), Weekly (SAQ A-EP) | Security / Engineering | Log review records |
+
+<Note>
+  SAQ A merchants have the lightest ongoing requirements (quarterly ASV scans, annual policy review, annual SAQ re-submission). SAQ A-EP and SAQ D merchants have progressively more rigorous requirements. Plan your resources accordingly.
+</Note>
+
+## Annual Re-Certification Process
+
+<Steps>
+  <Step title="Schedule your assessment (60 days before expiration)">
+    Begin your annual SAQ completion at least 60 days before your current certification expires. Your acquirer sets the annual deadline.
+  </Step>
+  <Step title="Gather documentation">
+    Collect all required evidence: ASV scan reports, security policies, service provider AOCs (including Yuno's current AOC), training records, and access review logs.
+  </Step>
+  <Step title="Complete the SAQ">
+    Answer each question based on your current environment. For any question answered "No" or "N/A," provide an explanation or compensating control.
+  </Step>
+  <Step title="Remediate gaps">
+    Address any compliance gaps identified during the self-assessment before submitting. Document all remediation actions.
+  </Step>
+  <Step title="Sign and submit">
+    An authorized officer must sign the Attestation of Compliance. Submit the completed SAQ and AOC to your acquiring bank.
+  </Step>
+</Steps>
+
+## Documentation to Maintain
+
+Keep these documents current and accessible for audits:
+
+| Document | Update Frequency | Retention |
+|----------|-----------------|-----------|
+| Completed SAQ and AOC | Annually | Current + 3 prior years |
+| Information security policy | Annually (or on change) | Current + 3 prior years |
+| Network diagram | On change | Current + 1 prior version |
+| Service provider inventory | Annually | Current year |
+| Yuno AOC | Annually (when renewed) | Current year |
+| ASV scan reports | Quarterly | 12 months minimum |
+| Vulnerability remediation records | As needed | 12 months minimum |
+| Incident response plan | Annually (or after incident) | Current + 1 prior version |
+| Training records | Annually | 3 years |
+| Change management logs | Ongoing | 12 months minimum |
+
+## Best Practices
+
+- **Start with the simplest SAQ**: Use Yuno's Checkout SDK to qualify for SAQ A and minimize your compliance burden. Only use Direct API with raw PANs if your business requires it.
+- **Automate vulnerability scanning**: Set up automated quarterly scans with an ASV to avoid missed deadlines.
+- **Keep your Yuno AOC current**: Request an updated AOC after Yuno completes their annual QSA audit. An expired AOC is a compliance gap.
+- **Minimize your payment page**: Remove all unnecessary JavaScript from pages that host Yuno's SDK. Every additional script increases risk and may affect your SAQ eligibility.
+- **Document as you go**: Maintaining compliance documentation throughout the year is far easier than reconstructing it at re-certification time.
+- **Engage your acquirer early**: If you are unsure which SAQ applies to your integration, ask your acquiring bank before beginning the assessment. Completing the wrong SAQ wastes time and may not satisfy your compliance obligation.

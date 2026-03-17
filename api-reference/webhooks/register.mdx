@@ -1,0 +1,27 @@
+---
+title: "Register Webhook Endpoint"
+openapi: "POST /v1/webhooks"
+---
+
+<Warning>
+This endpoint may return 404 in the sandbox environment. Configure webhooks through the Dashboard for sandbox testing.
+</Warning>
+
+<Note>
+To list, update, or delete webhook endpoints, use **Dashboard > Settings > Webhooks**. The API currently supports webhook registration only. Full CRUD via API is on the roadmap.
+</Note>
+
+## Supported Event Types
+
+When registering a webhook, you can subscribe to any of the following payment event types:
+
+- `payment.created`
+- `payment.succeeded`
+- `payment.failed`
+- `payment.declined`
+- `payment.cancelled`
+- `payment.expired`
+- `payment.refunded`
+- `payment.partially_refunded`
+
+See the [Webhook Events](/guides/webhooks/events) reference for the full list of event types across all resources (subscriptions, payouts, customers, disputes, and BaaS).

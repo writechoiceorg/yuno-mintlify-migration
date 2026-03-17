@@ -1,0 +1,115 @@
+---
+title: "Click to Pay"
+description: "Accept Visa and Mastercard Click to Pay for one-click checkout for returning cardholders."
+---
+
+
+## Overview
+
+Click to Pay is a card network-backed checkout experience developed by Visa and Mastercard (under the EMVCo SRC standard). It enables returning cardholders to complete purchases with a single click, without re-entering card details. Unlike Apple Pay or Google Pay, Click to Pay does not require a specific device or app -- it works across all browsers and devices.
+
+## How It Works
+
+1. The customer enters their email address at checkout.
+2. Click to Pay recognizes the email and retrieves enrolled card profiles.
+3. The customer selects a stored card and confirms with a one-time passcode (OTP).
+4. A payment token is generated and passed to Yuno for processing.
+5. No card numbers are transmitted -- only tokenized credentials.
+
+<Info>
+  Click to Pay works for cardholders who have previously enrolled their cards with Visa or Mastercard's Click to Pay service, either directly or through their issuing bank.
+</Info>
+
+## Prerequisites
+
+<Steps>
+  <Step title="Enable Click to Pay">
+    Activate Click to Pay in your Yuno Dashboard under **Settings > Digital Wallets > Click to Pay**.
+  </Step>
+  <Step title="Supported Networks">
+    Ensure your payment provider supports Visa and/or Mastercard tokenized transactions.
+  </Step>
+  <Step title="HTTPS Required">
+    Your checkout page must be served over HTTPS.
+  </Step>
+</Steps>
+
+## Integration with Full Checkout SDK
+
+When enabled, the Full Checkout SDK automatically detects returning Click to Pay users and presents the streamlined flow.
+
+```javascript
+const checkout = yuno.checkout({
+  countryCode: "US",
+  currency: "USD",
+  amount: "75.00",
+  checkoutSession: "session_ctp456",
+  customer: {
+    email: "customer@example.com" // Used for Click to Pay recognition
+  }
+});
+
+checkout.mount("#checkout-container");
+```
+
+## Direct API Integration
+
+For Direct API, you interact with the Click to Pay (SRC) system to obtain a token, then pass it to Yuno.
+
+```json
+POST /v1/payments
+{
+  "amount": {
+    "value": 75.00,
+    "currency": "USD"
+  },
+  "country": "US",
+  "payment_method": {
+    "type": "CLICK_TO_PAY",
+    "token": "src_token_from_click_to_pay"
+  },
+  "customer": {
+    "email": "customer@example.com"
+  }
+}
+```
+
+## Supported Markets
+
+| Network | Countries |
+|---------|-----------|
+| Visa | US, BR, MX, CO |
+| Mastercard | US, BR, MX, CO |
+
+<Note>
+  Click to Pay availability is expanding. Check the Yuno Dashboard for the latest supported markets and networks.
+</Note>
+
+## Customer Enrollment
+
+Customers can enroll in Click to Pay through:
+
+- Their issuing bank's app or website
+- The Visa or Mastercard Click to Pay portals
+- During checkout on a merchant site that supports enrollment
+
+<Warning>
+  Click to Pay recognition is email-based. Customers must use the same email they enrolled with. If the email does not match, the standard card entry form is presented as a fallback.
+</Warning>
+
+## Benefits
+
+| Benefit | Description |
+|---------|-------------|
+| **Higher conversion** | Fewer form fields reduce cart abandonment |
+| **Network-level security** | Tokenized credentials managed by Visa/Mastercard |
+| **Device agnostic** | Works on any browser without an app |
+| **Reduced PCI scope** | No raw card data on your servers |
+
+## Troubleshooting
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| Customer not recognized | Email mismatch or not enrolled | Customer must enroll or use enrolled email |
+| OTP not received | Carrier delay or incorrect phone | Customer should check enrolled phone number |
+| Token rejected | Expired SRC token | Ensure token is submitted within the validity window |

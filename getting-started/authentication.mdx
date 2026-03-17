@@ -1,0 +1,65 @@
+---
+title: "Authentication"
+description: "Set up API keys and authentication headers for Yuno API access"
+---
+
+## Authentication Headers
+
+All Yuno API requests require three authentication headers:
+
+| Header | Description | Usage |
+|--------|-------------|-------|
+| `public-api-key` | Your public API key | Client-side SDK initialization and server-side calls |
+| `private-secret-key` | Your private secret key | Server-side API calls only |
+| `account-code` | Your account identifier | All API calls |
+
+<Warning>
+  Never expose your `private-secret-key` in client-side code, mobile apps, or version control. This key should only be used in server-side environments.
+</Warning>
+
+## Getting Your API Keys
+
+1. Log in to the [Yuno Dashboard](https://dashboard.y.uno)
+2. Navigate to **Settings > API Keys**
+3. Copy your sandbox keys for testing, or production keys for live transactions
+
+## Header Format
+
+Include all three headers in every API request:
+
+```bash
+curl -X POST https://api-sandbox.y.uno/v1/checkout/sessions \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code" \
+  -H "Content-Type: application/json"
+```
+
+## Header Name Aliases
+
+The `account-code` header is the primary and recommended header name. The alias `X-Account-Code` is also accepted by the API and functions identically. Use `account-code` for consistency with Yuno's official examples and documentation.
+
+| Primary Header | Alias | Notes |
+|---------------|-------|-------|
+| `account-code` | `X-Account-Code` | Both accepted; use `account-code` as primary |
+
+## Sandbox vs Production Keys
+
+Each environment has its own set of API keys:
+
+| Environment | Base URL | Key Type |
+|-------------|----------|----------|
+| Sandbox | `https://api-sandbox.y.uno` | Test keys (no real transactions) |
+| Production | `https://api.y.uno` | Live keys (real transactions) |
+
+<Note>
+  Sandbox and production keys are not interchangeable. Using sandbox keys against the production URL (or vice versa) will result in authentication errors.
+</Note>
+
+## Security Best Practices
+
+- Store API keys in environment variables, not in source code
+- Use different keys for sandbox and production environments
+- Rotate keys periodically through the Yuno Dashboard
+- Restrict `private-secret-key` access to server-side code only
+- Monitor API usage in the Dashboard for unauthorized access

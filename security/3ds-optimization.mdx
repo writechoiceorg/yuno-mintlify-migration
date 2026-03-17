@@ -1,0 +1,319 @@
+---
+title: "3DS Optimization"
+description: "Maximize approval rates while minimizing friction with optimized 3D Secure flows."
+---
+
+
+## Overview
+
+3D Secure (3DS) protects merchants from fraud-related chargebacks through liability shift, but poorly configured 3DS can reduce conversion rates by introducing unnecessary friction. This guide covers strategies for optimizing your 3DS implementation to achieve high frictionless authentication rates while maintaining strong fraud protection.
+
+For foundational 3DS concepts, see [3D Secure](/security/3d-secure).
+
+## 3DS2 vs 3DS1
+
+3DS2 is a significant improvement over 3DS1 and should be used wherever supported.
+
+| Feature | 3DS1 | 3DS2 |
+|---------|------|------|
+| **User experience** | Full-page redirect to issuer | In-app or in-browser iframe |
+| **Frictionless flow** | Not supported | Supported (risk-based) |
+| **Data points for risk assessment** | ~15 fields | 100+ fields |
+| **Mobile support** | Poor (redirect-based) | Native SDKs available |
+| **Authentication methods** | Password only | OTP, biometric, app-based, out-of-band |
+| **Conversion impact** | -10% to -25% drop | -2% to -5% drop (with frictionless) |
+| **Status** | Being deprecated | Current standard |
+
+<Warning>
+  3DS1 is being phased out by card networks. Visa ended 3DS1 support in October 2022 and Mastercard followed in October 2023. Ensure your integration uses 3DS2 to avoid authentication failures. Yuno automatically attempts 3DS2 and falls back to 3DS1 only when the issuer does not support 3DS2.
+</Warning>
+
+## Risk-Based Authentication Decisioning
+
+3DS2 uses risk-based authentication (RBA) to determine whether a transaction requires a challenge or can be approved frictionlessly. The issuer makes the final decision based on data provided in the authentication request.
+
+### Risk Tiers
+
+| Risk Level | Authentication Flow | Target Percentage | Typical Scenarios |
+|-----------|--------------------|--------------------|-------------------|
+| **Low risk** | Frictionless (no customer action) | 60-70% of transactions | Returning customer, low value, known device |
+| **Medium risk** | Challenge (OTP or biometric) | 20-30% of transactions | New customer, moderate value, unusual pattern |
+| **High risk** | Step-up authentication (multi-factor) | 5-10% of transactions | High value, cross-border, risk signals present |
+
+<Info>
+  Your target should be a **60-70% frictionless rate** for an optimized 3DS implementation. If your frictionless rate is below 50%, you are likely not sending sufficient data for issuer risk assessment. If it is above 80%, verify that your fraud rates are not increasing.
+</Info>
+
+### Influencing the Issuer's Decision
+
+The issuer decides whether to approve frictionlessly or issue a challenge. You cannot force a frictionless outcome, but you can influence it by providing high-quality data.
+
+## Data Enrichment for Better Frictionless Rates
+
+The more data you provide in the 3DS authentication request, the better the issuer can assess risk and approve frictionlessly.
+
+### High-Impact Fields
+
+| Field | Impact on Frictionless Rate | Notes |
+|-------|---------------------------|-------|
+| `browser_info` (all subfields) | High | User agent, screen size, language, timezone, color depth |
+| `billing_address` | High | Full address enables AVS correlation |
+| `shipping_address` | High | Match with billing reduces risk perception |
+| `customer.email` | High | Known email associated with the card increases trust |
+| `customer.phone` | Medium | Enables out-of-band authentication |
+| `account_age` | Medium | Older accounts are lower risk |
+| `purchase_history` | Medium | Prior successful transactions indicate trust |
+| `device_fingerprint` | High | Recognized device signals low risk |
+| `ip_address` | Medium | Geolocation consistency with billing/shipping |
+| `recurring_indicator` | High | Recurring transactions from known customers |
+
+### Enriched 3DS Request Example
+
+```json
+{
+  "amount": { "value": 150.00, "currency": "BRL" },
+  "country": "BR",
+  "payment_method": {
+    "type": "CARD",
+    "token": "tok_card_abc123"
+  },
+  "three_d_secure": {
+    "enabled": true,
+    "version": "2.2"
+  },
+  "customer": {
+    "email": "customer@example.com",
+    "phone": "+5511999999999",
+    "document": {
+      "document_type": "CPF",
+      "document_number": "12345678901"
+    },
+    "billing_address": {
+      "street": "Rua Augusta 100",
+      "city": "Sao Paulo",
+      "state": "SP",
+      "zip_code": "01310-000",
+      "country": "BR"
+    }
+  },
+  "browser_info": {
+    "accept_header": "text/html",
+    "user_agent": "Mozilla/5.0...",
+    "language": "pt-BR",
+    "color_depth": 24,
+    "screen_height": 1080,
+    "screen_width": 1920,
+    "timezone_offset": -180,
+    "java_enabled": false,
+    "javascript_enabled": true
+  },
+  "shipping_address": {
+    "street": "Rua Augusta 100",
+    "city": "Sao Paulo",
+    "state": "SP",
+    "zip_code": "01310-000",
+    "country": "BR"
+  }
+}
+```
+
+<Note>
+  When using Yuno's Checkout SDK, browser information is collected and sent automatically. For Direct API integrations, you must collect and pass these fields yourself.
+</Note>
+
+## Issuer-Specific 3DS Behavior
+
+Issuers across Latin America have varying levels of 3DS2 support and different challenge thresholds. Understanding these patterns helps set expectations for frictionless rates by market.
+
+### Major LatAm Issuer 3DS Support
+
+| Country | Major Issuers | 3DS2 Support | Typical Frictionless Rate | Notes |
+|---------|--------------|-------------|---------------------------|-------|
+| **Brazil** | Itau, Bradesco, Banco do Brasil, Nubank | Strong | 55-70% | Highest 3DS adoption in LatAm |
+| **Mexico** | BBVA, Banorte, Citibanamex, HSBC | Moderate | 40-55% | Growing adoption, some issuers still 3DS1 |
+| **Colombia** | Bancolombia, Davivienda, BBVA | Moderate | 35-50% | Increasing support |
+| **Argentina** | Galicia, Santander, BBVA | Limited | 25-40% | Lower issuer readiness |
+| **Chile** | BCI, Banco de Chile, Santander | Moderate | 40-55% | Steady improvement |
+| **Peru** | BCP, Interbank, BBVA | Limited | 30-45% | Developing market |
+
+<Info>
+  Frictionless rates vary significantly by issuer, card type (credit vs. debit), and transaction characteristics. The ranges above are indicative. Monitor your actual rates per issuer in **Dashboard > Analytics > 3DS Performance**.
+</Info>
+
+## Mobile vs Desktop 3DS UX
+
+The 3DS challenge experience differs between mobile and desktop. Optimize for both to minimize drop-off.
+
+### Desktop Considerations
+
+| Aspect | Recommendation |
+|--------|---------------|
+| **Challenge display** | Render in a modal/lightbox overlay, not a redirect |
+| **Iframe sizing** | Minimum 400x400px for challenge content |
+| **Loading indicators** | Show a spinner during 3DS processing to prevent user abandonment |
+| **Timeout handling** | Display a helpful message if 3DS takes longer than 30 seconds |
+| **Browser compatibility** | Test across Chrome, Firefox, Safari, Edge |
+
+### Mobile Considerations
+
+| Aspect | Recommendation |
+|--------|---------------|
+| **Challenge display** | Use the native SDK's built-in challenge handling |
+| **Screen orientation** | Support both portrait and landscape for challenge content |
+| **App switching** | Handle cases where the issuer app opens for out-of-band authentication |
+| **Network interruption** | Gracefully handle connectivity loss during 3DS flow |
+| **Biometric auth** | Ensure your app allows the issuer's biometric prompt to display |
+
+<Warning>
+  On mobile, avoid opening 3DS challenges in a new browser tab or external browser. This causes high abandonment rates. Use in-app webviews or the Yuno Mobile SDK's native challenge handling.
+</Warning>
+
+## Cross-Border 3DS Strategy
+
+3DS requirements and effectiveness vary by region. Configure your strategy based on where your customers and their issuers are located.
+
+### Regional Requirements
+
+| Region | Requirement | Details |
+|--------|------------|---------|
+| **EU/EEA (PSD2/SCA)** | Mandatory | Strong Customer Authentication required for most card-not-present transactions |
+| **UK** | Mandatory | Follows PSD2/SCA requirements post-Brexit |
+| **Latin America** | Optional but recommended | No regulatory mandate; recommended for fraud protection and liability shift |
+| **North America** | Optional | No regulatory mandate; recommended for high-risk transactions |
+
+### SCA Exemptions (EU/EEA)
+
+In PSD2-regulated markets, certain transactions are eligible for SCA exemptions, allowing frictionless processing without a challenge.
+
+| Exemption | Criteria | Success Rate |
+|-----------|----------|-------------|
+| **Low-value transaction (LVT)** | Amount < EUR 30 (cumulative limit applies) | 80-90% |
+| **Transaction Risk Analysis (TRA)** | Merchant fraud rate below threshold for the amount band | 70-85% |
+| **Recurring payments** | Subsequent charges with same amount to same card | 85-95% |
+| **Trusted beneficiary** | Cardholder has whitelisted the merchant with their issuer | 90%+ |
+| **Secure corporate payment** | B2B transaction with dedicated corporate card | 75-85% |
+
+<Note>
+  Requesting an exemption does not guarantee frictionless processing. The issuer can override your exemption request and require a challenge if their risk assessment warrants it. Always be prepared to handle challenges even when requesting exemptions.
+</Note>
+
+### Requesting an Exemption via Yuno
+
+```json
+{
+  "three_d_secure": {
+    "enabled": true,
+    "version": "2.2",
+    "exemption_type": "TRANSACTION_RISK_ANALYSIS"
+  }
+}
+```
+
+Available exemption types:
+- `LOW_VALUE` -- Transactions under EUR 30
+- `TRANSACTION_RISK_ANALYSIS` -- Based on merchant fraud rate
+- `RECURRING` -- Subsequent recurring charges
+- `TRUSTED_BENEFICIARY` -- Merchant whitelisted by cardholder
+
+## 3DS Performance Metrics
+
+Track these metrics to evaluate and optimize your 3DS implementation.
+
+| Metric | Definition | Target | Alert Threshold |
+|--------|-----------|--------|----------------|
+| **Frictionless rate** | Frictionless authentications / Total 3DS attempts | 60-70% | < 50% |
+| **Challenge conversion rate** | Successful challenges / Total challenges presented | > 85% | < 70% |
+| **3DS authentication rate** | Successful authentications / Total 3DS attempts | > 90% | < 80% |
+| **3DS drop-off rate** | Abandoned during 3DS / Total 3DS attempts | < 5% | > 10% |
+| **Fallback to 3DS1 rate** | 3DS1 fallbacks / Total 3DS attempts | < 10% | > 20% |
+| **Overall 3DS conversion** | Successful payments with 3DS / Total 3DS-initiated payments | > 80% | < 70% |
+
+## Configuring 3DS in Yuno
+
+### Dashboard Settings
+
+Navigate to **Dashboard > Settings > Security > 3D Secure** to configure:
+
+| Setting | Options | Recommendation |
+|---------|---------|---------------|
+| **3DS mode** | Enabled / Disabled / Conditional | Conditional (apply rules) |
+| **Default version** | 3DS2 / 3DS1 / Auto | Auto (prefers 3DS2) |
+| **Challenge preference** | No preference / No challenge / Challenge mandated | No preference |
+| **Exemption strategy** | None / Auto / Custom rules | Auto for EU, None for LatAm |
+
+### API-Level Configuration
+
+Override Dashboard defaults per transaction:
+
+```json
+{
+  "three_d_secure": {
+    "enabled": true,
+    "version": "2.2",
+    "challenge_preference": "NO_PREFERENCE",
+    "exemption_type": null
+  }
+}
+```
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `enabled` | `true` / `false` | Enable or disable 3DS for this transaction |
+| `version` | `"2.2"` / `"2.1"` / `"2.0"` / `"1.0"` | Preferred 3DS version |
+| `challenge_preference` | `NO_PREFERENCE` / `NO_CHALLENGE` / `CHALLENGE_MANDATED` | Hint to issuer (not guaranteed) |
+| `exemption_type` | See exemption types above | SCA exemption to request |
+
+## A/B Testing 3DS Strategies
+
+Test different 3DS configurations to find the optimal balance between fraud prevention and conversion.
+
+### What to Test
+
+| Test Variable | Variants | Measure |
+|--------------|----------|---------|
+| 3DS on/off by amount | 3DS > $50 vs 3DS > $100 vs 3DS all | Conversion rate, fraud rate, chargeback rate |
+| Exemption strategy | No exemptions vs TRA for low-risk vs Auto | Frictionless rate, fraud rate |
+| Data enrichment | Minimal fields vs full enrichment | Frictionless rate |
+| Challenge preference | No preference vs No challenge | Frictionless rate, issuer override rate |
+
+### A/B Test Protocol
+
+<Steps>
+  <Step title="Define hypothesis and metrics">
+    State what you expect to change and which metrics you will measure. Ensure you have baseline data for at least 30 days.
+  </Step>
+  <Step title="Configure test groups">
+    Split traffic by a consistent criterion (e.g., customer ID hash) to ensure each customer has a consistent experience. Avoid random per-transaction assignment.
+  </Step>
+  <Step title="Run for sufficient duration">
+    Run each test for a minimum of 14 days with at least 1,000 transactions per variant to achieve statistical significance.
+  </Step>
+  <Step title="Analyze results">
+    Compare conversion rate, frictionless rate, fraud rate, and chargeback rate across variants. Account for the chargeback lag (30-45 days) before declaring a winner.
+  </Step>
+</Steps>
+
+## Troubleshooting Common 3DS Failures
+
+| Error | Likely Cause | Resolution |
+|-------|-------------|------------|
+| `AUTHENTICATION_FAILED` | Cardholder failed challenge (wrong OTP, timeout) | Retry payment; customer must contact issuer if persistent |
+| `DIRECTORY_SERVER_ERROR` | Card network 3DS directory unavailable | Retry after 1-2 minutes; if persistent, contact Yuno support |
+| `ISSUER_NOT_ENROLLED` | Issuer does not support 3DS for this card | Proceed without 3DS (no liability shift) or decline |
+| `TIMEOUT` | 3DS flow exceeded time limit | Increase timeout; check for network latency; ensure customer has stable connection |
+| `VERSION_NOT_SUPPORTED` | Requested 3DS version not supported by issuer | Set version to `"auto"` to allow Yuno to select the best available version |
+| `CHALLENGE_RENDER_FAILED` | Challenge iframe could not render | Check CSP headers allow Yuno's 3DS domain; verify iframe dimensions |
+| `BROWSER_INFO_MISSING` | Required browser fields not provided (Direct API) | Collect all `browser_info` fields; use SDK for automatic collection |
+
+<Note>
+  For `ISSUER_NOT_ENROLLED` errors, you can configure your integration to proceed without 3DS. Be aware that these transactions will not have liability shift and carry full chargeback risk. Consider applying additional fraud checks for non-3DS transactions.
+</Note>
+
+## Best Practices
+
+- **Send all available data**: Every additional field you provide improves the issuer's ability to approve frictionlessly. Prioritize browser info, billing address, and customer email.
+- **Use the SDK when possible**: Yuno's Checkout SDK handles browser data collection, challenge rendering, and version negotiation automatically.
+- **Monitor frictionless rates per issuer**: Some issuers challenge more aggressively than others. Identify issuers with low frictionless rates and ensure you are sending all available data for their transactions.
+- **Do not set challenge preference to NO_CHALLENGE in SCA-regulated markets**: This may cause the issuer to reject the authentication entirely rather than approving frictionlessly.
+- **Handle 3DS failures gracefully**: Show clear error messages and offer retry options. Do not simply display a generic "payment failed" message.
+- **Review 3DS metrics weekly**: Sudden drops in frictionless rate or increases in drop-off rate indicate a configuration or data quality issue that should be investigated immediately.

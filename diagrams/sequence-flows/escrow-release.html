@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Escrow Release</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  .lane-label {
+    position: absolute;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0a0a0a;
+    line-height: 1.43;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  .step {
+    position: absolute;
+    width: 104px;
+    height: 98px;
+    background: #ffffff;
+    border: 1px solid #3e4fe0;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #0a0a0a;
+    text-align: center;
+    line-height: 1.35;
+  }
+
+  .step-badge {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #3e4fe0;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fafafa;
+    line-height: 1;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     3 swim lanes (Buyer / Platform / Yuno):
+       Lane 0 (Buyer)    : y=48  → y=307  cy=177  box_top=128
+       Lane 1 (Platform) : y=307 → y=567  cy=437  box_top=388
+       Lane 2 (Yuno)     : y=567 → y=826  cy=696  box_top=647
+
+     7 columns, 170px spacing, starting at left=210:
+       Col1=210  Col2=380  Col3=550  Col4=720  Col5=890  Col6=1060  Col7=1230
+       cx: 262  432  602  772  942  1112  1282
+═══════════════════════════════════════════════════════════════ -->
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.07)"/>
+    </filter>
+    <marker id="arr-dn" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#64748b"/>
+    </marker>
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background card ───────────────────────────────────────── -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.55"/>
+
+  <!-- ── Lane tints (alternating) ──────────────────────────────── -->
+  <rect x="40" y="307" width="1460" height="260" fill="#fafafa" opacity="1"/>
+
+  <!-- ── Lane dividers ─────────────────────────────────────────── -->
+  <line x1="40" y1="307" x2="1500" y2="307" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+  <line x1="40" y1="567" x2="1500" y2="567" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ── Left label panel divider ──────────────────────────────── -->
+  <line x1="181" y1="48" x2="181" y2="826" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CONNECTOR PATHS
+  ════════════════════════════════════════════════════════════════ -->
+
+  <!-- v1: Col1 Buyer→Platform  "Book Service" (solid down) -->
+  <path id="v1" d="M 262,226 L 262,388"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v2: Col2 Platform→Yuno  "Create Escrow Payment" (solid down) -->
+  <path id="v2" d="M 432,486 L 432,647"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v3: Col3 Yuno→Platform  "Funds Held" (dashed up) -->
+  <path id="v3" d="M 602,647 L 602,486"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v4: Col4 Platform→Yuno  "Release Milestone 1" (solid down) -->
+  <path id="v4" d="M 772,486 L 772,647"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v5: Col5 Yuno→Platform  "Funds Released" (dashed up) -->
+  <path id="v5" d="M 942,647 L 942,486"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v6: Col6 Platform→Yuno  "Release Milestone 2" (solid down) -->
+  <path id="v6" d="M 1112,486 L 1112,647"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v7: Col7 Yuno→Platform  "Balance Updated" (dashed up) -->
+  <path id="v7" d="M 1282,647 L 1282,486"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ANIMATED SPARKS
+  ════════════════════════════════════════════════════════════════ -->
+  <g clip-path="url(#diagram-clip)">
+
+    <!-- v1: Book Service (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v1"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v2: Create Escrow (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="0.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v2"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v3: Funds Held (orange, up) -->
+    <circle r="3" fill="#f97316" filter="url(#spark-glow)" opacity="0.8">
+      <animateMotion dur="1.6s" begin="1.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v4: Release Milestone 1 (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="1.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v4"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v5: Funds Released (green, up — webhook) -->
+    <circle r="3" fill="#15803d" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.6s" begin="2.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v5"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v6: Release Milestone 2 (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="3.0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v6"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v7: Balance Updated (green, up — webhook) -->
+    <circle r="3" fill="#15803d" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.6s" begin="3.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v7"/>
+      </animateMotion>
+    </circle>
+
+  </g>
+</svg>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SWIM LANE LABELS
+═══════════════════════════════════════════════════════════════ -->
+<div class="lane-label" style="left:109px; top:156px;">Buyer</div>
+<div class="lane-label" style="left:109px; top:416px;">Platform</div>
+<div class="lane-label" style="left:109px; top:675px;">Yuno</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STEP BADGES
+═══════════════════════════════════════════════════════════════ -->
+<div class="step-badge" style="left:210px; top:118px;">1</div>
+<div class="step-badge" style="left:380px; top:378px;">2</div>
+<div class="step-badge" style="left:550px; top:637px;">3</div>
+<div class="step-badge" style="left:720px; top:378px;">4</div>
+<div class="step-badge" style="left:890px; top:637px;">5</div>
+<div class="step-badge" style="left:1060px; top:378px;">6</div>
+<div class="step-badge" style="left:1230px; top:637px;">7</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STEP BOXES
+     Lane0 top=128  · Lane1 top=388  · Lane2 top=647
+═══════════════════════════════════════════════════════════════ -->
+
+<!-- Col 1: Buyer→Platform "Book Service" -->
+<div class="step" style="left:210px; top:128px;">Book<br>Service</div>
+<div class="step" style="left:210px; top:388px;">Receives<br>booking</div>
+
+<!-- Col 2: Platform→Yuno "Create Escrow Payment" -->
+<div class="step" style="left:380px; top:388px;">Create<br>Escrow<br>Payment</div>
+<div class="step" style="left:380px; top:647px;">Holds<br>funds in<br>escrow</div>
+
+<!-- Col 3: Yuno→Platform "Funds Held" -->
+<div class="step" style="left:550px; top:647px;">Funds<br>Held</div>
+<div class="step" style="left:550px; top:388px;">Escrow<br>confirmed</div>
+
+<!-- Col 4: Platform→Yuno "Release Milestone 1" -->
+<div class="step" style="left:720px; top:388px;">Release<br>Milestone 1</div>
+<div class="step" style="left:720px; top:647px;">Processes<br>release</div>
+
+<!-- Col 5: Yuno→Platform "Funds Released" -->
+<div class="step" style="left:890px; top:647px;">Funds<br>Released</div>
+<div class="step" style="left:890px; top:388px;">Milestone 1<br>complete</div>
+
+<!-- Col 6: Platform→Yuno "Release Milestone 2" -->
+<div class="step" style="left:1060px; top:388px;">Release<br>Milestone 2</div>
+<div class="step" style="left:1060px; top:647px;">Processes<br>release</div>
+
+<!-- Col 7: Yuno→Platform "Balance Updated" -->
+<div class="step" style="left:1230px; top:647px;">Balance<br>Updated</div>
+<div class="step" style="left:1230px; top:388px;">Escrow<br>complete</div>
+
+</div><!-- /diagram -->
+</div><!-- /scroll-wrapper -->
+</body>
+</html>

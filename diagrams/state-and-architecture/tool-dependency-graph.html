@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Tool Dependency Graph</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  /* ── Node boxes (Base 1 style) ─────────────────────────────── */
+  .node {
+    position: absolute;
+    border: 1px solid;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    padding: 12px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a0a0a;
+    text-align: center;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+  }
+
+  .node.dark-green { border-color: #15803d; background: #dcfce7; }
+  .node.blue       { border-color: #2563eb; background: #eff6ff; }
+  .node.lavender   { border-color: #8b5cf6; background: #f5f3ff; }
+  .node.violet     { border-color: #7c3aed; background: #ede9fe; }
+  .node.red        { border-color: #dc2626; background: #fff1f2; }
+  .node.amber      { border-color: #b45309; background: #fef3c7; }
+
+  /* ── Legend ────────────────────────────────────────────────── */
+  .legend {
+    position: absolute;
+    bottom: 64px;
+    left: 72px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 400;
+  }
+  .legend-line {
+    width: 32px;
+    height: 0;
+    border-top: 1.5px solid #94a3b8;
+  }
+  .legend-line.dashed {
+    border-top-style: dashed;
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<!--
+  COORDINATE SYSTEM (Base 1)
+  bg_diagram: left=40, top=48, width=1460, height=778
+
+  Row 1 top=108:  create_customer cx=280 | create_recipient cx=700
+  Row 2 top=278:  create_checkout_session cx=280 | create_payout cx=700 | get_payment_methods cx=1220
+  Row 3 top=448:  create_payment cx=680  | get_payment cx=1220
+  Row 4 top=628:  capture_payment cx=370 | cancel_payment cx=680 | refund_payment cx=1050
+
+  Solid lines  = required dependency
+  Dashed lines = optional / read-only dependency
+-->
+
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.08)"/>
+    </filter>
+
+    <!-- Solid arrowhead -->
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#94a3b8"/>
+    </marker>
+    <!-- Dashed arrowhead (same visual, separate id for future flexibility) -->
+    <marker id="arr-d" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#94a3b8"/>
+    </marker>
+
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background card ──────────────────────────────────────── -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.6"/>
+
+  <!-- ── Dashed grid — vertical ─────────────────────────────── -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="190"  y1="48" x2="190"  y2="826"/>
+    <line x1="340"  y1="48" x2="340"  y2="826"/>
+    <line x1="490"  y1="48" x2="490"  y2="826"/>
+    <line x1="640"  y1="48" x2="640"  y2="826"/>
+    <line x1="790"  y1="48" x2="790"  y2="826"/>
+    <line x1="940"  y1="48" x2="940"  y2="826"/>
+    <line x1="1090" y1="48" x2="1090" y2="826"/>
+    <line x1="1240" y1="48" x2="1240" y2="826"/>
+    <line x1="1390" y1="48" x2="1390" y2="826"/>
+  </g>
+
+  <!-- ── Dashed grid — horizontal ──────────────────────────── -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="40" y1="135" x2="1500" y2="135"/>
+    <line x1="40" y1="285" x2="1500" y2="285"/>
+    <line x1="40" y1="435" x2="1500" y2="435"/>
+    <line x1="40" y1="585" x2="1500" y2="585"/>
+    <line x1="40" y1="735" x2="1500" y2="735"/>
+  </g>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SOLID CONNECTOR PATHS  (required dependencies)
+  ════════════════════════════════════════════════════════════════ -->
+
+  <!-- p1: create_recipient → create_payout (straight vertical) -->
+  <path id="p1" d="M 700,152 L 700,278"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p2: create_checkout_session → create_payment (diagonal right-down) -->
+  <path id="p2" d="M 280,322 C 330,400 560,440 638,448"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p3: create_payment → capture_payment (diagonal left-down) -->
+  <path id="p3" d="M 642,492 C 590,560 460,580 410,628"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p4: create_payment → cancel_payment (straight vertical) -->
+  <path id="p4" d="M 680,492 L 680,628"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p5: create_payment → refund_payment (diagonal right-down) -->
+  <path id="p5" d="M 720,492 C 800,560 940,580 1000,628"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       DASHED CONNECTOR PATHS  (optional dependencies)
+  ════════════════════════════════════════════════════════════════ -->
+
+  <!-- d1: create_customer → create_checkout_session (dashed vertical) -->
+  <path id="d1" d="M 280,152 L 280,278"
+        stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"
+        fill="none" marker-end="url(#arr-d)"/>
+
+  <!-- d2: get_payment_methods → create_payment (dashed curve left-down) -->
+  <path id="d2" d="M 1220,322 C 1220,400 960,430 722,448"
+        stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"
+        fill="none" marker-end="url(#arr-d)"/>
+
+  <!-- d3: get_payment → capture_payment (dashed diagonal down-left) -->
+  <path id="d3" d="M 1160,492 C 900,560 600,600 410,628"
+        stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"
+        fill="none" marker-end="url(#arr-d)"/>
+
+  <!-- d4: get_payment → refund_payment (dashed diagonal down-left) -->
+  <path id="d4" d="M 1220,492 C 1220,560 1170,580 1100,628"
+        stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"
+        fill="none" marker-end="url(#arr-d)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ANIMATED SPARKS
+  ════════════════════════════════════════════════════════════════ -->
+  <g clip-path="url(#diagram-clip)">
+
+    <!-- p1: → create_payout (green) -->
+    <circle r="3.5" fill="#15803d" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p1"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p2: → create_payment (blue) -->
+    <circle r="3.5" fill="#2563eb" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="2.2s" begin="0.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p2"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p3: → capture_payment (violet) -->
+    <circle r="3.5" fill="#7c3aed" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="2s" begin="0.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p4: → cancel_payment (red) -->
+    <circle r="3.5" fill="#dc2626" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.6s" begin="1.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p4"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p5: → refund_payment (amber) -->
+    <circle r="3.5" fill="#b45309" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2s" begin="1.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p5"/>
+      </animateMotion>
+    </circle>
+
+    <!-- d1: create_customer → create_checkout_session (slate, dashed) -->
+    <circle r="3" fill="#64748b" filter="url(#spark-glow)" opacity="0.7">
+      <animateMotion dur="1.6s" begin="0.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#d1"/>
+      </animateMotion>
+    </circle>
+
+    <!-- d2: get_payment_methods → create_payment (indigo, dashed) -->
+    <circle r="3" fill="#8b5cf6" filter="url(#spark-glow)" opacity="0.7">
+      <animateMotion dur="2.6s" begin="0.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#d2"/>
+      </animateMotion>
+    </circle>
+
+    <!-- d3: get_payment → create_payment (indigo, dashed) -->
+    <circle r="3" fill="#8b5cf6" filter="url(#spark-glow)" opacity="0.7">
+      <animateMotion dur="2s" begin="1s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#d3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- d4: get_payment → refund_payment (amber, dashed) -->
+    <circle r="3" fill="#b45309" filter="url(#spark-glow)" opacity="0.7">
+      <animateMotion dur="1.8s" begin="1.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#d4"/>
+      </animateMotion>
+    </circle>
+
+  </g>
+</svg>
+
+<!-- ════════════════════════════════════════════════════════════════
+     HTML NODES  (left = center x, transform:translateX(-50%))
+════════════════════════════════════════════════════════════════ -->
+
+<!-- Row 1 -->
+<div class="node dark-green" style="left:280px; top:108px;">create_customer</div>
+<div class="node dark-green" style="left:700px; top:108px;">create_recipient</div>
+
+<!-- Row 2 -->
+<div class="node blue" style="left:280px; top:278px;">create_checkout_session</div>
+<div class="node blue" style="left:700px; top:278px;">create_payout</div>
+<div class="node lavender" style="left:1220px; top:278px;">get_payment_methods</div>
+
+<!-- Row 3 -->
+<div class="node blue" style="left:680px; top:448px;">create_payment</div>
+<div class="node lavender" style="left:1220px; top:448px;">get_payment</div>
+
+<!-- Row 4 -->
+<div class="node violet" style="left:370px; top:628px;">capture_payment</div>
+<div class="node red"    style="left:680px; top:628px;">cancel_payment</div>
+<div class="node amber"  style="left:1050px; top:628px;">refund_payment</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     LEGEND
+════════════════════════════════════════════════════════════════ -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-line"></div>
+    Required dependency
+  </div>
+  <div class="legend-item">
+    <div class="legend-line dashed"></div>
+    Optional dependency
+  </div>
+</div>
+
+</div><!-- /diagram -->
+</div><!-- /scroll-wrapper -->
+</body>
+</html>

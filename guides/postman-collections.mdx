@@ -1,0 +1,169 @@
+---
+title: "Postman Collections"
+description: "Import and configure Yuno's Postman collection for rapid API testing"
+---
+
+## Overview
+
+Yuno provides a public Postman workspace with pre-built collections covering the full API surface. Use these collections to explore the API, test payment flows, and prototype integrations without writing code.
+
+## Forking the Yuno Workspace
+
+<Steps>
+  <Step title="Open the Yuno Postman workspace">
+    Navigate to [Yuno's public Postman workspace](https://www.postman.com/yuno-payments) and browse the available collections.
+  </Step>
+
+  <Step title="Fork the collection">
+    Click the **Fork** icon on the collection you want to use. Forking creates a personal copy in your Postman workspace that stays linked to the original for updates.
+
+    - Enter a label for your fork (e.g., "My Yuno Integration")
+    - Select your target workspace
+    - Click **Fork Collection**
+  </Step>
+
+  <Step title="Fork the environment">
+    Fork the **Yuno Sbx - Postman** environment alongside the collection. This environment contains the variable structure you need for authentication and request configuration.
+  </Step>
+</Steps>
+
+<Note>
+Forking rather than exporting keeps your copy linked to the original. When Yuno updates the collection, you can pull changes into your fork.
+</Note>
+
+## Environment Setup
+
+The **Yuno Sbx - Postman** environment provides pre-configured variables for sandbox testing. After forking, update the following variables with your credentials:
+
+| Variable | Description | Where to Find |
+|----------|-------------|---------------|
+| `public-api-key` | Client-side API key | Dashboard > Settings > API Keys |
+| `private-secret-key` | Server-side secret key | Dashboard > Settings > API Keys |
+| `account-code` | Merchant account identifier | Dashboard > Settings > API Keys |
+
+### Configuring Variables
+
+1. In Postman, click **Environments** in the sidebar
+2. Select **Yuno Sbx - Postman**
+3. Enter your values in the **Current Value** column for each variable
+4. Click **Save**
+
+<Warning>
+Never share your `private-secret-key` or commit Postman environments with real credentials to version control. Use Postman's "Current Value" field, which is local to your machine and not synced to shared workspaces.
+</Warning>
+
+### Additional Environment Variables
+
+The collection uses these auto-populated variables for request chaining:
+
+| Variable | Description | Auto-populated |
+|----------|-------------|----------------|
+| `checkout-session-id` | ID from Create Checkout Session response | Yes |
+| `payment-id` | ID from Create Payment response | Yes |
+| `customer-id` | ID from Create Customer response | Yes |
+| `base-url` | Yuno API base URL | Pre-configured |
+
+## Collection Structure
+
+The Yuno Postman collection is organized by API resource:
+
+| Folder | Endpoints | Description |
+|--------|-----------|-------------|
+| **Checkout Sessions** | Create, retrieve, list | Manage checkout session lifecycle |
+| **Payments** | Create, capture, cancel, refund | Full payment operations |
+| **Customers** | Create, update, retrieve | Customer profile management |
+| **Payment Methods** | List, retrieve | Query available payment methods |
+| **Providers** | List connections | View configured provider connections |
+| **Webhooks** | Test delivery | Simulate webhook events |
+
+Each request includes:
+- Pre-configured headers (authorization, content-type)
+- Example request body with documented fields
+- Test scripts that auto-save response IDs to environment variables
+
+## Running Your First Request
+
+<Steps>
+  <Step title="Select the environment">
+    In the top-right corner of Postman, select **Yuno Sbx - Postman** from the environment dropdown.
+  </Step>
+
+  <Step title="Open Create Checkout Session">
+    Navigate to **Checkout Sessions > Create Checkout Session** in the collection sidebar.
+  </Step>
+
+  <Step title="Review the request body">
+    The request body is pre-populated with a valid example. Review and modify fields as needed:
+
+    ```json
+    {
+      "amount": {
+        "currency": "BRL",
+        "value": 100
+      },
+      "country": "BR",
+      "merchant_order_id": "order-test-001",
+      "payment_description": "Test payment"
+    }
+    ```
+  </Step>
+
+  <Step title="Send the request">
+    Click **Send**. A successful response returns a `201` status with the checkout session object. The `checkout_session_id` is automatically saved to your environment variables.
+  </Step>
+
+  <Step title="Continue the flow">
+    Use the saved `checkout_session_id` in subsequent requests like **Create Payment** to complete the payment flow.
+  </Step>
+</Steps>
+
+## Request Chaining
+
+The collection uses Postman test scripts to chain requests automatically. When you run a request, the response ID is saved to an environment variable and referenced by the next request in the flow:
+
+```
+Create Checkout Session → saves checkout-session-id
+    ↓
+Create Payment → uses checkout-session-id, saves payment-id
+    ↓
+Capture Payment → uses payment-id
+```
+
+This allows you to run a complete payment flow sequentially without manually copying IDs between requests.
+
+## Testing with Different Payment Methods
+
+The collection includes example request bodies for common payment methods:
+
+| Payment Method | Country | Key Fields |
+|----------------|---------|------------|
+| **Card** | Multiple | `card.number`, `card.cvv`, `card.expiration_month/year` |
+| **PIX** | BR | `customer.document` (CPF/CNPJ) |
+| **OXXO** | MX | `customer.email` |
+| **Bank Transfer** | CO | `customer.document`, `customer.phone` |
+
+Switch between payment method examples by selecting the corresponding request variant within each folder.
+
+<Note>
+Sandbox test credentials and card numbers are documented in the request descriptions. Use the provided test values for consistent results.
+</Note>
+
+## Sharing with Your Team
+
+Share your configured collection with team members:
+
+1. **Postman Team Workspace:** Move your fork to a team workspace so all members have access
+2. **Environment management:** Create a shared environment with non-sensitive variables (`account-code`, `base-url`) and instruct members to add their own `private-secret-key` locally
+3. **Collection updates:** When Yuno updates the source collection, pull changes into your fork via **Pull Changes** in the fork menu
+
+<Warning>
+Shared Postman workspaces sync environment variables. Ensure `private-secret-key` is set only in the **Current Value** column (local, not synced) and not in the **Initial Value** column (synced to workspace).
+</Warning>
+
+## Best Practices
+
+- **Keep your fork updated.** Regularly pull changes from the Yuno source collection to get new endpoints and fixes.
+- **Use environment variables for all dynamic values.** Avoid hardcoding IDs, keys, or tokens in request bodies.
+- **Run requests in sequence for payment flows.** The chaining scripts depend on running requests in the correct order.
+- **Review test scripts.** The collection includes assertions that validate response structure. Run them as part of your testing to catch integration issues early.
+- **Create separate environments for sandbox and production.** Duplicate the environment, update credentials, and switch between them using the environment selector.

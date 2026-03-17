@@ -1,0 +1,127 @@
+---
+title: "Co-Badged Cards"
+description: "Handle cards with multiple network brands and let customers or merchants choose the preferred network."
+---
+
+
+## Overview
+
+Co-badged cards are payment cards that carry two or more network brands, such as a card that is both Visa and Elo, or Mastercard and Maestro. These cards are common in markets like Brazil (Visa/Elo), Europe (Mastercard/Maestro, Visa/V Pay), and other regions where local and international networks coexist.
+
+Yuno detects co-badged cards and allows you to select the preferred network for processing, enabling cost optimization and regulatory compliance.
+
+## How Co-Badging Works
+
+A single physical card can be linked to multiple payment networks. Each network may offer different:
+
+- **Interchange rates** (local networks are often cheaper)
+- **Acceptance rates** (international networks may have broader acceptance)
+- **Feature support** (3DS, tokenization, installments)
+- **Regulatory compliance** (some regulations require offering network choice)
+
+```
+Physical Card
+    ├── Network 1: Visa (international)
+    └── Network 2: Elo (local - Brazil)
+```
+
+<Info>
+  In Brazil, many cards are co-badged with Elo (local) and Visa or Mastercard (international). Routing through Elo typically offers lower interchange fees for domestic transactions.
+</Info>
+
+## Detecting Co-Badged Cards
+
+When a card is tokenized or used in a payment, Yuno returns all available networks:
+
+```json
+{
+  "payment_method": {
+    "type": "CARD",
+    "card": {
+      "last_four": "7890",
+      "primary_brand": "VISA",
+      "available_brands": ["VISA", "ELO"],
+      "fingerprint": "fp_xyz789"
+    }
+  }
+}
+```
+
+## Selecting a Network
+
+### Merchant-Preferred Network
+
+Specify your preferred network when creating a payment:
+
+```json
+POST /v1/payments
+{
+  "amount": { "value": 100.00, "currency": "BRL" },
+  "country": "BR",
+  "payment_method": {
+    "type": "CARD",
+    "token": "tok_card_abc123",
+    "preferred_brand": "ELO"
+  }
+}
+```
+
+### Customer Choice (Regulatory Compliance)
+
+In some jurisdictions (notably the EU under PSD2), customers must be given the choice of which network to use. Present the available brands and let the customer select:
+
+```javascript
+// Display available networks to the customer
+const availableBrands = paymentMethod.card.available_brands;
+// ["VISA", "ELO"]
+
+// Customer selects their preferred network
+const selectedBrand = customerSelection; // e.g., "ELO"
+
+// Include selection in payment request
+const payment = {
+  payment_method: {
+    token: "tok_card_abc123",
+    preferred_brand: selectedBrand
+  }
+};
+```
+
+## Cost Optimization
+
+| Network Type | Typical Interchange | Best For |
+|-------------|-------------------|----------|
+| Local (Elo, Maestro) | Lower | Domestic transactions |
+| International (Visa, MC) | Higher | Cross-border, wider acceptance |
+
+<Warning>
+  Not all providers support routing to all networks on a co-badged card. If the preferred network is not supported by your configured provider, the transaction will fall back to the default network.
+</Warning>
+
+## Common Co-Badge Combinations
+
+| Region | Combination | Notes |
+|--------|-------------|-------|
+| Brazil | Visa + Elo | Very common, Elo has lower domestic interchange |
+| Brazil | Mastercard + Elo | Similar cost advantages for domestic |
+| Europe | Mastercard + Maestro | Maestro for debit, Mastercard for credit |
+| Europe | Visa + V Pay | V Pay for European domestic debit |
+
+## Regulatory Requirements
+
+| Regulation | Region | Requirement |
+|-----------|--------|-------------|
+| PSD2 | EU/EEA | Merchants must offer cardholder choice of network |
+| Brazilian Central Bank | Brazil | Recommended to offer network choice |
+
+<Note>
+  When operating in the EU, ensure your checkout flow presents all available networks to the customer. Yuno's Full Checkout SDK handles this automatically when co-badged card support is enabled.
+</Note>
+
+## Best Practices
+
+- **Enable co-badge detection**: Ensure your integration reads the `available_brands` field from card responses.
+- **Route to local networks**: For domestic transactions, prefer local networks for lower interchange costs.
+- **Comply with regulations**: In regulated markets, present network choice to customers.
+- **Test both networks**: Verify that transactions process correctly on each available network.
+- **Monitor acceptance rates**: Compare approval rates between networks to optimize routing decisions.

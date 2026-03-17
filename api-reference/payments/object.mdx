@@ -1,0 +1,334 @@
+---
+title: "The Payment Object"
+description: "Represents a payment created after generating a checkout session for a customer."
+---
+
+This object represents the payment created after generating the checkout session for a customer. To refund a payment, see [Refunds](/guides/direct-api/refunds) and the [Refund Payment](/api-reference/payments/refund) API.
+
+<Info>
+  **Metadata and routing logic** — For routing logic to work correctly, metadata must **also** be set at the [Checkout Session](/api-reference/checkout-sessions/create) level. Setting it only on the Payment object will not trigger route logic.
+</Info>
+
+## Object Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier of the payment (UUID, MAX 64; MIN 36).
+
+  Example: `8546df3a-b83e-4bb5-a4b3-57aa6385924f`
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  The unique identifier of the account (UUID, MAX 64; MIN 36).
+
+  Example: `9104911d-5df9-429e-8488-ad41abea1a4b`
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  The description of the payment (MAX 255; MIN 3).
+
+  Example: `Purchase on web`
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  The country where the payment takes place. ISO 3166-1 alpha-2 code.
+
+  Example: `BR`
+</ResponseField>
+
+<ResponseField name="merchant_order_id" type="string">
+  The merchant's unique order identifier used for reconciliation.
+
+  Example: `order-20260301-001`
+</ResponseField>
+
+<ResponseField name="checkout_session" type="string">
+  The checkout session identifier used to create this payment.
+
+  Example: `a1b2c3d4-e5f6-7890-abcd-ef1234567890`
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current payment status. See [Payment Statuses](/reference/payment-statuses) for the complete lifecycle.
+
+  Values: `CREATED`, `PENDING`, `AUTHORIZED`, `IN_PROCESS`, `SUCCEEDED`, `PARTIALLY_APPROVED`, `CAPTURED`, `PARTIALLY_CAPTURED`, `DECLINED`, `REJECTED`, `CANCELLED`, `EXPIRED`, `REFUNDED`, `PARTIALLY_REFUNDED`, `IN_DISPUTE`, `CHARGEBACK`
+
+  Example: `SUCCEEDED`
+</ResponseField>
+
+<ResponseField name="sub_status" type="string">
+  Provider-level status detail that provides more granular information about the payment state.
+
+  Example: `PENDING_PROVIDER_CONFIRMATION`
+</ResponseField>
+
+<ResponseField name="amount" type="object">
+  The payment amount details.
+  <Expandable title="amount">
+    <ResponseField name="value" type="number">
+      The payment amount value.
+
+      Example: `100.50`
+    </ResponseField>
+    <ResponseField name="currency" type="string">
+      ISO 4217 currency code.
+
+      Example: `BRL`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="customer_id" type="string">
+  ID of the associated customer record. Links to the [Customer Object](/api-reference/customers/object).
+
+  Example: `c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f`
+</ResponseField>
+
+<ResponseField name="payment_method" type="object">
+  Details about the payment method used.
+  <Expandable title="payment_method">
+    <ResponseField name="type" type="string">
+      The payment method type.
+
+      Values: `CARD`, `PIX`, `BOLETO`, `OXXO`, `PSE`, `BANK_TRANSFER`, `WALLET`, `BNPL`
+
+      Example: `CARD`
+    </ResponseField>
+    <ResponseField name="vaulted_token" type="string">
+      Token reference if the card is enrolled/vaulted.
+
+      Example: `vtok_9f8e7d6c-5b4a-3210-fedc-ba9876543210`
+    </ResponseField>
+    <ResponseField name="card" type="object">
+      Card-specific details (present when type is `CARD`).
+      <Expandable title="card">
+        <ResponseField name="first_six" type="string">
+          First six digits of the card number (BIN).
+        </ResponseField>
+        <ResponseField name="last_four" type="string">
+          Last four digits of the card number.
+        </ResponseField>
+        <ResponseField name="brand" type="string">
+          Card brand. Values: `VISA`, `MASTERCARD`, `AMEX`, `DINERS`, `ELO`, `DISCOVER`
+        </ResponseField>
+        <ResponseField name="type" type="string">
+          Card type. Values: `CREDIT`, `DEBIT`, `PREPAID`
+        </ResponseField>
+        <ResponseField name="issuer_name" type="string">
+          Name of the issuing bank.
+        </ResponseField>
+        <ResponseField name="country" type="string">
+          Card issuer country (ISO 3166-1 alpha-2).
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="provider" type="object">
+  Information about the payment provider that processed the payment.
+  <Expandable title="provider">
+    <ResponseField name="id" type="string">
+      Yuno's identifier for the provider connection.
+    </ResponseField>
+    <ResponseField name="name" type="string">
+      Provider name (e.g., `ADYEN`, `STRIPE`, `MERCADOPAGO`).
+    </ResponseField>
+    <ResponseField name="transaction_id" type="string">
+      The provider's own transaction identifier.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="transactions" type="array">
+  Individual processing attempts for this payment. A payment may have multiple transactions if the first provider declines and Yuno routes to an alternative. See [Transactions](/core-concepts/transactions).
+  <Expandable title="transaction object">
+    <ResponseField name="id" type="string">
+      Transaction identifier.
+    </ResponseField>
+    <ResponseField name="type" type="string">
+      Transaction type. Values: `PURCHASE`, `AUTHORIZE`, `CAPTURE`, `CANCEL`, `REFUND`, `VERIFY`, `CHARGEBACK`, `FRAUD_SCREENING`, `SALE`
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Transaction status. Values: `CREATED`, `SUCCEEDED`, `PENDING`, `DECLINED`, `REJECTED`, `FAILED`, `CANCELLED`, `EXPIRED`, `ERROR`, `WON`, `LOST`
+    </ResponseField>
+    <ResponseField name="provider" type="string">
+      Provider that processed this attempt.
+    </ResponseField>
+    <ResponseField name="provider_transaction_id" type="string">
+      Provider's own transaction reference.
+    </ResponseField>
+    <ResponseField name="response_code" type="string">
+      Provider response code. See [Response Codes](/reference/response-codes).
+    </ResponseField>
+    <ResponseField name="response_message" type="string">
+      Human-readable response message from the provider.
+    </ResponseField>
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="refunds" type="array">
+  Refund records associated with this payment.
+  <Expandable title="refund object">
+    <ResponseField name="id" type="string">
+      Refund identifier.
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Refund status. Values: `PENDING`, `SUCCEEDED`, `DECLINED`, `ERROR`
+    </ResponseField>
+    <ResponseField name="amount" type="object">
+      Refund amount (value + currency).
+    </ResponseField>
+    <ResponseField name="reason" type="string">
+      Reason for the refund.
+    </ResponseField>
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="three_ds" type="object">
+  3DS authentication details, present for card payments. See [3D Secure](/security/3d-secure).
+  <Expandable title="three_ds">
+    <ResponseField name="version" type="string">
+      3DS version used (`1.0`, `2.1`, `2.2`).
+    </ResponseField>
+    <ResponseField name="eci" type="string">
+      Electronic Commerce Indicator. See [ECI Indicators](/reference/eci-indicators).
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Authentication status. Values: `AUTHENTICATED`, `ATTEMPTED`, `FAILED`, `REJECTED`, `UNAVAILABLE`
+    </ResponseField>
+    <ResponseField name="flow" type="string">
+      Whether the flow was `FRICTIONLESS` or `CHALLENGE`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="installments" type="object">
+  Installment details if payment was split into installments.
+  <Expandable title="installments">
+    <ResponseField name="quantity" type="integer">
+      Number of installments.
+    </ResponseField>
+    <ResponseField name="type" type="string">
+      Installment type. Values: `MERCHANT`, `PROVIDER`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="failure_reason" type="object">
+  Decline details when status is `DECLINED` or `REJECTED`.
+  <Expandable title="failure_reason">
+    <ResponseField name="code" type="string">
+      Yuno error code.
+    </ResponseField>
+    <ResponseField name="message" type="string">
+      Human-readable decline reason.
+    </ResponseField>
+    <ResponseField name="provider_code" type="string">
+      Raw code from the provider.
+    </ResponseField>
+    <ResponseField name="merchant_advisory_code" type="string">
+      MAC code when available. See [Response Codes](/reference/response-codes#merchant-advisory-codes-mac).
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Custom key-value pairs set by the merchant. Up to 50 keys, each key max 40 characters, each value max 500 characters.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the payment was created.
+
+  Example: `2026-03-01T14:31:00.000Z`
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 timestamp of the last payment update.
+
+  Example: `2026-03-01T14:31:02.000Z`
+</ResponseField>
+
+## Example
+
+```json
+{
+  "id": "8546df3a-b83e-4bb5-a4b3-57aa6385924f",
+  "account_id": "9104911d-5df9-429e-8488-ad41abea1a4b",
+  "description": "Purchase on web",
+  "country": "US",
+  "merchant_order_id": "order-20260301-001",
+  "checkout_session": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "status": "SUCCEEDED",
+  "sub_status": null,
+  "amount": {
+    "value": 100.50,
+    "currency": "USD"
+  },
+  "customer_id": "c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f",
+  "payment_method": {
+    "type": "CARD",
+    "vaulted_token": "vtok_9f8e7d6c-5b4a-3210-fedc-ba9876543210",
+    "card": {
+      "first_six": "411111",
+      "last_four": "1111",
+      "brand": "VISA",
+      "type": "CREDIT",
+      "issuer_name": "Chase",
+      "country": "US"
+    }
+  },
+  "provider": {
+    "id": "conn_abc123",
+    "name": "ADYEN",
+    "transaction_id": "8835562831897070"
+  },
+  "transactions": [
+    {
+      "id": "txn_f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "type": "PURCHASE",
+      "status": "SUCCEEDED",
+      "provider": "ADYEN",
+      "provider_transaction_id": "8835562831897070",
+      "response_code": "00",
+      "response_message": "Approved",
+      "created_at": "2026-03-01T14:31:01.000Z"
+    }
+  ],
+  "refunds": [],
+  "three_ds": {
+    "version": "2.2",
+    "eci": "05",
+    "status": "AUTHENTICATED",
+    "flow": "FRICTIONLESS"
+  },
+  "installments": null,
+  "failure_reason": null,
+  "metadata": {
+    "internal_ref": "abc-123"
+  },
+  "created_at": "2026-03-01T14:31:00.000Z",
+  "updated_at": "2026-03-01T14:31:02.000Z"
+}
+```
+
+## Related Endpoints
+
+- [Create Payment](/api-reference/payments/create) — `POST /v1/payments`
+- [Get Payment](/api-reference/payments/get) — `GET /v1/payments/{payment_id}`
+- [Get Payment by Merchant Order](/api-reference/payments/get-by-merchant-order) — `GET /v1/payments?merchant_order_id={id}`
+- [Capture Payment](/api-reference/payments/capture) — `POST /v1/payments/{payment_id}/transactions/{transaction_id}/capture`
+- [Cancel Payment](/api-reference/payments/cancel) — `POST /v1/payments/{payment_id}/cancel`
+- [Refund Payment](/api-reference/payments/refund) — `POST /v1/payments/{payment_id}/refund`
+- [Cancel or Refund](/api-reference/payments/cancel-or-refund) — `POST /v1/payments/{payment_id}/cancel-or-refund`
+
+## Related Concepts
+
+- [Payment Statuses](/reference/payment-statuses) — Status lifecycle and transition diagram
+- [Transactions](/core-concepts/transactions) — How transactions relate to payments
+- [Response Codes](/reference/response-codes) — MAC codes and provider error mapping

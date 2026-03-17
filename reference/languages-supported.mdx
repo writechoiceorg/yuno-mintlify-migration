@@ -1,0 +1,60 @@
+---
+title: "Supported Languages"
+description: "Locale codes supported by Yuno SDKs for checkout display language configuration."
+---
+
+## Overview
+
+Yuno SDKs support multiple locale codes for display language configuration. Pass the appropriate locale code during SDK initialization to set the checkout language.
+
+<Info>
+  If the `language` parameter is omitted, the SDK defaults to the browser's language when available.
+</Info>
+
+## Supported Locales
+
+### Americas
+
+| Language | Locale Code |
+|----------|-------------|
+| English (United States) | `en-US` |
+| English (Canada) | `en-CA` |
+| Spanish (Latin America) | `es-CO` |
+| Portuguese (Brazil) | `pt-BR` |
+
+### Europe
+
+| Language | Locale Code |
+|----------|-------------|
+| German (Germany) | `de-DE` |
+| English (United Kingdom) | `en-GB` |
+| French (France) | `fr-FR` |
+| Italian (Italy) | `it-IT` |
+| Dutch (Netherlands) | `nl-NL` |
+| Polish (Poland) | `pl-PL` |
+| Russian (Russia) | `ru-RU` |
+| Swedish (Sweden) | `sv-SE` |
+| Turkish (Turkey) | `tr-TR` |
+
+### Asia
+
+| Language | Locale Code |
+|----------|-------------|
+| Japanese (Japan) | `ja-JP` |
+| Korean (South Korea) | `ko-KR` |
+| Chinese Simplified (China) | `zh-CN` |
+| Chinese Traditional (Taiwan) | `zh-TW` |
+| Thai (Thailand) | `th-TH` |
+| Vietnamese (Vietnam) | `vi-VN` |
+| Indonesian (Indonesia) | `id-ID` |
+| Malay (Malaysia) | `ms-MY` |
+| Filipino (Philippines) | `fil-PH` |
+
+## Usage Example
+
+```javascript
+const yuno = await Yuno.initialize({
+  publicApiKey: "your-public-api-key",
+  language: "pt-BR"
+});
+```

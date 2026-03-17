@@ -1,0 +1,92 @@
+---
+title: "Customers"
+description: "Create and manage customer profiles for payments and vaulted payment methods"
+---
+
+## Overview
+
+Customer profiles in Yuno store identity information, documents, and associated payment methods. Creating a customer allows you to vault payment methods for returning users and streamline checkout with pre-filled data.
+
+## Creating a Customer
+
+```bash
+curl -X POST https://api-sandbox.y.uno/v1/customers \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "merchant_customer_id": "your-internal-id-123",
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "email": "jane@example.com",
+    "country": "US"
+  }'
+```
+
+The response includes a Yuno-generated `customer_id` that you use in subsequent API calls.
+
+## Customer Identifiers
+
+| Identifier | Source | Purpose |
+|------------|--------|---------|
+| `customer_id` | Yuno-generated | Primary key for Yuno API calls |
+| `merchant_customer_id` | Your system | Maps to your internal user ID |
+
+<Note>
+  Always store the Yuno `customer_id` alongside your internal user ID. You need it to retrieve enrolled payment methods, create one-click payments, and manage the customer profile.
+</Note>
+
+## Document Types
+
+Many payment methods -- especially in Latin America -- require customer identification documents. Yuno supports the following document types:
+
+| Document Type | Country | Format | Example |
+|---------------|---------|--------|---------|
+| `CPF` | Brazil | 11 digits | `12345678901` |
+| `CNPJ` | Brazil | 14 digits | `12345678000195` |
+| `CC` | Colombia | 6-10 digits | `1234567890` |
+| `CE` | Colombia | 6-10 digits | `1234567` |
+| `NIT` | Colombia | 9-10 digits | `123456789` |
+| `RUT` | Chile | 8-9 chars | `12345678K` |
+| `DNI` | Argentina, Peru | 7-8 digits | `12345678` |
+| `CURP` | Mexico | 18 chars | `ABCD123456HDFRRL09` |
+| `PASSPORT` | Global | Varies | `AB1234567` |
+
+<Warning>
+  Document numbers must be sent as digits only (no dots, dashes, or formatting). For example, a CPF of `123.456.789-01` should be sent as `12345678901`.
+</Warning>
+
+## Associating Payment Methods
+
+When a customer completes a payment with `"vaulted_token": true`, the payment method is automatically associated with their profile. You can retrieve all enrolled methods for a customer:
+
+```bash
+curl -X GET https://api-sandbox.y.uno/v1/customers/{customer_id}/payment-methods \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code"
+```
+
+This returns a list of vaulted payment methods (masked card numbers, PIX keys, etc.) that can be used for one-click checkout.
+
+## Customer in Payments
+
+Include customer details in payment requests to satisfy payment-method-specific requirements:
+
+```json
+{
+  "customer": {
+    "customer_id": "yuno-customer-id",
+    "email": "jane@example.com"
+  }
+}
+```
+
+<Note>
+  Some payment methods require additional customer fields. For example, PIX in Brazil requires `customer.document` with a CPF or CNPJ. See [Payment Methods](/core-concepts/payment-methods) for method-specific requirements.
+</Note>
+
+<Note>
+  If you pass `customer_id`, Yuno pulls stored profile data. You can still override specific fields (like `email`) in the same request.
+</Note>

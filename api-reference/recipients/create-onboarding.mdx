@@ -1,0 +1,140 @@
+---
+title: "Create Onboarding"
+description: "Start the onboarding process for a recipient with a payment provider."
+api: "POST https://api-sandbox.y.uno/v1/recipients/{recipient_id}/onboardings"
+---
+
+Creates a new onboarding process for a recipient, registering them with a payment provider for marketplace split payments. The recipient must exist before starting onboarding.
+
+<Info>
+  A recipient can have multiple onboardings — one per provider connection. Each onboarding tracks the registration lifecycle independently.
+</Info>
+
+## Path Parameters
+
+<ParamField path="recipient_id" type="string" required>
+  The unique identifier of the recipient.
+</ParamField>
+
+## Request Body
+
+<ParamField body="type" type="string" required>
+  Type of onboarding.
+
+  Values: `PREVIOUSLY_ONBOARDED`, `ONBOARD_ONTO_THE_PROVIDER`
+
+  - `PREVIOUSLY_ONBOARDED` — Recipient already exists at the provider; link them in Yuno.
+  - `ONBOARD_ONTO_THE_PROVIDER` — Register the recipient with the provider through Yuno.
+</ParamField>
+
+<ParamField body="workflow" type="string" required>
+  Workflow type for the onboarding process.
+
+  Values: `HOSTED_BY_PROVIDER`, `DIRECT`
+
+  - `HOSTED_BY_PROVIDER` — Provider handles the onboarding UI (redirect flow).
+  - `DIRECT` — Yuno sends the data directly to the provider API.
+</ParamField>
+
+<ParamField body="callback_url" type="string">
+  URL to redirect the recipient after completing a provider-hosted onboarding flow.
+
+  Example: `https://www.your-site.com/onboarding-complete`
+</ParamField>
+
+<ParamField body="provider" type="object" required>
+  Payment provider details.
+  <Expandable title="provider">
+    <ParamField body="id" type="string" required>
+      Provider identifier.
+
+      Values: `PAGARME`, `STRIPE`, `ADYEN`, `ALELO`, `EDENRED`, `PLUXEE`, `VR`
+    </ParamField>
+    <ParamField body="connection_id" type="string" required>
+      Yuno connection identifier for this provider.
+    </ParamField>
+    <ParamField body="recipient_id" type="string">
+      Provider's own recipient identifier. Required for `PREVIOUSLY_ONBOARDED` type.
+    </ParamField>
+    <ParamField body="recipient_type" type="string">
+      Recipient classification at the provider level.
+
+      Values: `MEAL`, `FOOD`, `MULTI_BENEFITS`, `FLEET`
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="documentation" type="array">
+  Supporting documents for the onboarding (identity, business registration, etc.).
+  <Expandable title="documentation item">
+    <ParamField body="file_name" type="string">
+      Document filename.
+    </ParamField>
+    <ParamField body="content_type" type="string">
+      Document classification (e.g., `RECEIPT`).
+    </ParamField>
+    <ParamField body="content_category" type="string">
+      Category (e.g., `INVOICE`, `ID_PROOF`).
+    </ParamField>
+    <ParamField body="content" type="string">
+      Base64-encoded file content. Max 1 MB.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="withdrawal_methods" type="array">
+  Bank account details for receiving payouts.
+  <Expandable title="withdrawal method">
+    <ParamField body="bank.code" type="string">
+      Bank identifier code.
+    </ParamField>
+    <ParamField body="bank.branch" type="string">
+      Branch code.
+    </ParamField>
+    <ParamField body="bank.account" type="string">
+      Account number.
+    </ParamField>
+    <ParamField body="bank.account_type" type="string">
+      Account type: `CHECKINGS` or `SAVINGS`.
+    </ParamField>
+    <ParamField body="bank.country" type="string">
+      ISO 3166-1 alpha-2 country code.
+    </ParamField>
+    <ParamField body="bank.currency" type="string">
+      ISO 4217 currency code.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<RequestExample>
+```json Request
+{
+  "type": "ONBOARD_ONTO_THE_PROVIDER",
+  "workflow": "DIRECT",
+  "provider": {
+    "id": "PAGARME",
+    "connection_id": "322d48b6-f423-4438-8ffb-0b9b5059a2e9"
+  },
+  "withdrawal_methods": [
+    {
+      "bank": {
+        "code": "246",
+        "branch": "123",
+        "account": "1093333333",
+        "account_type": "CHECKINGS",
+        "country": "US",
+        "currency": "USD"
+      }
+    }
+  ]
+}
+```
+</RequestExample>
+
+## Related Pages
+
+- [Onboarding Statuses](/api-reference/recipients/onboarding-statuses) — Status lifecycle reference
+- [Get Onboarding](/api-reference/recipients/get-onboarding) — Retrieve onboarding details
+- [Update Onboarding](/api-reference/recipients/update-onboarding) — Modify an existing onboarding
+- [Continue Onboarding](/api-reference/recipients/continue-onboarding) — Resume a paused onboarding
+- [Cancel Onboarding](/api-reference/recipients/cancel-onboarding) — Cancel an in-progress onboarding

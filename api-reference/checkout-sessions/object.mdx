@@ -1,0 +1,150 @@
+---
+title: "The Checkout Session Object"
+description: "Represents a checkout session that initializes the payment flow for a customer."
+---
+
+The Checkout Session object is the entry point for every payment in Yuno. It defines the transaction context — amount, country, available payment methods — and returns an `sdk_token` used to render the checkout experience on the client side.
+
+<Info>
+  **Metadata and routing** — Metadata set at the Checkout Session level propagates to the resulting [Payment Object](/api-reference/payments/object) and is used by routing rules. Always set metadata here rather than only on the payment.
+</Info>
+
+## Object Fields
+
+<ResponseField name="checkout_session" type="string">
+  The unique identifier for this checkout session (UUID).
+
+  Example: `a1b2c3d4-e5f6-7890-abcd-ef1234567890`
+</ResponseField>
+
+<ResponseField name="amount" type="object">
+  The transaction amount details.
+  <Expandable title="amount">
+    <ResponseField name="value" type="number">
+      The payment amount value.
+
+      Example: `250.00`
+    </ResponseField>
+    <ResponseField name="currency" type="string">
+      ISO 4217 currency code.
+
+      Example: `BRL`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  The country where the payment takes place. ISO 3166-1 alpha-2 code. Determines which payment methods and providers are available.
+
+  Example: `BR`
+</ResponseField>
+
+<ResponseField name="merchant_order_id" type="string">
+  Your internal order identifier, used for reconciliation between your system and Yuno.
+
+  Example: `order-20260310-042`
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of the checkout session.
+
+  Values: `ACTIVE`, `EXPIRED`, `COMPLETED`
+
+  Example: `ACTIVE`
+</ResponseField>
+
+<ResponseField name="customer_id" type="string">
+  ID of the associated [Customer Object](/api-reference/customers/object). When provided, Yuno can display vaulted payment methods for one-click checkout.
+
+  Example: `c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f`
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Internal description of the checkout session (MAX 255; MIN 3).
+
+  Example: `Subscription renewal — March 2026`
+</ResponseField>
+
+<ResponseField name="payment_description" type="string">
+  Customer-facing payment description displayed in the checkout UI and on payment receipts.
+
+  Example: `Example Store — Order #042`
+</ResponseField>
+
+<ResponseField name="payment_methods" type="array">
+  List of payment method types available for this checkout session, determined by country, merchant enablements, and provider configuration.
+
+  Example: `["CARD", "BANK_TRANSFER", "WALLET"]`
+</ResponseField>
+
+<ResponseField name="callback_url" type="string">
+  Server-side webhook URL where Yuno sends asynchronous payment status notifications.
+
+  Example: `https://api.example.com/webhooks/yuno`
+</ResponseField>
+
+<ResponseField name="return_url" type="string">
+  Client-side URL where the customer is redirected after completing or abandoning the checkout flow.
+
+  Example: `https://www.example.com/order/confirmation`
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Custom key-value pairs set by the merchant. Up to 50 keys, each key max 40 characters, each value max 500 characters. Propagates to the resulting payment and is available in webhooks.
+</ResponseField>
+
+<ResponseField name="sdk_token" type="string">
+  Token used to initialize the Yuno SDK on the client side. Returned only in the create response. Treat this as short-lived and sensitive.
+
+  Example: `stok_live_abc123def456...`
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the checkout session was created.
+
+  Example: `2026-03-10T18:00:00.000Z`
+</ResponseField>
+
+## Example
+
+```json
+{
+  "checkout_session": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "amount": {
+    "value": 250.00,
+    "currency": "USD"
+  },
+  "country": "US",
+  "merchant_order_id": "order-20260310-042",
+  "status": "ACTIVE",
+  "customer_id": "c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f",
+  "description": "Subscription renewal — March 2026",
+  "payment_description": "Example Store — Order #042",
+  "payment_methods": [
+    "CARD",
+    "BANK_TRANSFER",
+    "WALLET"
+  ],
+  "callback_url": "https://api.example.com/webhooks/yuno",
+  "return_url": "https://www.example.com/order/confirmation",
+  "metadata": {
+    "plan_id": "pro-monthly",
+    "internal_ref": "sub-renew-042"
+  },
+  "sdk_token": "stok_live_abc123def456ghi789jkl012mno345",
+  "created_at": "2026-03-10T18:00:00.000Z"
+}
+```
+
+## Related Endpoints
+
+- [Create Checkout Session](/api-reference/checkout-sessions/create) — `POST /v1/checkout/sessions`
+- [Get Checkout Session](/api-reference/checkout-sessions/get) — `GET /v1/checkout/sessions/{checkout_session}`
+- [Update Checkout Session](/api-reference/checkout-sessions/update) — `PATCH /v1/checkout/sessions/{checkout_session}`
+- [Get Payment Methods](/api-reference/checkout-sessions/get-payment-methods) — `GET /v1/checkout/sessions/{checkout_session}/payment-methods`
+
+## Related Concepts
+
+- [Checkout Flow](/core-concepts/checkout) — How checkout sessions fit into the payment lifecycle
+- [Payment Object](/api-reference/payments/object) — The payment created from a checkout session
+- [SDK Integration](/guides/sdk/overview) — Using the `sdk_token` to render checkout on the client

@@ -1,0 +1,183 @@
+---
+title: "The Recipient Object"
+description: "Represents a recipient in a marketplace or split-payment configuration, used to route funds to sub-merchants or sellers."
+---
+
+The Recipient object represents a sub-merchant, seller, or payee in a marketplace or split-payment setup. Recipients must be onboarded (KYC/KYB) before they can receive funds. Yuno manages the onboarding flow and fund distribution based on your split configuration.
+
+<Info>
+  **Onboarding required** — Recipients must complete the onboarding process before they can receive payments. Use the [Transfer Onboarding](/api-reference/recipients/transfer-onboarding) endpoint to generate the onboarding link, then track progress via `onboarding_status`.
+</Info>
+
+## Object Fields
+
+<ResponseField name="id" type="string">
+  Yuno's unique identifier for this recipient (UUID).
+
+  Example: `rcp_1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d`
+</ResponseField>
+
+<ResponseField name="merchant_recipient_id" type="string">
+  Your internal identifier for this recipient, used for reconciliation between your system and Yuno.
+
+  Example: `seller-augusta-shop-001`
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  The country where the recipient operates. ISO 3166-1 alpha-2 code. Determines onboarding requirements and payout rails.
+
+  Example: `US`
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The recipient's full legal name (individual) or business name (company).
+
+  Example: `Augusta Shop LLC`
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  The recipient's contact email. Used for onboarding communications and payout notifications.
+
+  Example: `finance@augusta-shop.com`
+</ResponseField>
+
+<ResponseField name="document" type="object">
+  The recipient's identification document. Required for KYC/KYB compliance.
+  <Expandable title="document">
+    <ResponseField name="document_type" type="string">
+      Type of identification document.
+
+      Values: `CPF`, `CNPJ`, `CC`, `CE`, `NIT`, `DNI`, `RUC`, `RUT`, `RFC`, `CURP`, `PASSPORT`, `NATIONAL_ID`, `OTHER`
+
+      Example: `EIN`
+    </ResponseField>
+    <ResponseField name="document_number" type="string">
+      Document number. Digits only, no formatting.
+
+      Example: `123456789` (EIN — 9 digits)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="bank_account" type="object">
+  The recipient's bank account for receiving payouts.
+  <Expandable title="bank_account">
+    <ResponseField name="bank_code" type="string">
+      Bank identifier code (COMPE code in Brazil, SWIFT/BIC internationally).
+
+      Example: `021000021` (Chase)
+    </ResponseField>
+    <ResponseField name="bank_name" type="string">
+      Human-readable bank name.
+
+      Example: `Chase`
+    </ResponseField>
+    <ResponseField name="account_type" type="string">
+      Type of bank account.
+
+      Values: `CHECKING`, `SAVINGS`
+
+      Example: `CHECKING`
+    </ResponseField>
+    <ResponseField name="account_number" type="string">
+      Bank account number.
+
+      Example: `12345-6`
+    </ResponseField>
+    <ResponseField name="branch_number" type="string">
+      Bank branch number (agencia in Brazil).
+
+      Example: `null`
+    </ResponseField>
+    <ResponseField name="holder_name" type="string">
+      Name of the account holder. Must match the recipient's legal name.
+
+      Example: `Augusta Shop LLC`
+    </ResponseField>
+    <ResponseField name="holder_document" type="string">
+      Document number of the account holder. Must match the recipient's document.
+
+      Example: `123456789`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current operational status of the recipient.
+
+  Values: `ACTIVE`, `INACTIVE`, `SUSPENDED`
+
+  Example: `ACTIVE`
+</ResponseField>
+
+<ResponseField name="onboarding_status" type="string">
+  Current status of the recipient's KYC/KYB onboarding process.
+
+  Values: `PENDING`, `IN_PROGRESS`, `COMPLETED`, `REJECTED`, `REQUIRES_ACTION`
+
+  Example: `COMPLETED`
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the recipient was created.
+
+  Example: `2026-01-15T10:30:00.000Z`
+</ResponseField>
+
+## Example
+
+```json
+{
+  "id": "rcp_1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+  "merchant_recipient_id": "seller-augusta-shop-001",
+  "country": "US",
+  "name": "Augusta Shop LLC",
+  "email": "finance@augusta-shop.com",
+  "document": {
+    "document_type": "EIN",
+    "document_number": "123456789"
+  },
+  "bank_account": {
+    "bank_code": "021000021",
+    "bank_name": "Chase",
+    "account_type": "CHECKING",
+    "account_number": "123456789",
+    "branch_number": null,
+    "holder_name": "Augusta Shop LLC",
+    "holder_document": "123456789"
+  },
+  "status": "ACTIVE",
+  "onboarding_status": "COMPLETED",
+  "created_at": "2026-01-15T10:30:00.000Z"
+}
+```
+
+## Onboarding Lifecycle
+
+| Status | Description |
+|--------|-------------|
+| `PENDING` | Recipient created but onboarding not yet started. |
+| `IN_PROGRESS` | Recipient has started the onboarding flow but has not completed all steps. |
+| `REQUIRES_ACTION` | Additional information or documents are needed from the recipient. Use [Continue Onboarding](/api-reference/recipients/continue-onboarding) to resume. |
+| `COMPLETED` | Onboarding is complete. The recipient can receive payouts. |
+| `REJECTED` | Onboarding was rejected due to KYC/KYB failure. Review the reason and update the recipient's information before retrying. |
+
+<Warning>
+  Recipients with `onboarding_status` other than `COMPLETED` cannot receive fund splits. Payments involving incomplete recipients will hold funds until onboarding is finished.
+</Warning>
+
+## Related Endpoints
+
+- [Create Recipient](/api-reference/recipients/create) — `POST /v1/recipients`
+- [Get Recipient](/api-reference/recipients/get) — `GET /v1/recipients/{recipient_id}`
+- [List Recipients](/api-reference/recipients/list) — `GET /v1/recipients`
+- [Update Recipient](/api-reference/recipients/update) — `PATCH /v1/recipients/{recipient_id}`
+- [Delete Recipient](/api-reference/recipients/delete) — `DELETE /v1/recipients/{recipient_id}`
+- [Transfer Onboarding](/api-reference/recipients/transfer-onboarding) — `POST /v1/recipients/{recipient_id}/onboarding`
+- [Continue Onboarding](/api-reference/recipients/continue-onboarding) — `POST /v1/recipients/{recipient_id}/onboarding/continue`
+
+## Related Concepts
+
+- [Marketplaces](/core-concepts/marketplaces) — How split payments and fund distribution work
+- [Payouts](/core-concepts/payouts) — How recipients receive their funds
+- [KYC/KYB](/guides/kyc-kyb) — Onboarding requirements by country

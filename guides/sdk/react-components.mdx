@@ -1,0 +1,503 @@
+---
+title: "React Components"
+description: "Embed Yuno checkout in React applications with pre-built components and hooks"
+---
+
+
+## Overview
+
+The `@yuno-payments/react` package provides pre-built React components and hooks for integrating Yuno checkout into your React application. Components handle SDK lifecycle management, PCI compliance, and payment state automatically.
+
+<Note>
+React components wrap the Yuno Web SDK. All features available in the Web SDK are accessible through React components and hooks.
+</Note>
+
+## Prerequisites
+
+- React 18+ and React DOM
+- Yuno API keys ([Authentication](/getting-started/authentication))
+- At least one payment method enabled in your [Dashboard](/platform/dashboard/connections)
+
+## Installation
+
+```bash
+npm install @yuno-payments/react
+```
+
+<CodeGroup>
+
+```bash npm
+npm install @yuno-payments/react
+```
+
+```bash yarn
+yarn add @yuno-payments/react
+```
+
+```bash pnpm
+pnpm add @yuno-payments/react
+```
+
+</CodeGroup>
+
+## YunoProvider
+
+Wrap your application (or the section that uses Yuno components) with `<YunoProvider>` to initialize the SDK context:
+
+```tsx
+import { YunoProvider } from '@yuno-payments/react';
+
+function App() {
+  return (
+    <YunoProvider
+      publicApiKey="your-public-api-key"
+      country="CO"
+      language="es"
+    >
+      <CheckoutPage />
+    </YunoProvider>
+  );
+}
+```
+
+### YunoProvider Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `publicApiKey` | `string` | Yes | Your Yuno public API key |
+| `country` | `string` | Yes | ISO 3166-1 alpha-2 country code |
+| `language` | `'en' \| 'es' \| 'pt'` | No | UI language (auto-detected if omitted) |
+| `environment` | `'sandbox' \| 'production'` | No | Defaults to `'production'` |
+| `theme` | `YunoTheme` | No | Theme configuration object |
+| `children` | `ReactNode` | Yes | Child components |
+
+<Warning>
+Do not render multiple `<YunoProvider>` instances in the same React tree. Use a single provider at the top level.
+</Warning>
+
+## YunoCheckout Component
+
+Renders the full checkout UI with all available payment methods.
+
+```tsx
+import { YunoCheckout } from '@yuno-payments/react';
+
+function CheckoutPage() {
+  return (
+    <YunoCheckout
+      checkoutSession="session_abc123"
+      country="CO"
+      language="es"
+      onPaymentComplete={(data) => {
+        console.log('Payment completed:', data.payment_id);
+        window.location.href = `/confirmation?id=${data.payment_id}`;
+      }}
+      onError={(error) => {
+        console.error('Payment error:', error.code, error.message);
+      }}
+    />
+  );
+}
+```
+
+### YunoCheckout Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `checkoutSession` | `string` | Yes | Checkout session ID from server-side creation |
+| `country` | `string` | Yes | ISO 3166-1 alpha-2 country code |
+| `language` | `'en' \| 'es' \| 'pt'` | No | Overrides provider language setting |
+| `onPaymentComplete` | `(data: PaymentResult) => void` | No | Called when payment succeeds or is pending |
+| `onPaymentProcessing` | `() => void` | No | Called when async processing begins |
+| `onError` | `(error: YunoError) => void` | No | Called on payment failure |
+| `layout` | `LayoutOptions` | No | Layout direction and display options |
+| `className` | `string` | No | CSS class for the container element |
+| `style` | `CSSProperties` | No | Inline styles for the container element |
+
+<Warning>
+Always verify the final payment status server-side via webhooks or the GET payment API. Client-side callbacks should not be the sole source of truth.
+</Warning>
+
+## YunoPaymentForm Component
+
+Renders a card-only payment form for custom checkout flows where you control payment method selection.
+
+```tsx
+import { YunoPaymentForm } from '@yuno-payments/react';
+
+function CardPaymentForm() {
+  return (
+    <YunoPaymentForm
+      checkoutSession="session_abc123"
+      paymentMethodType="CARD"
+      onReady={() => console.log('Form ready')}
+      onError={(error) => console.error(error)}
+    />
+  );
+}
+```
+
+### YunoPaymentForm Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `checkoutSession` | `string` | Yes | Checkout session ID |
+| `paymentMethodType` | `string` | Yes | Payment method type (e.g., `'CARD'`) |
+| `onReady` | `() => void` | No | Called when the form is rendered and interactive |
+| `onError` | `(error: YunoError) => void` | No | Called on validation or payment errors |
+| `className` | `string` | No | CSS class for the container |
+| `style` | `CSSProperties` | No | Inline styles for the container |
+
+## Hooks
+
+### useYunoPayment
+
+Provides imperative control over the payment flow. Use this hook when you need to trigger submission programmatically.
+
+```tsx
+import { useYunoPayment } from '@yuno-payments/react';
+
+function CustomCheckout() {
+  const {
+    submit,
+    reset,
+    getPaymentStatus,
+    isSubmitting,
+    error,
+  } = useYunoPayment();
+
+  const handleSubmit = async () => {
+    const result = await submit();
+    if (result.status === 'APPROVED') {
+      window.location.href = '/success';
+    }
+  };
+
+  return (
+    <div>
+      <YunoPaymentForm
+        checkoutSession="session_abc123"
+        paymentMethodType="CARD"
+      />
+      <button onClick={handleSubmit} disabled={isSubmitting}>
+        {isSubmitting ? 'Processing...' : 'Pay Now'}
+      </button>
+      {error && <p className="error">{error.message}</p>}
+    </div>
+  );
+}
+```
+
+### useYunoPayment Return Type
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `submit` | `() => Promise<PaymentResult>` | Submits the current payment form |
+| `reset` | `() => void` | Resets the form to its initial state |
+| `getPaymentStatus` | `() => Promise<PaymentStatus>` | Queries current payment status |
+| `isSubmitting` | `boolean` | `true` while a submission is in progress |
+| `error` | `YunoError \| null` | Most recent error, or `null` |
+
+### useYunoCheckoutSession
+
+Creates and manages checkout sessions client-side. Useful when session creation needs to be triggered dynamically.
+
+```tsx
+import { useYunoCheckoutSession } from '@yuno-payments/react';
+
+function DynamicCheckout({ orderId, amount }: Props) {
+  const {
+    session,
+    isLoading,
+    error,
+    createSession,
+  } = useYunoCheckoutSession();
+
+  useEffect(() => {
+    createSession({
+      amount: { currency: 'USD', value: amount },
+      country: 'CO',
+      merchant_order_id: orderId,
+      workflow: 'SDK_CHECKOUT',
+    });
+  }, [orderId, amount]);
+
+  if (isLoading) return <div>Loading checkout...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!session) return null;
+
+  return (
+    <YunoCheckout
+      checkoutSession={session.checkout_session}
+      country="CO"
+      onPaymentComplete={(data) => console.log(data)}
+    />
+  );
+}
+```
+
+### useYunoCheckoutSession Return Type
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `session` | `CheckoutSession \| null` | The created session object |
+| `isLoading` | `boolean` | `true` while the session is being created |
+| `error` | `YunoError \| null` | Error from session creation |
+| `createSession` | `(params: SessionParams) => Promise<void>` | Triggers session creation |
+
+## TypeScript Interfaces
+
+```typescript
+interface YunoTheme {
+  primary?: string;
+  secondary?: string;
+  background?: string;
+  text?: string;
+  error?: string;
+  success?: string;
+  borderRadius?: string;
+  fontFamily?: string;
+  fontSize?: string;
+  mode?: 'light' | 'dark';
+}
+
+interface PaymentResult {
+  payment_id: string;
+  status: 'APPROVED' | 'PENDING' | 'DECLINED' | 'CANCELLED';
+  amount: { currency: string; value: number };
+  payment_method: string;
+}
+
+interface YunoError {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+interface PaymentStatus {
+  payment_id: string;
+  status: 'APPROVED' | 'PENDING' | 'DECLINED' | 'CANCELLED' | 'PROCESSING';
+  provider_status?: string;
+}
+
+interface LayoutOptions {
+  direction?: 'vertical' | 'horizontal';
+  showHeader?: boolean;
+  showPaymentMethodIcons?: boolean;
+  compactMode?: boolean;
+}
+
+interface CheckoutSession {
+  checkout_session: string;
+  status: string;
+  merchant_order_id: string;
+}
+
+interface SessionParams {
+  amount: { currency: string; value: number };
+  country: string;
+  merchant_order_id: string;
+  workflow: 'SDK_CHECKOUT';
+  customer_id?: string;
+}
+```
+
+## Theming with CSS Variables
+
+In addition to the `theme` prop on `<YunoProvider>`, you can override styles using CSS variables:
+
+```css
+:root {
+  --yuno-primary: #0066FF;
+  --yuno-secondary: #6B7280;
+  --yuno-background: #FFFFFF;
+  --yuno-text: #1F2937;
+  --yuno-error: #EF4444;
+  --yuno-success: #10B981;
+  --yuno-border-radius: 8px;
+  --yuno-font-family: 'Inter', system-ui, sans-serif;
+  --yuno-font-size: 14px;
+}
+```
+
+<Note>
+CSS variables take the lowest precedence. The `theme` prop on `<YunoProvider>` overrides CSS variables, and the Checkout Builder in the Dashboard is overridden by both.
+</Note>
+
+## Error Boundary Integration
+
+Wrap Yuno components in a React error boundary to handle unexpected SDK errors gracefully:
+
+```tsx
+import { ErrorBoundary } from 'react-error-boundary';
+
+function CheckoutErrorFallback({ error, resetErrorBoundary }) {
+  return (
+    <div role="alert">
+      <p>Checkout failed to load.</p>
+      <pre>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>Retry</button>
+    </div>
+  );
+}
+
+function CheckoutPage() {
+  return (
+    <ErrorBoundary FallbackComponent={CheckoutErrorFallback}>
+      <YunoCheckout
+        checkoutSession="session_abc123"
+        country="CO"
+        onPaymentComplete={(data) => console.log(data)}
+      />
+    </ErrorBoundary>
+  );
+}
+```
+
+## Server-Side Rendering (Next.js)
+
+Yuno components require browser APIs and cannot render on the server. Use dynamic imports with SSR disabled:
+
+```tsx
+import dynamic from 'next/dynamic';
+
+const YunoCheckout = dynamic(
+  () => import('@yuno-payments/react').then((mod) => mod.YunoCheckout),
+  { ssr: false, loading: () => <div>Loading checkout...</div> }
+);
+
+export default function CheckoutPage({ sessionId }: { sessionId: string }) {
+  return (
+    <YunoCheckout
+      checkoutSession={sessionId}
+      country="CO"
+      onPaymentComplete={(data) => console.log(data)}
+    />
+  );
+}
+```
+
+<Warning>
+Always create checkout sessions server-side (e.g., in `getServerSideProps` or a Route Handler) to keep your private API key secure.
+</Warning>
+
+## Complete Example
+
+A full checkout page combining provider, session management, and payment handling:
+
+```tsx
+'use client';
+
+import {
+  YunoProvider,
+  YunoCheckout,
+  useYunoCheckoutSession,
+} from '@yuno-payments/react';
+import { useEffect, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+
+function CheckoutContent({ orderId, amount }: {
+  orderId: string;
+  amount: number;
+}) {
+  const { session, isLoading, error, createSession } =
+    useYunoCheckoutSession();
+
+  useEffect(() => {
+    createSession({
+      amount: { currency: 'USD', value: amount },
+      country: 'CO',
+      merchant_order_id: orderId,
+      workflow: 'SDK_CHECKOUT',
+    });
+  }, [orderId, amount]);
+
+  if (isLoading) return <p>Preparing checkout...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+  if (!session) return null;
+
+  return (
+    <YunoCheckout
+      checkoutSession={session.checkout_session}
+      country="CO"
+      language="es"
+      onPaymentComplete={(data) => {
+        window.location.href = `/confirmation?id=${data.payment_id}`;
+      }}
+      onError={(error) => {
+        console.error('Payment failed:', error.code);
+      }}
+    />
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <YunoProvider
+      publicApiKey={process.env.NEXT_PUBLIC_YUNO_KEY!}
+      country="CO"
+      language="es"
+    >
+      <ErrorBoundary fallback={<p>Checkout unavailable.</p>}>
+        <h1>Complete Your Purchase</h1>
+        <CheckoutContent orderId="order-456" amount={99.99} />
+      </ErrorBoundary>
+    </YunoProvider>
+  );
+}
+```
+
+## Testing with React Testing Library
+
+```tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { YunoProvider, YunoCheckout } from '@yuno-payments/react';
+
+// Mock the SDK module
+jest.mock('@yuno-payments/react', () => ({
+  ...jest.requireActual('@yuno-payments/react'),
+  YunoCheckout: ({ onPaymentComplete, onError }: any) => (
+    <div data-testid="yuno-checkout">
+      <button onClick={() => onPaymentComplete({
+        payment_id: 'pay_test_123',
+        status: 'APPROVED',
+      })}>
+        Simulate Success
+      </button>
+      <button onClick={() => onError({
+        code: 'DECLINED',
+        message: 'Card declined',
+      })}>
+        Simulate Error
+      </button>
+    </div>
+  ),
+}));
+
+describe('CheckoutPage', () => {
+  it('handles successful payment', async () => {
+    const onComplete = jest.fn();
+
+    render(
+      <YunoProvider publicApiKey="test-key" country="CO">
+        <YunoCheckout
+          checkoutSession="session_test"
+          country="CO"
+          onPaymentComplete={onComplete}
+        />
+      </YunoProvider>
+    );
+
+    await userEvent.click(screen.getByText('Simulate Success'));
+
+    expect(onComplete).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'APPROVED' })
+    );
+  });
+});
+```
+
+<Note>
+Since Yuno SDK components depend on browser APIs and external scripts, mock the components in unit tests and use end-to-end tests (e.g., Cypress, Playwright) for full integration testing against the sandbox environment.
+</Note>

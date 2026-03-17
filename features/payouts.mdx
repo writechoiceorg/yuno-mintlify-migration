@@ -1,0 +1,132 @@
+---
+title: "Payouts"
+description: "Send money to bank accounts, wallets, or cards with Yuno's Payouts API for disbursements and settlements."
+---
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/payout-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/payout-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## Overview
+
+Yuno Payouts enable you to send money from your merchant account to recipients' bank accounts, digital wallets, or cards. This is essential for marketplaces paying sellers, platforms disbursing earnings, insurance companies processing claims, or any business that needs to move funds outward.
+
+## Payout Flow
+
+1. **Create a recipient** with their banking or wallet details.
+2. **Initiate a payout** specifying the amount, currency, and recipient.
+3. **Yuno routes the payout** through the appropriate provider for the destination.
+4. **Track the status** via webhooks or the Payouts API.
+
+## Creating a Recipient
+
+Before sending a payout, register the recipient's financial details.
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/payout-recipients \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "name": "Carlos Oliveira",
+    "email": "carlos@example.com",
+    "document": {
+      "document_type": "CPF",
+      "document_number": "12345678901"
+    },
+    "bank_account": {
+      "bank_code": "001",
+      "branch": "1234",
+      "account_number": "567890-1",
+      "account_type": "CHECKING"
+    },
+    "country": "BR"
+  }'
+```
+
+```json Response
+{
+  "id": "rec_carlos_001",
+  "name": "Carlos Oliveira",
+  "status": "ACTIVE",
+  "country": "BR",
+  "created_at": "2026-02-28T10:00:00Z"
+}
+```
+</CodeGroup>
+
+## Initiating a Payout
+
+```json
+POST /v1/payouts
+{
+  "recipient_id": "rec_carlos_001",
+  "amount": {
+    "value": 1500.00,
+    "currency": "BRL"
+  },
+  "country": "BR",
+  "description": "Seller earnings - February 2026",
+  "metadata": {
+    "seller_id": "seller_456",
+    "period": "2026-02"
+  }
+}
+```
+
+## Payout Status Lifecycle
+
+| Status | Description |
+|--------|-------------|
+| `CREATED` | Payout request received |
+| `PROCESSING` | Payout is being processed by the provider |
+| `COMPLETED` | Funds delivered to recipient |
+| `FAILED` | Payout could not be completed |
+| `CANCELLED` | Payout was cancelled before processing |
+
+<Info>
+  Payout processing times vary by destination. Bank transfers in Brazil (via PIX) can be instant, while traditional wire transfers may take 1-3 business days.
+</Info>
+
+## Supported Payout Destinations
+
+| Destination | Countries | Speed |
+|------------|-----------|-------|
+| Bank account (PIX) | BR | Instant |
+| Bank account (wire) | BR, MX, CO, CL, AR | 1-3 business days |
+| Digital wallet | BR, MX | Near-instant |
+| Card (Visa Direct) | Select markets | Near-instant |
+
+## Webhook Events
+
+| Event | Trigger |
+|-------|---------|
+| `payout.created` | Payout request submitted |
+| `payout.processing` | Payout sent to provider |
+| `payout.completed` | Funds delivered successfully |
+| `payout.failed` | Payout could not be completed |
+
+<Warning>
+  Always validate recipient bank details before initiating payouts. Invalid account information results in failed payouts and potential delays in re-processing.
+</Warning>
+
+## Error Handling
+
+| Error Code | Cause | Resolution |
+|-----------|-------|------------|
+| `INVALID_RECIPIENT` | Recipient details are incorrect | Verify bank account number and branch |
+| `INSUFFICIENT_BALANCE` | Merchant account balance too low | Fund your account or reduce payout amount |
+| `PROVIDER_ERROR` | Downstream provider issue | Retry after checking provider status |
+| `UNSUPPORTED_COUNTRY` | Country not enabled for payouts | Contact Yuno support for enablement |
+
+<Note>
+  Payout availability and supported destinations depend on your merchant configuration and enabled providers. Check your Yuno Dashboard under **Settings > Payouts** for your current setup.
+</Note>

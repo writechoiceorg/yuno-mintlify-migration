@@ -1,0 +1,101 @@
+---
+title: "API Reference"
+description: "Yuno Payments API reference documentation"
+---
+
+## Base URLs
+
+| Environment | Base URL |
+|-------------|----------|
+| Sandbox | `https://api-sandbox.y.uno` |
+| Production | `https://api.y.uno` |
+
+## Authentication
+
+All API requests require three headers:
+
+| Header | Description |
+|--------|-------------|
+| `public-api-key` | Your public API key from the Dashboard |
+| `private-secret-key` | Your private secret key (server-side only) |
+| `account-code` | Your account identifier |
+
+<Warning>
+  Never expose your `private-secret-key` in client-side code.
+</Warning>
+
+See the [Authentication](/getting-started/authentication) page for details on obtaining and managing API keys.
+
+## Common Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Resource created |
+| 400 | Invalid request — check the error object for details |
+| 401 | Authentication failed — verify your API keys |
+| 403 | Forbidden — payment method not enabled or permission denied |
+| 404 | Resource not found |
+| 429 | Rate limit exceeded — implement exponential backoff |
+| 500 | Server error — retry or contact Yuno support |
+
+## Error Format
+
+All errors return a JSON object:
+
+```json
+{
+  "error": {
+    "code": "INVALID_FIELD",
+    "message": "customer.document is required for PIX"
+  }
+}
+```
+
+## Rate Limits
+
+Yuno enforces rate limits per API key to ensure platform stability. Limits vary by endpoint category:
+
+| Endpoint Category | Limit | Window |
+|---|---|---|
+| Checkout Sessions (create/update) | 100 requests | 60 seconds |
+| Payments (create/capture/cancel/refund) | 100 requests | 60 seconds |
+| Customers (CRUD) | 200 requests | 60 seconds |
+| List endpoints (GET) | 200 requests | 60 seconds |
+| Webhooks (register) | 50 requests | 60 seconds |
+
+Rate limit information is included in every API response via the following headers:
+
+| Header | Description |
+|---|---|
+| `X-RateLimit-Limit` | Maximum number of requests allowed in the current window |
+| `X-RateLimit-Remaining` | Number of requests remaining in the current window |
+| `X-RateLimit-Reset` | Unix timestamp (seconds) when the current window resets |
+| `Retry-After` | Seconds to wait before retrying (only present on `429` responses) |
+
+If you receive a `429` response, implement exponential backoff retry logic. Use the `Retry-After` header value as the minimum wait time before retrying.
+
+## Pagination
+
+List endpoints support cursor-based pagination with `limit`, `starting_after`, and `ending_before` query parameters.
+
+## OpenAPI Specification
+
+The Yuno API is described using an OpenAPI 3.1.0 specification file, available in this repository at `api-reference/openapi.json`. You can use this spec with code generation tools such as [openapi-generator](https://openapi-generator.tech/), [Swagger Codegen](https://swagger.io/tools/swagger-codegen/), or any OpenAPI-compatible client library generator.
+
+Download the raw spec file from GitHub:
+[`openapi.json` on GitHub](https://github.com/caio-yuno/mintlify-docs/blob/main/api-reference/openapi.json)
+
+## Changelog & Versioning
+
+Stay up to date with API and SDK changes:
+
+- [API Changelog](/changelog/api)
+- [Web SDK Changelog](/changelog/web-sdk)
+- [Android SDK Changelog](/changelog/android-sdk)
+- [iOS SDK Changelog](/changelog/ios-sdk)
+- [Flutter SDK Changelog](/changelog/flutter-sdk)
+
+<Tip>
+  Subscribe to changelog updates to be notified of new API versions, breaking changes, and SDK releases. Check the [Changelog overview](/changelog/overview) for update frequency and versioning policy.
+</Tip>

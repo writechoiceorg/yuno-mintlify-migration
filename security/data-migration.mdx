@@ -1,0 +1,371 @@
+---
+title: "Token Migration"
+description: "Migrate card tokens into or out of Yuno's secure vault with PCI-compliant processes."
+---
+
+## Overview
+
+Token migration transfers card numbers from your existing payment processor to Yuno's secure vault, generating new `vaulted_token` values for each card. This ensures continuity for your customers — they can keep using their saved cards without re-entering payment information.
+
+The process involves three main steps:
+
+1. You request the data export from your current payment processor.
+2. Yuno collaborates with your provider to securely import card data.
+3. You use Yuno's API to map provider tokens to Yuno `vaulted_tokens`.
+
+## What Can Be Migrated
+
+| Data Type | Migratable | Process |
+|-----------|-----------|---------|
+| **Vaulted card tokens** | Yes | PGP-encrypted transfer via SFTP |
+| **Customer records** | Yes | API batch import |
+| **Subscription data** | Yes | Manual or API-assisted recreation |
+| **Transaction history** | Partial | Reference data only (not re-processable) |
+| **Dispute records** | No | Historical records remain with previous processor |
+
+<Info>
+  Card token migration is the most critical component. It allows existing customers to continue using their saved cards without re-entering card details or going through a new enrollment flow.
+</Info>
+
+<Warning>
+  Alternative payment methods such as **Mercado Pago Wallet Connect** or **Bancolombia Tokenbox** may have technical limitations that restrict migration. Contact [Yuno support](mailto:support@y.uno) to assess eligibility before starting.
+</Warning>
+
+## Step 1 & 2: Importing Cards from Your Gateway
+
+### Merchant Responsibilities
+
+You are responsible for:
+
+- Contacting your current gateway and requesting a payment method data export.
+- Following your provider's specified export protocols.
+- Managing all communication with the exporting gateway throughout the migration.
+- Obtaining customer subscription information directly from the exporting entity.
+
+### Secure Transfer Protocol
+
+All migration data is encrypted using **PGP keys** and transferred via **SFTP** (Secure File Transfer Protocol).
+
+#### Requirements You Must Provide
+
+| Requirement | Details |
+|-------------|---------|
+| **Public SSH key** | 4096-bit RSA key for SFTP access |
+| **Outbound IPs** | Your server IPs that will connect to the SFTP endpoint |
+| **Template file** | A file showing your data structure with mandatory fields |
+
+Generate your SSH key with:
+
+```bash
+ssh-keygen -t rsa -b 4096 -C "your-email@company.com"
+```
+
+#### Mandatory Fields in the Migration File
+
+The data export file from your current provider must include these fields for each card:
+
+| Field | Description |
+|-------|-------------|
+| **Cardholder name** | Full name as it appears on the card |
+| **Expiration date** | Card expiry (MM/YY or MM/YYYY) |
+| **Card number (PAN)** | Full primary account number |
+| **Card ID** | The provider's unique identifier for the card |
+
+<Note>
+  Yuno does not validate expiration dates during credit card import. Ensure your exported data includes accurate expiry dates to avoid issues with future transactions.
+</Note>
+
+### PGP Encryption Key
+
+All sensitive migration data must be encrypted with Yuno's PGP public key before transfer.
+
+| Property | Value |
+|----------|-------|
+| **Email** | security-migrations@y.uno |
+| **Purpose** | Encrypting sensitive data (production environment) |
+| **Created** | 22 Nov 2024 |
+| **Expires** | 22 Nov 2026 |
+| **Key ID** | `73D3D88A` |
+| **Key length** | 4096 bits |
+| **Algorithm** | RSA |
+| **Fingerprint** | `5160 7134 4C00 D270 93FB C450 19ED AACD 73D3 D88A` |
+| **Download** | [yuno-pgp-production.asc](/security/keys/yuno-pgp-production.asc) |
+
+<Accordion title="Yuno PGP Public Key">
+```
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+sNugHSYrj1RUuA==
+=ik2s
+-----END PGP PUBLIC KEY BLOCK-----
+```
+</Accordion>
+
+### Data Validation Before Import
+
+Before Yuno begins the import, provide the following to Yuno Support:
+
+| Information | Purpose |
+|-------------|---------|
+| **External identifier name** | The field name your provider uses as the unique card identifier |
+| **Approximate count** | Number of payment methods being migrated |
+| **Known data gaps** | Any missing data (e.g., missing cardholder names, expiration dates) |
+
+## Step 3: Client-Side Implementation
+
+After Yuno imports the card data, you complete the migration via the Yuno API by adding customers and enrolling payment methods.
+
+### Required Data Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `account_id` | Your Yuno account identifier |
+| `merchant_customer_id` | Your internal customer ID |
+| `first_name` | Customer's first name |
+| `last_name` | Customer's last name |
+| `email` | Customer's email address |
+| `country` | ISO 3166-1 alpha-2 country code |
+| `document_number` | Customer's tax/identity document number |
+| `document_type` | Document type (e.g., `CPF`, `CNPJ`, `CC`) |
+| `payment_method_type` | Type of payment method (e.g., `CARD`) |
+| `payment_method_id` | The provider's original payment method identifier |
+| `vaulted_token` | The Yuno token generated during import |
+
+### Customer Import
+
+Import customer records using the Customers API:
+
+```json
+POST /v1/customers
+{
+  "merchant_customer_id": "your_customer_id_001",
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "email": "customer1@example.com",
+  "country": "US"
+}
+```
+
+### Enroll Migrated Payment Methods
+
+Link migrated tokens to customers by enrolling the payment methods:
+
+```json
+POST /v1/customers/{customer_id}/payment-methods
+{
+  "payment_method_type": "CARD",
+  "vaulted_token": "tok_yuno_abc123"
+}
+```
+
+## How Token Migration Works
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/token-migration-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/token-migration-flow.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+### Token Mapping File
+
+After migration, Yuno provides a mapping file linking source tokens to Yuno tokens:
+
+```json
+{
+  "migrations": [
+    {
+      "source_token": "tok_source_001",
+      "yuno_token": "tok_yuno_abc123",
+      "status": "MIGRATED",
+      "card_last_four": "4242",
+      "card_brand": "VISA"
+    },
+    {
+      "source_token": "tok_source_002",
+      "yuno_token": "tok_yuno_def456",
+      "status": "MIGRATED",
+      "card_last_four": "1234",
+      "card_brand": "MASTERCARD"
+    }
+  ]
+}
+```
+
+<Warning>
+  Update your database to replace source processor tokens with Yuno tokens using the mapping file. Transactions submitted with old source tokens will fail.
+</Warning>
+
+## Subscription Migration
+
+Active subscriptions must be recreated in Yuno with the migrated payment method tokens:
+
+1. Export active subscriptions from your current processor.
+2. Map each subscription's payment token to the corresponding Yuno token.
+3. Create subscriptions in Yuno with matching billing schedules.
+4. Coordinate the cutover date to avoid duplicate charges.
+
+<Note>
+  Schedule subscription migration to occur just after a billing cycle completes at your current processor. This minimizes the risk of duplicate charges and provides a clean transition point.
+</Note>
+
+## Data Protection & PCI Compliance
+
+Yuno tokenizes and encrypts all imported card data in compliance with **PCI DSS** standards. However, as the merchant you remain responsible for:
+
+- Managing customer data protection in accordance with local regulations.
+- Communicating any fees or issues to your customers during the migration process.
+- Ensuring sensitive data is encrypted before transfer using the provided PGP key.
+
+## Migration Timeline
+
+| Phase | Duration | Activities |
+|-------|----------|------------|
+| Assessment | 1-2 weeks | Data review, scope definition, validation requirements |
+| Setup | 1 week | SSH keys, SFTP channels, PGP encryption, API configuration |
+| Token transfer | 1-3 days | Depends on volume |
+| Validation | 1 week | Test transactions, reconciliation |
+| Cutover | 1 day | Traffic switch |
+| **Total** | **3-5 weeks** | End-to-end |
+
+## Best Practices
+
+- **Start early**: Begin the migration assessment well before your planned go-live date.
+- **Run in parallel**: Process a percentage of transactions through Yuno while maintaining the old processor as a fallback.
+- **Validate thoroughly**: Test migrated tokens with real transactions before full cutover.
+- **Communicate with customers**: Inform customers that their payment experience will not change during the migration.
+- **Keep the mapping file**: Retain the token mapping file for reference during the transition period.
+- **Pre-validate your data**: Check for known gaps (missing names, expired cards) before submitting the migration file to reduce iteration cycles.
+
+---
+
+## Exporting Tokens from Yuno
+
+Yuno provides a secure, PCI DSS-compliant process for exporting tokenized card data from its vault to your systems or a third-party provider.
+
+### When to Request an Export
+
+You may request a token export when:
+
+- Switching to a different payment processor or tokenization provider.
+- Managing tokens within your own PCI DSS-certified infrastructure.
+
+### Prerequisites
+
+Three requirements must be satisfied sequentially:
+
+<Steps>
+  <Step title="Formal Request">
+    Submit a written request to your primary Yuno contact and [support@y.uno](mailto:support@y.uno) including:
+
+    - Authorization from the third party receiving the data
+    - Confirmation of the recipient (internal team or external provider)
+    - Legal and compliance approval from your organization
+  </Step>
+
+  <Step title="PCI DSS Certification">
+    The receiving entity must hold a **current PCI DSS Attestation of Compliance (AOC)**, regardless of whether the recipient is an external provider or your own infrastructure.
+  </Step>
+
+  <Step title="Technical Requirements">
+    The receiving entity must provide:
+
+    | Requirement | Purpose |
+    |-------------|---------|
+    | **PGP public key** | Encrypt the export file for secure transfer |
+    | **Static IP address** | Whitelist for SFTP access |
+    | **SSH public key** | Authentication for SFTP connection |
+  </Step>
+</Steps>
+
+### Export File Format
+
+Exported files are PGP-encrypted and formatted as **CSV with UTF-8 encoding**.
+
+| Field | Description |
+|-------|-------------|
+| `holder_name` | Cardholder name |
+| `number` | Primary Account Number (PAN) |
+| `token` | Token stored in Yuno's vault |
+| `expiration_year` | Card expiration year |
+| `expiration_month` | Card expiration month |
+
+### Secure Delivery Process
+
+1. **Yuno's Security Team** prepares and encrypts the export file, creates an SFTP user account, and uploads the file.
+2. **Notification** is sent confirming file readiness, SFTP access details, and the active access window.
+3. **You access** the SFTP using your SSH key and whitelisted IP, download the file within the defined time window. The file is automatically removed after the window expires.
+
+<Warning>
+  The file is never sent by email or made publicly accessible. Access is strictly limited to the configured secure SFTP channel.
+</Warning>
+
+### Security & Compliance
+
+- Yuno maintains **PCI DSS Level 1** certification.
+- All exports are fully logged and monitored.
+- Only authorized personnel handle encrypted data.
+- Files are not stored beyond the required access window.

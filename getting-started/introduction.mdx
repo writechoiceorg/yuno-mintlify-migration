@@ -1,0 +1,65 @@
+---
+title: "What is Yuno?"
+description: "Yuno is a payment infrastructure and orchestration company connecting businesses to 1000+ payment methods across 190+ countries through a single API"
+---
+
+## Overview
+
+Yuno is a payment orchestration platform that gives businesses a single integration point to access over 1000 payment methods, 300+ providers, and 190+ countries. Instead of building and maintaining individual integrations with each payment processor, Yuno abstracts provider complexity behind a unified API.
+
+## What Yuno Does
+
+Yuno sits between your application and payment providers. When a customer pays, Yuno determines the optimal route, handles communication with the provider, manages retries on failure, and returns a normalized response -- regardless of which provider processed the transaction.
+
+```
+Your App  -->  Yuno API  -->  Provider A (primary)
+                          -->  Provider B (fallback)
+                          -->  Provider C (regional)
+```
+
+## Multi-Provider Orchestration
+
+With Yuno, you can connect multiple providers for the same payment method. Yuno routes each transaction based on rules you configure:
+
+- **Cost optimization** -- Route to the provider with the lowest processing fees
+- **Approval rate optimization** -- Route based on historical success rates by BIN, country, or amount
+- **Failover** -- Automatically retry with a backup provider when the primary declines
+- **Geographic routing** -- Use local acquirers for domestic transactions to improve approval rates
+
+## Key Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| **Smart Routing** | Rule-based and AI-driven transaction routing across providers |
+| **Payment Optimization** | Automatic retries, cascading, and provider failover |
+| **Unified API** | Single API contract for cards, bank transfers, wallets, vouchers, and more |
+| **Tokenization** | PCI-compliant card vaulting with network tokenization support |
+| **Analytics** | Real-time dashboards for approval rates, provider performance, and costs |
+| **No-code configuration** | Manage providers, routing rules, and payment methods from the Dashboard |
+
+## Who Uses Yuno
+
+Yuno is built for businesses processing payments in Latin America and globally:
+
+- **E-commerce platforms** needing local payment methods (PIX, OXXO, PSE, Boleto)
+- **Marketplaces** requiring split payments and multi-provider routing
+- **SaaS companies** managing recurring billing across regions
+- **Enterprise merchants** optimizing approval rates and reducing processing costs
+
+<Note>
+  Yuno handles PCI compliance, provider certifications, and regulatory requirements so your team can focus on building your product.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="How Payments Work" icon="arrows-spin" href="/getting-started/how-payments-work">
+    Understand the end-to-end payment flow through Yuno.
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/getting-started/quickstart">
+    Create your first payment in minutes with a step-by-step guide.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Browse all available API endpoints and schemas.
+  </Card>
+</CardGroup>

@@ -1,0 +1,83 @@
+---
+title: "Idempotency"
+description: "Safely retry API requests without creating duplicate payments or transactions"
+---
+
+## Why Idempotency Matters
+
+Network issues, timeouts, and retries are inevitable in payment processing. Without idempotency, retrying a failed request could create duplicate charges -- resulting in a customer being billed twice for the same order.
+
+Yuno supports idempotency keys to ensure that retrying a request produces the same result as the original, even if the original succeeded but you did not receive the response.
+
+## How It Works
+
+Include the `X-Idempotency-Key` header in your API request. If Yuno receives a second request with the same idempotency key, it returns the stored response from the first request instead of processing a new transaction.
+
+```bash
+curl -X POST https://api-sandbox.y.uno/v1/payments \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code" \
+  -H "X-Idempotency-Key: order-9876-attempt-1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "checkout_session": "cs_abc123",
+    "payment_method": { "type": "CARD", "token": "tok_test_abc123" },
+    "amount": { "currency": "USD", "value": 100.00 },
+    "country": "US"
+  }'
+```
+
+## Request Lifecycle with Idempotency
+
+```
+Request 1 (key: "abc-123")  -->  Yuno processes  -->  Stores result  -->  Returns 200
+Request 2 (key: "abc-123")  -->  Yuno finds key  -->  Returns stored result (no reprocessing)
+Request 3 (key: "def-456")  -->  New key          -->  Processes as new request
+```
+
+## When to Use Idempotency Keys
+
+| Endpoint | Recommended? | Why |
+|----------|-------------|-----|
+| `POST /v1/payments` | **Required** | Prevents duplicate charges |
+| `POST /v1/payments/{payment_id}/transactions/{transaction_id}/capture` | **Required** | Prevents double capture |
+| `POST /v1/payments/{payment_id}/refund` | **Required** | Prevents duplicate refunds |
+| `POST /v1/checkout/sessions` | Recommended | Prevents duplicate sessions |
+| `GET` endpoints | Not needed | GET requests are naturally idempotent |
+
+<Warning>
+  Omitting idempotency keys on payment creation is dangerous. If your server times out waiting for a response and retries, you risk creating a duplicate payment. Always include an idempotency key for state-changing operations.
+</Warning>
+
+## Generating Idempotency Keys
+
+Use a value that uniquely identifies the operation from your system's perspective. Common patterns:
+
+| Pattern | Example | Good For |
+|---------|---------|----------|
+| Order ID + attempt | `order-9876-attempt-1` | E-commerce payments |
+| UUID v4 | `550e8400-e29b-41d4-a716-446655440000` | General purpose |
+| Hash of payload | `sha256(payload)` | Deduplication by content |
+
+```javascript
+const { randomUUID } = require('crypto');
+
+const idempotencyKey = `${orderId}-${randomUUID()}`;
+```
+
+<Note>
+  If you retry with the same idempotency key but a **different request body**, Yuno returns a `409 Conflict` error. The key is bound to the original request parameters.
+</Note>
+
+## Key Expiration
+
+Idempotency keys are stored for **24 hours**. After expiration, a request with the same key is treated as a new request. Design your retry logic to complete within this window.
+
+## Best Practices
+
+- **Always use idempotency keys** for `POST` requests that create or modify resources
+- **Generate keys deterministically** from your order/transaction IDs when possible
+- **Do not reuse keys** across different operations (e.g., payment and refund for the same order should have different keys)
+- **Implement retry with backoff** -- combine idempotency keys with exponential backoff for robust error handling
+- **Log your keys** alongside request/response data for debugging

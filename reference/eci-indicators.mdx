@@ -1,0 +1,95 @@
+---
+title: "ECI Indicators"
+description: "Electronic Commerce Indicator values and their meaning for 3DS transactions"
+---
+
+## What is ECI?
+
+The Electronic Commerce Indicator (ECI) is a value returned during 3D Secure (3DS) authentication that indicates the level of security applied to a card transaction. The ECI value determines whether the transaction qualifies for a liability shift from the merchant to the card issuer in case of a fraud-related chargeback.
+
+ECI values are set by the card issuer's Access Control Server (ACS) during the 3DS authentication process and are included in the authorization request sent to the acquirer.
+
+## ECI Values by Card Network
+
+Each card network defines its own ECI values. The meaning is consistent across networks, but the numeric codes differ between Visa/Amex and Mastercard.
+
+| Authentication Result | Visa | Mastercard | Amex | Liability Shift |
+|----------------------|------|------------|------|-----------------|
+| Fully authenticated (3DS challenge completed) | `05` | `02` | `05` | Yes — shifts to issuer |
+| Attempted authentication (merchant attempted, issuer not participating) | `06` | `01` | `06` | Yes — shifts to issuer |
+| Non-3DS / authentication failed / not attempted | `07` | `00` | `07` | No — remains with merchant |
+
+## Detailed ECI Reference
+
+### Visa / Amex
+
+| ECI | Meaning | Description | Liability Shift |
+|-----|---------|-------------|-----------------|
+| `05` | Fully Authenticated | Cardholder successfully completed 3DS authentication. The issuer verified the cardholder's identity through a challenge (password, OTP, biometric). | Yes |
+| `06` | Attempted Authentication | The merchant attempted 3DS authentication, but the issuer or card was not enrolled in 3DS. The attempt is recorded for liability purposes. | Yes |
+| `07` | Non-3DS Transaction | No 3DS authentication was performed or authentication failed. The transaction proceeds without 3DS protection. | No |
+
+### Mastercard
+
+| ECI | Meaning | Description | Liability Shift |
+|-----|---------|-------------|-----------------|
+| `02` | Fully Authenticated | Cardholder successfully completed 3DS authentication via Mastercard Identity Check. | Yes |
+| `01` | Attempted Authentication | Merchant attempted authentication, but issuer/card was not enrolled. Attempt is recorded. | Yes |
+| `00` | Non-3DS Transaction | No authentication performed or authentication failed. | No |
+
+## Liability Shift Implications
+
+The liability shift is a key benefit of 3DS authentication. When liability shifts to the issuer, the merchant is protected from fraud-related chargebacks.
+
+| Scenario | Liability | ECI (Visa) | ECI (MC) |
+|----------|-----------|------------|----------|
+| Customer completes 3DS challenge successfully | Issuer | `05` | `02` |
+| 3DS attempted but issuer not participating | Issuer | `06` | `01` |
+| No 3DS performed | Merchant | `07` | `00` |
+| 3DS authentication fails and merchant proceeds | Merchant | `07` | `00` |
+
+<Warning>
+Proceeding with a transaction after a failed 3DS authentication (ECI 07/00) means the merchant assumes full liability for fraud-related chargebacks. Evaluate your risk tolerance before processing these transactions.
+</Warning>
+
+## How ECI Affects Interchange Rates
+
+Transactions with successful 3DS authentication (ECI 05/02) may qualify for lower interchange rates from some card networks and issuers, as the reduced fraud risk is factored into pricing. The exact interchange benefit varies by:
+
+- Card network (Visa, Mastercard, Amex)
+- Issuing region
+- Merchant category
+- Transaction type (e-commerce, recurring)
+
+Transactions without 3DS (ECI 07/00) typically incur standard or higher interchange rates and may be subject to additional risk-based fees in regions where SCA (Strong Customer Authentication) is mandated, such as the European Economic Area under PSD2.
+
+## ECI in the Yuno API Response
+
+The ECI value is included in the payment response within the `three_d_secure` object after authentication is processed.
+
+```json
+{
+  "transaction": {
+    "three_d_secure": {
+      "version": "2.2.0",
+      "eci": "05",
+      "authentication_status": "Y",
+      "cavv": "AAABBJkZUQAAAABjRWWZEEFgFz8=",
+      "ds_transaction_id": "a3b2c1d4-e5f6-7890-abcd-ef1234567890",
+      "liability_shift": true
+    }
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `eci` | The Electronic Commerce Indicator value |
+| `authentication_status` | `Y` = authenticated, `A` = attempted, `N` = failed, `U` = unavailable |
+| `cavv` | Cardholder Authentication Verification Value (proof of authentication) |
+| `ds_transaction_id` | Directory Server transaction identifier |
+| `liability_shift` | Boolean indicating whether liability shifted to issuer |
+
+<Note>
+The `three_d_secure` object is only present when 3DS authentication was attempted. For non-3DS transactions, this object will be absent from the response.
+</Note>

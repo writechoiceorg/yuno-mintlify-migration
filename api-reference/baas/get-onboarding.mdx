@@ -1,0 +1,62 @@
+---
+title: "Get Onboarding Status"
+description: "Check the current status of an entity onboarding"
+api: "GET https://api-sandbox.y.uno/v1/baas/entities/{entity_id}/onboardings/{onboarding_id}"
+---
+
+## Path parameters
+
+<ParamField path="entity_id" type="string" required>
+  The entity identifier.
+</ParamField>
+
+<ParamField path="onboarding_id" type="string" required>
+  The onboarding identifier obtained from [Create Entity Onboarding](/api-reference/baas/create-onboarding).
+</ParamField>
+
+## Response
+
+Returns the onboarding object with the same schema as the [Create Entity Onboarding](/api-reference/baas/create-onboarding) response, reflecting the current status.
+
+<ResponseExample>
+```json 200 OK — Succeeded
+{
+  "id": "onb_990e8400-e29b-41d4-a716-446655440000",
+  "entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "yuno_account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "provider": {
+    "entity_id": "col_entity_onboarded_123",
+    "status": "verified"
+  },
+  "onboarding_type": "ONE_STEP",
+  "status": "SUCCEEDED",
+  "requirements": [],
+  "created_at": "2026-02-01T10:00:00Z",
+  "updated_at": "2026-02-01T14:30:00Z",
+  "expires_at": "2026-02-08T10:00:00Z"
+}
+```
+
+```json 200 OK — Pending Documentation
+{
+  "id": "onb_990e8400-e29b-41d4-a716-446655440000",
+  "entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "yuno_account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "provider": {
+    "entity_id": "col_entity_onboarded_123",
+    "status": "additional_info_required"
+  },
+  "onboarding_type": "ONE_STEP",
+  "status": "PENDING_ADDITIONAL_DOCUMENTATION",
+  "requirements": [
+    {
+      "type": "PROOF_OF_ADDRESS",
+      "description": "Please provide a utility bill or bank statement from the last 3 months"
+    }
+  ],
+  "created_at": "2026-02-01T10:00:00Z",
+  "updated_at": "2026-02-01T12:00:00Z",
+  "expires_at": "2026-02-08T10:00:00Z"
+}
+```
+</ResponseExample>

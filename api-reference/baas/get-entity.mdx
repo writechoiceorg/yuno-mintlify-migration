@@ -1,0 +1,89 @@
+---
+title: "Get Entity"
+description: "Retrieve details of an existing BaaS entity"
+api: "GET https://api-sandbox.y.uno/v1/baas/entities/{entity_id}"
+---
+
+## Path parameters
+
+<ParamField path="entity_id" type="string" required>
+  The unique identifier of the entity obtained from the Create Entity endpoint.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">
+  Entity identifier.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Merchant's Yuno account identifier.
+</ResponseField>
+
+<ResponseField name="merchant_entity_id" type="string">
+  Merchant's own identifier for reconciliation.
+</ResponseField>
+
+<ResponseField name="national_entity" type="string">
+  `INDIVIDUAL` or `ENTITY`.
+</ResponseField>
+
+<ResponseField name="phone" type="object">
+  Phone details with `country_code` and `number`.
+</ResponseField>
+
+<ResponseField name="address" type="object">
+  Address with `address_line_1`, `city`, `state`, `zip_code`, `country`.
+</ResponseField>
+
+<ResponseField name="entity_detail" type="object">
+  Individual or business details.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 timestamp.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "merchant_entity_id": "merchant_user_12345",
+  "national_entity": "INDIVIDUAL",
+  "phone": {
+    "country_code": "+1",
+    "number": "2025551234"
+  },
+  "address": {
+    "address_line_1": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zip_code": "94102",
+    "country": "US"
+  },
+  "entity_detail": {
+    "individual": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com",
+      "date_of_birth": "1990-01-15"
+    }
+  },
+  "created_at": "2026-02-01T10:00:00Z",
+  "updated_at": "2026-02-01T10:00:00Z"
+}
+```
+
+```json 404 Not Found
+{
+  "code": "ENTITY_NOT_FOUND",
+  "messages": ["Entity not found"],
+  "http_code": 404
+}
+```
+</ResponseExample>

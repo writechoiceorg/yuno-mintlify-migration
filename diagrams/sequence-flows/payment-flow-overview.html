@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Payment Integration Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  /* ── Swim lane labels ───────────────────────────────────────── */
+  .lane-label {
+    position: absolute;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0a0a0a;
+    line-height: 1.43;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  /* ── Step boxes ─────────────────────────────────────────────── */
+  .step {
+    position: absolute;
+    width: 104px;
+    height: 98px;
+    background: #ffffff;
+    border: 1px solid #3e4fe0;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #0a0a0a;
+    text-align: center;
+    line-height: 1.33;
+  }
+
+  /* ── Step number badges ─────────────────────────────────────── */
+  .step-badge {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #3e4fe0;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fafafa;
+    line-height: 1;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SVG: background, swim lane dividers, connectors, sparks
+═══════════════════════════════════════════════════════════════ -->
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.07)"/>
+    </filter>
+
+    <marker id="arr-dn" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#64748b"/>
+    </marker>
+
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background card ───────────────────────────────────────── -->
+  <rect x="40" y="48" width="1460" height="778" rx="10" fill="#ffffff" filter="url(#card-shadow)" opacity="0.55"/>
+
+  <!-- ── Swim lane tinted bands (alternating) ──────────────────── -->
+  <rect x="40" y="231" width="1460" height="194" fill="#fafafa" opacity="1"/>
+  <rect x="40" y="425" width="1460" height="194" fill="#fafafa" opacity="1"/>
+
+  <!-- ── Horizontal swim lane dividers ─────────────────────────── -->
+  <line x1="40"  y1="231" x2="1500" y2="231" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+  <line x1="40"  y1="425" x2="1500" y2="425" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+  <line x1="40"  y1="619" x2="1500" y2="619" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ── Vertical divider (left label panel) ───────────────────── -->
+  <line x1="181" y1="48" x2="181" y2="826" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CONNECTOR PATHS
+
+       Column positions (8 cols, 163px spacing, starting at left=211):
+         Col1=211  Col2=374  Col3=537  Col4=700
+         Col5=863  Col6=1026 Col7=1189 Col8=1352
+
+       Column center X:
+         cx1=263  cx2=426  cx3=589  cx4=752
+         cx5=915  cx6=1078 cx7=1241 cx8=1404
+
+       Row Y centers:
+         Row0 (Customer)    : top=99   cy=148   bottom=197
+         Row1 (Your Server) : top=292  cy=341   bottom=390
+         Row2 (Yuno)        : top=487  cy=536   bottom=585
+         Row3 (Provider)    : top=686  cy=735   bottom=784
+
+       Solid lines  = request / action
+       Dashed lines = response / return
+  ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Entry: left boundary → Col1 Row1 -->
+  <path id="h0" d="M 181,341 L 211,341"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v1: Col1  Row1 → Row2  (Step 1 – Create checkout session, solid down) -->
+  <path id="v1" d="M 263,390 L 263,487"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v2: Col2  Row2 → Row1  (session_id return, dashed up) -->
+  <path id="v2" d="M 426,487 L 426,390"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v3: Col3  Row0 → Row2  (Step 2 – Select payment method, solid down, long) -->
+  <path id="v3" d="M 589,197 L 589,487"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v4: Col4  Row1 → Row2  (Step 3 – Create payment, solid down) -->
+  <path id="v4" d="M 752,390 L 752,487"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v5: Col5  Row2 → Row3  (Step 4 – Route & process, solid down) -->
+  <path id="v5" d="M 915,585 L 915,686"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v6: Col6  Row3 → Row2  (Result return, dashed up) -->
+  <path id="v6" d="M 1078,686 L 1078,585"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v7: Col7  Row2 → Row1  (Payment response, dashed up) -->
+  <path id="v7" d="M 1241,487 L 1241,390"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v8: Col8  Row2 → Row1  (Step 5 – Webhook notification, solid up) -->
+  <path id="v8" d="M 1404,487 L 1404,390"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ANIMATED SPARKS
+  ═══════════════════════════════════════════════════════════════ -->
+  <g clip-path="url(#diagram-clip)">
+
+    <!-- h0 entry -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="0.6s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#h0"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v1: Step 1 (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.4s" begin="0.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v1"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v2: session_id return (orange, up, dashed) -->
+    <circle r="3" fill="#f97316" filter="url(#spark-glow)" opacity="0.8">
+      <animateMotion dur="1.4s" begin="0.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v2"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v3: Step 2 – Select payment method (blue, down long) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v4: Step 3 – Create payment (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.4s" begin="1.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v4"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v5: Step 4 – Route & process (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.4s" begin="2.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v5"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v6: Result return (orange, up, dashed) -->
+    <circle r="3" fill="#f97316" filter="url(#spark-glow)" opacity="0.8">
+      <animateMotion dur="1.4s" begin="3s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v6"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v7: Payment response (orange, up, dashed) -->
+    <circle r="3" fill="#f97316" filter="url(#spark-glow)" opacity="0.8">
+      <animateMotion dur="1.4s" begin="3.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v7"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v8: Step 5 – Webhook (green, up) -->
+    <circle r="3.5" fill="#15803d" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.4s" begin="4.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v8"/>
+      </animateMotion>
+    </circle>
+
+  </g>
+</svg>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SWIM LANE LABELS
+═══════════════════════════════════════════════════════════════ -->
+<div class="lane-label" style="left:109px; top:135px;">Customer</div>
+<div class="lane-label" style="left:109px; top:321px;">Your<br>Server</div>
+<div class="lane-label" style="left:109px; top:521px;">Yuno</div>
+<div class="lane-label" style="left:109px; top:715px;">Provider</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STEP BOXES
+     Col left positions: 211, 374, 537, 700, 863, 1026, 1189, 1352
+     Row top positions:  99 (R0), 292 (R1), 487 (R2), 686 (R3)
+═══════════════════════════════════════════════════════════════ -->
+
+<!-- ── Col 1 · Step 1: Create checkout session ─────────────────── -->
+<div class="step" style="left:211px; top:292px;">Create<br>checkout<br>session</div>
+<div class="step" style="left:211px; top:487px;">Creates<br>checkout<br>session</div>
+
+<!-- ── Col 2 · session_id return ───────────────────────────────── -->
+<div class="step" style="left:374px; top:292px;">Receives<br>session_id</div>
+<div class="step" style="left:374px; top:487px;">Returns<br>session_id</div>
+
+<!-- ── Col 3 · Step 2: Select payment method ───────────────────── -->
+<div class="step" style="left:537px; top:99px;">Select<br>payment<br>method</div>
+<div class="step" style="left:537px; top:487px;">Receives<br>payment<br>method</div>
+
+<!-- ── Col 4 · Step 3: Create payment ──────────────────────────── -->
+<div class="step" style="left:700px; top:292px;">Create<br>payment</div>
+<div class="step" style="left:700px; top:487px;">Processes<br>payment<br>request</div>
+
+<!-- ── Col 5 · Step 4: Route & process ─────────────────────────── -->
+<div class="step" style="left:863px; top:487px;">Route &<br>process</div>
+<div class="step" style="left:863px; top:686px;">Processes<br>payment</div>
+
+<!-- ── Col 6 · Result return ───────────────────────────────────── -->
+<div class="step" style="left:1026px; top:487px;">Receives<br>result</div>
+<div class="step" style="left:1026px; top:686px;">Returns<br>result</div>
+
+<!-- ── Col 7 · Payment response ────────────────────────────────── -->
+<div class="step" style="left:1189px; top:292px;">Receives<br>payment<br>response</div>
+<div class="step" style="left:1189px; top:487px;">Returns<br>payment<br>response</div>
+
+<!-- ── Col 8 · Step 5: Webhook notification ────────────────────── -->
+<div class="step" style="left:1352px; top:292px;">Webhook<br>notification</div>
+<div class="step" style="left:1352px; top:487px;">Sends<br>webhook<br>notification</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     NUMBERED STEP BADGES  (left = box_left-10, top = box_top-9)
+═══════════════════════════════════════════════════════════════ -->
+<div class="step-badge" style="left:201px; top:283px;">1</div>
+<div class="step-badge" style="left:527px; top:90px;">2</div>
+<div class="step-badge" style="left:690px; top:283px;">3</div>
+<div class="step-badge" style="left:853px; top:477px;">4</div>
+<div class="step-badge" style="left:1342px; top:283px;">5</div>
+
+</div><!-- /diagram -->
+</div><!-- /scroll-wrapper -->
+</body>
+</html>

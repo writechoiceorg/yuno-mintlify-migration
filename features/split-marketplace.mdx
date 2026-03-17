@@ -1,0 +1,158 @@
+---
+title: "Split Payments & Marketplaces"
+description: "Split a single payment across multiple recipients for marketplace, platform, and multi-party commerce use cases."
+---
+
+## Overview
+
+Split Payments allow you to divide a single customer payment across multiple recipients in a single transaction. This is essential for marketplaces, platforms, and any business model where a payment needs to be distributed among sellers, service providers, or partners -- with the platform optionally retaining a commission.
+
+## How Split Payments Work
+
+1. A customer makes a single payment on your platform.
+2. You specify the split rules: how the payment amount is distributed among recipients.
+3. Yuno processes the payment and routes funds to each recipient according to the split configuration.
+4. The platform can retain a commission or fee from each split.
+
+## Split Payment Example
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/payments \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "amount": {
+      "value": 200.00,
+      "currency": "USD"
+    },
+    "country": "US",
+    "payment_method": {
+      "type": "CARD",
+      "token": "tok_card_abc123"
+    },
+    "split": [
+      {
+        "recipient_id": "rec_seller_001",
+        "amount": 160.00,
+        "description": "Seller payment"
+      },
+      {
+        "recipient_id": "rec_platform",
+        "amount": 40.00,
+        "description": "Platform commission"
+      }
+    ],
+    "customer": {
+      "email": "buyer@example.com"
+    }
+  }'
+```
+
+```json Response
+{
+  "id": "pay_split_abc123",
+  "status": "APPROVED",
+  "amount": {
+    "value": 200.00,
+    "currency": "USD"
+  },
+  "split": [
+    {
+      "recipient_id": "rec_seller_001",
+      "amount": 160.00,
+      "status": "PENDING_SETTLEMENT"
+    },
+    {
+      "recipient_id": "rec_platform",
+      "amount": 40.00,
+      "status": "PENDING_SETTLEMENT"
+    }
+  ]
+}
+```
+</CodeGroup>
+
+## Split Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| **Fixed amount** | Each recipient gets a specific amount | Seller: $160, Platform: $40 |
+| **Percentage** | Each recipient gets a percentage of total | Seller: 80%, Platform: 20% |
+| **Remainder** | One recipient gets the remainder after others | Seller: remainder, Platform: $40 |
+
+## Marketplace Architecture
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/marketplace-architecture.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/marketplace-architecture.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+<Warning>
+  The sum of all split amounts must equal the total payment amount. If the amounts do not match, the API will return a validation error.
+</Warning>
+
+## Managing Recipients
+
+Register each seller or partner as a payout recipient before using them in splits.
+
+```json
+POST /v1/payout-recipients
+{
+  "name": "Seller Store ABC",
+  "email": "seller@storeABC.com",
+  "tax_id": {
+    "type": "EIN",
+    "number": "12-3456789"
+  },
+  "bank_account": {
+    "routing_number": "021000021",
+    "account_number": "123456789",
+    "account_type": "CHECKING"
+  },
+  "country": "US"
+}
+```
+
+## Refunds on Split Payments
+
+When refunding a split payment, you can refund the full amount or specify per-recipient refund amounts.
+
+```json
+POST /v1/payments/pay_split_abc123/refund
+{
+  "amount": 200.00,
+  "split_refund": [
+    { "recipient_id": "rec_seller_001", "amount": 160.00 },
+    { "recipient_id": "rec_platform", "amount": 40.00 }
+  ]
+}
+```
+
+<Info>
+  Partial refunds are supported. You can refund a portion of one recipient's share while leaving others intact.
+</Info>
+
+## Use Cases
+
+| Use Case | Split Model |
+|----------|-------------|
+| **Marketplace** | Seller receives product price, platform takes commission |
+| **Food delivery** | Restaurant, driver, and platform each get a share |
+| **SaaS with add-ons** | Core platform and add-on providers split revenue |
+| **Event tickets** | Venue, promoter, and ticketing platform share proceeds |
+
+## Settlement
+
+Each recipient in a split payment receives their funds according to the settlement schedule configured for their account. Settlement timing may differ per recipient based on their provider and country.
+
+<Note>
+  Split payment recipients must be registered and verified before they can receive funds. Verification requirements vary by country and may include document validation and bank account confirmation.
+</Note>

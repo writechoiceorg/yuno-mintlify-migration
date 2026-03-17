@@ -1,0 +1,166 @@
+---
+title: "Single Sign-On (SSO)"
+description: "Configure SSO for secure team access to the Yuno Dashboard"
+---
+
+## Overview
+
+Single Sign-On (SSO) allows your team to authenticate to the Yuno Dashboard using your organization's identity provider (IdP). SSO centralizes access management, enforces your existing security policies, and eliminates the need for separate Yuno credentials.
+
+SSO is available on **Enterprise** plans. Contact your Yuno account manager to enable SSO for your organization.
+
+## Benefits
+
+| Benefit | Description |
+|---------|-------------|
+| **Centralized access** | Manage Yuno access through your existing IdP |
+| **Security enforcement** | Apply your organization's MFA, password, and session policies |
+| **Automated provisioning** | Team members gain access automatically based on IdP group membership |
+| **Simplified onboarding** | New team members log in with existing corporate credentials |
+| **Audit compliance** | Authentication events flow through your IdP's audit trail |
+
+## Supported Protocols
+
+| Protocol | Standard | Use Case |
+|----------|----------|----------|
+| **SAML 2.0** | XML-based assertion exchange | Enterprise IdPs (Okta, Azure AD, OneLogin) |
+| **OIDC** | OAuth 2.0-based identity layer | Google Workspace, Auth0, custom IdPs |
+
+## Configuration Steps
+
+<Steps>
+  <Step title="Navigate to SSO settings">
+    Go to **Dashboard > Settings > SSO** and click **Configure SSO**.
+  </Step>
+
+  <Step title="Select protocol">
+    Choose **SAML 2.0** or **OIDC** based on your identity provider's capabilities.
+  </Step>
+
+  <Step title="Enter identity provider details">
+    Provide the required configuration from your IdP:
+
+    **For SAML 2.0:**
+
+    | Field | Description | Example |
+    |-------|-------------|---------|
+    | **IdP Entity ID** | Unique identifier for your IdP | `https://idp.example.com/saml/metadata` |
+    | **SSO URL** | IdP login endpoint | `https://idp.example.com/saml/sso` |
+    | **Certificate** | X.509 signing certificate (PEM format) | Upload or paste certificate |
+
+    **For OIDC:**
+
+    | Field | Description | Example |
+    |-------|-------------|---------|
+    | **Issuer URL** | OIDC discovery endpoint | `https://accounts.google.com` |
+    | **Client ID** | OAuth client identifier | `abc123.apps.googleusercontent.com` |
+    | **Client Secret** | OAuth client secret | Stored securely by Yuno |
+  </Step>
+
+  <Step title="Configure Yuno as a service provider">
+    Copy the values from the **Service Provider Details** panel in Yuno and add them to your IdP:
+
+    | Value | Description |
+    |-------|-------------|
+    | **ACS URL** | Assertion Consumer Service URL (SAML) or Redirect URI (OIDC) |
+    | **Entity ID** | Yuno's service provider identifier |
+    | **Metadata URL** | SAML metadata endpoint for automatic configuration |
+  </Step>
+
+  <Step title="Map attributes">
+    Configure attribute mapping between your IdP and Yuno. See [Attribute Mapping](#attribute-mapping).
+  </Step>
+
+  <Step title="Test the connection">
+    Click **Test SSO** to initiate a test login flow. See [Testing SSO](#testing-sso-configuration).
+  </Step>
+
+  <Step title="Enable SSO">
+    After a successful test, toggle SSO to **Active**. Team members will be redirected to your IdP on their next login.
+  </Step>
+</Steps>
+
+## Identity Provider Setup Examples
+
+### Okta
+
+1. In Okta Admin Console, go to **Applications > Create App Integration**
+2. Select **SAML 2.0** and click **Next**
+3. Set **Single sign-on URL** to your Yuno ACS URL
+4. Set **Audience URI** to your Yuno Entity ID
+5. Configure attribute statements (see [Attribute Mapping](#attribute-mapping))
+6. Copy the **IdP metadata URL** and paste it in the Yuno SSO configuration
+
+### Azure AD
+
+1. In Azure Portal, go to **Enterprise Applications > New Application > Create your own**
+2. Select **Integrate any other application** and create
+3. Go to **Single sign-on > SAML**
+4. Set **Identifier (Entity ID)** to your Yuno Entity ID
+5. Set **Reply URL** to your Yuno ACS URL
+6. Download the **Federation Metadata XML** and upload it to Yuno
+
+### Google Workspace
+
+1. In Google Admin Console, go to **Apps > Web and mobile apps > Add App > Add custom SAML app**
+2. Copy the **SSO URL** and **Certificate** from Google and enter them in Yuno
+3. Set **ACS URL** and **Entity ID** from Yuno's Service Provider Details
+4. Configure attribute mapping for email and name
+
+## Attribute Mapping
+
+Map your IdP attributes to Yuno user fields:
+
+| Yuno Field | Required | Expected Value | Common IdP Attribute |
+|------------|----------|----------------|---------------------|
+| **email** | Yes | User's email address | `user.email`, `mail`, `email` |
+| **first_name** | Yes | User's first name | `user.firstName`, `givenName` |
+| **last_name** | Yes | User's last name | `user.lastName`, `surname` |
+| **role** | No | Yuno Dashboard role | `user.groups`, `memberOf` (mapped) |
+
+## Team Role Mapping
+
+Map IdP groups to Yuno Dashboard roles to automate access control:
+
+| Yuno Role | Permissions | Typical IdP Group |
+|-----------|-------------|-------------------|
+| **Admin** | Full access: settings, keys, team, all features | `yuno-admins` |
+| **Developer** | View and manage transactions, connections, routing | `yuno-developers` |
+| **Analyst** | View insights, reports, and payment data | `yuno-analysts` |
+| **Viewer** | Read-only access to payments and dashboard | `yuno-viewers` |
+
+Configure role mapping in the SSO settings under **Role Mapping**. Users without a mapped group are assigned the **Viewer** role by default.
+
+## Testing SSO Configuration
+
+<Steps>
+  <Step title="Click Test SSO">
+    In the SSO configuration page, click **Test SSO**. A new browser window opens with your IdP's login page.
+  </Step>
+
+  <Step title="Authenticate with your IdP">
+    Log in using your IdP credentials. After authentication, you are redirected back to Yuno.
+  </Step>
+
+  <Step title="Review test results">
+    Yuno displays the attributes received from your IdP. Verify that email, name, and role are mapped correctly.
+  </Step>
+</Steps>
+
+<Warning>
+Do not enable SSO for your organization until you have completed a successful test. A misconfigured SSO setup can lock team members out of the Dashboard.
+</Warning>
+
+## Troubleshooting
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| **"Invalid SAML response"** | Certificate mismatch or expired certificate | Re-upload the current IdP signing certificate in Yuno |
+| **User redirected to IdP but login fails** | ACS URL or Entity ID mismatch | Verify the ACS URL and Entity ID match exactly between Yuno and your IdP |
+| **User authenticated but receives "Access Denied"** | Email domain not allowed or role not mapped | Check that the user's email domain is in your allowed list and their IdP group maps to a Yuno role |
+| **SSO works but users get Viewer role** | Role mapping not configured | Set up group-to-role mapping in SSO settings |
+| **"Clock skew" error** | Server time difference between IdP and Yuno | Ensure your IdP server clock is synchronized via NTP |
+
+<Note>
+If you encounter issues not listed here, contact Yuno support with your SSO configuration details (redact secrets) and the error message. Include the IdP metadata URL and Yuno Entity ID for faster resolution.
+</Note>

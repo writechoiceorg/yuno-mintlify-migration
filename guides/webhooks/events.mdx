@@ -1,0 +1,1269 @@
+---
+title: "Webhook Events"
+description: "Complete reference of all webhook event types, triggers, and payload examples"
+---
+
+## Overview
+
+Yuno sends webhook events to notify your server about changes to payments, subscriptions, payouts, customers, disputes, and BaaS resources. Each event contains the full resource state at the time of the event.
+
+<Note>
+Process events idempotently. You may receive the same event multiple times due to retries. Use the `id` and `timestamp` fields to detect and deduplicate events.
+</Note>
+
+## Event Payload Structure
+
+All webhook events follow this structure:
+
+```json
+{
+  "id": "evt_a1b2c3d4e5f6",
+  "event": "payment.succeeded",
+  "timestamp": "2026-01-15T14:30:00.000Z",
+  "data": {
+    // Full resource object at the time of the event
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique event identifier |
+| `event` | `string` | Event type (e.g., `payment.succeeded`) |
+| `timestamp` | `string` | ISO 8601 datetime when the event occurred |
+| `data` | `object` | Full resource object (payment, subscription, payout, etc.) |
+
+---
+
+## Payment Events
+
+### payment.created
+
+A new payment has been initiated.
+
+**Trigger:** A payment is created via the API or SDK.
+
+```json
+{
+  "id": "evt_pay_created_001",
+  "event": "payment.created",
+  "timestamp": "2026-01-15T14:30:00.000Z",
+  "data": {
+    "id": "pay_a1b2c3d4",
+    "status": "PENDING",
+    "amount": {
+      "value": 100.00,
+      "currency": "BRL"
+    },
+    "country": "BR",
+    "payment_method": {
+      "type": "PIX"
+    },
+    "merchant_order_id": "order-456",
+    "customer": {
+      "id": "cust_001"
+    },
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+### payment.authorized
+
+A payment has been authorized but not yet captured. The funds are held on the customer's account.
+
+**Trigger:** Payment authorization is approved by the provider/issuer. Applies to card payments with separate capture flows.
+
+```json
+{
+  "id": "evt_pay_auth_001",
+  "event": "payment.authorized",
+  "timestamp": "2026-01-15T14:30:05.000Z",
+  "data": {
+    "id": "pay_a1b2c3d4",
+    "status": "AUTHORIZED",
+    "amount": {
+      "value": 100.00,
+      "currency": "USD"
+    },
+    "country": "CO",
+    "payment_method": {
+      "type": "CARD",
+      "card": {
+        "last_four": "4242",
+        "brand": "VISA"
+      }
+    },
+    "authorization_code": "AUTH123456",
+    "merchant_order_id": "order-789",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+### payment.succeeded
+
+A payment has been completed successfully. Funds have been captured.
+
+**Trigger:** Payment is captured (automatically or manually) and confirmed by the provider.
+
+```json
+{
+  "id": "evt_pay_success_001",
+  "event": "payment.succeeded",
+  "timestamp": "2026-01-15T14:30:10.000Z",
+  "data": {
+    "id": "pay_a1b2c3d4",
+    "status": "SUCCEEDED",
+    "amount": {
+      "value": 100.00,
+      "currency": "BRL"
+    },
+    "country": "BR",
+    "payment_method": {
+      "type": "PIX"
+    },
+    "provider_reference": "prov_ref_abc123",
+    "merchant_order_id": "order-456",
+    "created_at": "2026-01-15T14:30:00.000Z",
+    "completed_at": "2026-01-15T14:30:10.000Z"
+  }
+}
+```
+
+### payment.failed
+
+A payment has failed during processing.
+
+**Trigger:** Payment processing fails due to a technical error, provider issue, or validation failure (distinct from a decline by the issuer).
+
+```json
+{
+  "id": "evt_pay_fail_001",
+  "event": "payment.failed",
+  "timestamp": "2026-01-15T14:30:10.000Z",
+  "data": {
+    "id": "pay_a1b2c3d4",
+    "status": "FAILED",
+    "amount": {
+      "value": 50.00,
+      "currency": "USD"
+    },
+    "country": "CO",
+    "payment_method": {
+      "type": "CARD"
+    },
+    "error": {
+      "code": "PROCESSING_ERROR",
+      "message": "Provider returned an internal error"
+    },
+    "merchant_order_id": "order-101",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+<Note>
+`payment.failed` indicates a processing error (timeout, provider error). `payment.declined` indicates the payment was actively refused by the issuer or provider. These are distinct events: failed means the transaction could not be processed, while declined means it was processed but rejected.
+</Note>
+
+### payment.declined
+
+A payment has been declined by the provider or card issuer.
+
+**Trigger:** The issuer or payment provider rejects the transaction (e.g., insufficient funds, fraud check).
+
+```json
+{
+  "id": "evt_pay_decline_001",
+  "event": "payment.declined",
+  "timestamp": "2026-01-15T14:30:08.000Z",
+  "data": {
+    "id": "pay_a1b2c3d4",
+    "status": "DECLINED",
+    "amount": {
+      "value": 200.00,
+      "currency": "MXN"
+    },
+    "country": "MX",
+    "payment_method": {
+      "type": "CARD",
+      "card": {
+        "last_four": "1234",
+        "brand": "MASTERCARD"
+      }
+    },
+    "decline_reason": {
+      "code": "INSUFFICIENT_FUNDS",
+      "message": "The card has insufficient funds"
+    },
+    "merchant_order_id": "order-202",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+### payment.cancelled
+
+A payment has been cancelled or voided before settlement.
+
+**Trigger:** The merchant cancels or voids a pending/authorized payment.
+
+```json
+{
+  "id": "evt_pay_cancel_001",
+  "event": "payment.cancelled",
+  "timestamp": "2026-01-15T15:00:00.000Z",
+  "data": {
+    "id": "pay_a1b2c3d4",
+    "status": "CANCELLED",
+    "amount": {
+      "value": 100.00,
+      "currency": "USD"
+    },
+    "country": "CO",
+    "payment_method": {
+      "type": "CARD"
+    },
+    "merchant_order_id": "order-789",
+    "cancelled_at": "2026-01-15T15:00:00.000Z",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+### payment.expired
+
+A payment authorization has expired without being captured.
+
+**Trigger:** The authorization window closes (typically 7-30 days depending on provider) without a capture.
+
+```json
+{
+  "id": "evt_pay_expire_001",
+  "event": "payment.expired",
+  "timestamp": "2026-01-22T14:30:00.000Z",
+  "data": {
+    "id": "pay_a1b2c3d4",
+    "status": "EXPIRED",
+    "amount": {
+      "value": 75.00,
+      "currency": "USD"
+    },
+    "country": "US",
+    "payment_method": {
+      "type": "CARD"
+    },
+    "merchant_order_id": "order-303",
+    "created_at": "2026-01-15T14:30:00.000Z",
+    "expired_at": "2026-01-22T14:30:00.000Z"
+  }
+}
+```
+
+### payment.refunded
+
+A full refund has been processed for a payment.
+
+**Trigger:** A refund is completed for the full payment amount.
+
+```json
+{
+  "id": "evt_pay_refund_001",
+  "event": "payment.refunded",
+  "timestamp": "2026-01-20T10:00:00.000Z",
+  "data": {
+    "id": "pay_a1b2c3d4",
+    "status": "REFUNDED",
+    "amount": {
+      "value": 100.00,
+      "currency": "BRL"
+    },
+    "refund": {
+      "id": "ref_x1y2z3",
+      "amount": {
+        "value": 100.00,
+        "currency": "BRL"
+      },
+      "reason": "Customer request",
+      "created_at": "2026-01-20T10:00:00.000Z"
+    },
+    "country": "BR",
+    "merchant_order_id": "order-456",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+### payment.partially_refunded
+
+A partial refund has been processed for a payment.
+
+**Trigger:** A refund is completed for less than the full payment amount.
+
+```json
+{
+  "id": "evt_pay_partial_ref_001",
+  "event": "payment.partially_refunded",
+  "timestamp": "2026-01-20T10:00:00.000Z",
+  "data": {
+    "id": "pay_a1b2c3d4",
+    "status": "PARTIALLY_REFUNDED",
+    "amount": {
+      "value": 100.00,
+      "currency": "USD"
+    },
+    "refund": {
+      "id": "ref_p1q2r3",
+      "amount": {
+        "value": 25.00,
+        "currency": "USD"
+      },
+      "reason": "Partial return",
+      "created_at": "2026-01-20T10:00:00.000Z"
+    },
+    "total_refunded": {
+      "value": 25.00,
+      "currency": "USD"
+    },
+    "country": "CO",
+    "merchant_order_id": "order-789",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+---
+
+## Subscription Events
+
+### subscription.created
+
+A new subscription has been created.
+
+**Trigger:** A subscription is created via the API.
+
+```json
+{
+  "id": "evt_sub_created_001",
+  "event": "subscription.created",
+  "timestamp": "2026-01-15T14:30:00.000Z",
+  "data": {
+    "id": "sub_m1n2o3p4",
+    "status": "ACTIVE",
+    "plan": {
+      "id": "plan_001",
+      "name": "Premium Monthly",
+      "amount": {
+        "value": 29.99,
+        "currency": "USD"
+      },
+      "interval": "MONTHLY"
+    },
+    "customer": {
+      "id": "cust_001"
+    },
+    "country": "CO",
+    "current_period_start": "2026-01-15T00:00:00.000Z",
+    "current_period_end": "2026-02-15T00:00:00.000Z",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+### subscription.updated
+
+A subscription's configuration has been changed.
+
+**Trigger:** Subscription plan, amount, or billing details are modified.
+
+```json
+{
+  "id": "evt_sub_updated_001",
+  "event": "subscription.updated",
+  "timestamp": "2026-01-20T10:00:00.000Z",
+  "data": {
+    "id": "sub_m1n2o3p4",
+    "status": "ACTIVE",
+    "plan": {
+      "id": "plan_002",
+      "name": "Enterprise Monthly",
+      "amount": {
+        "value": 99.99,
+        "currency": "USD"
+      },
+      "interval": "MONTHLY"
+    },
+    "customer": {
+      "id": "cust_001"
+    },
+    "country": "CO",
+    "updated_at": "2026-01-20T10:00:00.000Z"
+  }
+}
+```
+
+### subscription.paused
+
+A subscription has been paused. No recurring payments will be collected until resumed.
+
+**Trigger:** The merchant or customer pauses the subscription.
+
+```json
+{
+  "id": "evt_sub_paused_001",
+  "event": "subscription.paused",
+  "timestamp": "2026-02-01T10:00:00.000Z",
+  "data": {
+    "id": "sub_m1n2o3p4",
+    "status": "PAUSED",
+    "plan": {
+      "id": "plan_001",
+      "name": "Premium Monthly"
+    },
+    "customer": {
+      "id": "cust_001"
+    },
+    "paused_at": "2026-02-01T10:00:00.000Z"
+  }
+}
+```
+
+### subscription.resumed
+
+A paused subscription has been resumed. Recurring payments will continue.
+
+**Trigger:** The merchant or customer resumes a paused subscription.
+
+```json
+{
+  "id": "evt_sub_resumed_001",
+  "event": "subscription.resumed",
+  "timestamp": "2026-02-15T10:00:00.000Z",
+  "data": {
+    "id": "sub_m1n2o3p4",
+    "status": "ACTIVE",
+    "plan": {
+      "id": "plan_001",
+      "name": "Premium Monthly"
+    },
+    "customer": {
+      "id": "cust_001"
+    },
+    "resumed_at": "2026-02-15T10:00:00.000Z",
+    "current_period_start": "2026-02-15T00:00:00.000Z",
+    "current_period_end": "2026-03-15T00:00:00.000Z"
+  }
+}
+```
+
+### subscription.cancelled
+
+A subscription has been cancelled. No further payments will be collected.
+
+**Trigger:** The merchant or customer cancels the subscription.
+
+```json
+{
+  "id": "evt_sub_cancel_001",
+  "event": "subscription.cancelled",
+  "timestamp": "2026-03-01T10:00:00.000Z",
+  "data": {
+    "id": "sub_m1n2o3p4",
+    "status": "CANCELLED",
+    "plan": {
+      "id": "plan_001",
+      "name": "Premium Monthly"
+    },
+    "customer": {
+      "id": "cust_001"
+    },
+    "cancelled_at": "2026-03-01T10:00:00.000Z",
+    "cancellation_reason": "Customer request"
+  }
+}
+```
+
+### subscription.payment.succeeded
+
+A recurring subscription payment has been processed successfully.
+
+**Trigger:** The scheduled recurring charge succeeds.
+
+```json
+{
+  "id": "evt_sub_pay_ok_001",
+  "event": "subscription.payment.succeeded",
+  "timestamp": "2026-02-15T00:05:00.000Z",
+  "data": {
+    "subscription_id": "sub_m1n2o3p4",
+    "payment": {
+      "id": "pay_rec_001",
+      "status": "SUCCEEDED",
+      "amount": {
+        "value": 29.99,
+        "currency": "USD"
+      }
+    },
+    "billing_period": {
+      "start": "2026-02-15T00:00:00.000Z",
+      "end": "2026-03-15T00:00:00.000Z"
+    }
+  }
+}
+```
+
+### subscription.payment.failed
+
+A recurring subscription payment has failed.
+
+**Trigger:** The scheduled recurring charge is declined or fails.
+
+```json
+{
+  "id": "evt_sub_pay_fail_001",
+  "event": "subscription.payment.failed",
+  "timestamp": "2026-02-15T00:05:00.000Z",
+  "data": {
+    "subscription_id": "sub_m1n2o3p4",
+    "payment": {
+      "id": "pay_rec_002",
+      "status": "FAILED",
+      "amount": {
+        "value": 29.99,
+        "currency": "USD"
+      },
+      "error": {
+        "code": "INSUFFICIENT_FUNDS",
+        "message": "The card has insufficient funds"
+      }
+    },
+    "retry_scheduled": true,
+    "next_retry_at": "2026-02-18T00:00:00.000Z"
+  }
+}
+```
+
+### subscription.retry_scheduled
+
+A retry has been scheduled after a failed subscription payment.
+
+**Trigger:** The dunning engine schedules a retry attempt.
+
+```json
+{
+  "id": "evt_sub_retry_sched_001",
+  "event": "subscription.retry_scheduled",
+  "timestamp": "2026-02-15T00:10:00.000Z",
+  "data": {
+    "subscription_id": "sub_m1n2o3p4",
+    "retry_attempt": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-02-18T00:00:00.000Z",
+    "original_payment_id": "pay_rec_002"
+  }
+}
+```
+
+### subscription.retry_succeeded
+
+A retry attempt for a failed subscription payment has succeeded.
+
+**Trigger:** A scheduled retry charge is approved.
+
+```json
+{
+  "id": "evt_sub_retry_ok_001",
+  "event": "subscription.retry_succeeded",
+  "timestamp": "2026-02-18T00:05:00.000Z",
+  "data": {
+    "subscription_id": "sub_m1n2o3p4",
+    "retry_attempt": 1,
+    "payment": {
+      "id": "pay_rec_003",
+      "status": "SUCCEEDED",
+      "amount": {
+        "value": 29.99,
+        "currency": "USD"
+      }
+    },
+    "original_payment_id": "pay_rec_002"
+  }
+}
+```
+
+### subscription.retry_failed
+
+A retry attempt for a failed subscription payment has also failed.
+
+**Trigger:** A scheduled retry charge is declined or fails.
+
+```json
+{
+  "id": "evt_sub_retry_fail_001",
+  "event": "subscription.retry_failed",
+  "timestamp": "2026-02-18T00:05:00.000Z",
+  "data": {
+    "subscription_id": "sub_m1n2o3p4",
+    "retry_attempt": 1,
+    "max_retries": 3,
+    "payment": {
+      "id": "pay_rec_004",
+      "status": "FAILED",
+      "amount": {
+        "value": 29.99,
+        "currency": "USD"
+      }
+    },
+    "next_retry_at": "2026-02-21T00:00:00.000Z",
+    "original_payment_id": "pay_rec_002"
+  }
+}
+```
+
+### subscription.dunning.final_action
+
+The dunning process has exhausted all retry attempts and taken final action.
+
+**Trigger:** All retry attempts have failed and the subscription is cancelled or paused according to dunning policy.
+
+```json
+{
+  "id": "evt_sub_dunning_final_001",
+  "event": "subscription.dunning.final_action",
+  "timestamp": "2026-02-25T00:05:00.000Z",
+  "data": {
+    "subscription_id": "sub_m1n2o3p4",
+    "action_taken": "CANCELLED",
+    "total_retry_attempts": 3,
+    "original_payment_id": "pay_rec_002",
+    "customer": {
+      "id": "cust_001"
+    }
+  }
+}
+```
+
+---
+
+## Payout Events
+
+### payout.created
+
+A new payout has been initiated.
+
+**Trigger:** A payout is created via the API.
+
+```json
+{
+  "id": "evt_payout_created_001",
+  "event": "payout.created",
+  "timestamp": "2026-01-15T14:30:00.000Z",
+  "data": {
+    "id": "pout_d1e2f3g4",
+    "status": "PENDING",
+    "amount": {
+      "value": 500.00,
+      "currency": "BRL"
+    },
+    "country": "BR",
+    "recipient": {
+      "id": "rcpt_001",
+      "document": {
+        "type": "CPF",
+        "number": "***.***.***-01"
+      }
+    },
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+### payout.succeeded
+
+A payout has been completed and funds have been transferred.
+
+**Trigger:** The payout is confirmed by the provider.
+
+```json
+{
+  "id": "evt_payout_ok_001",
+  "event": "payout.succeeded",
+  "timestamp": "2026-01-15T15:00:00.000Z",
+  "data": {
+    "id": "pout_d1e2f3g4",
+    "status": "SUCCEEDED",
+    "amount": {
+      "value": 500.00,
+      "currency": "BRL"
+    },
+    "country": "BR",
+    "provider_reference": "prov_pout_ref_001",
+    "completed_at": "2026-01-15T15:00:00.000Z",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+### payout.failed
+
+A payout has failed during processing.
+
+**Trigger:** The provider rejects the payout or a processing error occurs.
+
+```json
+{
+  "id": "evt_payout_fail_001",
+  "event": "payout.failed",
+  "timestamp": "2026-01-15T15:00:00.000Z",
+  "data": {
+    "id": "pout_d1e2f3g4",
+    "status": "FAILED",
+    "amount": {
+      "value": 500.00,
+      "currency": "BRL"
+    },
+    "country": "BR",
+    "error": {
+      "code": "INVALID_ACCOUNT",
+      "message": "The recipient account could not be found"
+    },
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+---
+
+## Customer Events
+
+### customer.created
+
+A new customer record has been created.
+
+**Trigger:** A customer is created via the API or during a payment/enrollment flow.
+
+```json
+{
+  "id": "evt_cust_created_001",
+  "event": "customer.created",
+  "timestamp": "2026-01-15T14:30:00.000Z",
+  "data": {
+    "id": "cust_001",
+    "email": "customer@example.com",
+    "first_name": "Maria",
+    "last_name": "Silva",
+    "country": "BR",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+### customer.updated
+
+A customer's information has been updated.
+
+**Trigger:** Customer details are modified via the API.
+
+```json
+{
+  "id": "evt_cust_updated_001",
+  "event": "customer.updated",
+  "timestamp": "2026-01-20T10:00:00.000Z",
+  "data": {
+    "id": "cust_001",
+    "email": "maria.new@example.com",
+    "first_name": "Maria",
+    "last_name": "Silva",
+    "country": "BR",
+    "updated_at": "2026-01-20T10:00:00.000Z"
+  }
+}
+```
+
+### customer.deleted
+
+A customer record has been deleted.
+
+**Trigger:** A customer is deleted via the API.
+
+```json
+{
+  "id": "evt_cust_deleted_001",
+  "event": "customer.deleted",
+  "timestamp": "2026-01-25T10:00:00.000Z",
+  "data": {
+    "id": "cust_001",
+    "deleted_at": "2026-01-25T10:00:00.000Z"
+  }
+}
+```
+
+---
+
+## Dispute Events
+
+### dispute.created
+
+A chargeback dispute has been opened.
+
+**Trigger:** A cardholder or issuer initiates a dispute against a payment.
+
+```json
+{
+  "id": "evt_disp_created_001",
+  "event": "dispute.created",
+  "timestamp": "2026-02-01T10:00:00.000Z",
+  "data": {
+    "id": "disp_h1i2j3k4",
+    "status": "OPEN",
+    "payment_id": "pay_a1b2c3d4",
+    "amount": {
+      "value": 100.00,
+      "currency": "USD"
+    },
+    "reason": "FRAUDULENT",
+    "evidence_due_by": "2026-02-15T23:59:59.000Z",
+    "created_at": "2026-02-01T10:00:00.000Z"
+  }
+}
+```
+
+### dispute.updated
+
+A dispute's evidence or status has been updated.
+
+**Trigger:** Evidence is submitted, or the dispute progresses to a new stage.
+
+```json
+{
+  "id": "evt_disp_updated_001",
+  "event": "dispute.updated",
+  "timestamp": "2026-02-10T10:00:00.000Z",
+  "data": {
+    "id": "disp_h1i2j3k4",
+    "status": "UNDER_REVIEW",
+    "payment_id": "pay_a1b2c3d4",
+    "amount": {
+      "value": 100.00,
+      "currency": "USD"
+    },
+    "reason": "FRAUDULENT",
+    "evidence_submitted": true,
+    "updated_at": "2026-02-10T10:00:00.000Z"
+  }
+}
+```
+
+### dispute.won
+
+A dispute has been resolved in the merchant's favor.
+
+**Trigger:** The card network or issuer rules in the merchant's favor.
+
+```json
+{
+  "id": "evt_disp_won_001",
+  "event": "dispute.won",
+  "timestamp": "2026-02-20T10:00:00.000Z",
+  "data": {
+    "id": "disp_h1i2j3k4",
+    "status": "WON",
+    "payment_id": "pay_a1b2c3d4",
+    "amount": {
+      "value": 100.00,
+      "currency": "USD"
+    },
+    "resolved_at": "2026-02-20T10:00:00.000Z"
+  }
+}
+```
+
+### dispute.lost
+
+A dispute has been resolved in the cardholder's favor. Funds are returned to the cardholder.
+
+**Trigger:** The card network or issuer rules in the cardholder's favor.
+
+```json
+{
+  "id": "evt_disp_lost_001",
+  "event": "dispute.lost",
+  "timestamp": "2026-02-20T10:00:00.000Z",
+  "data": {
+    "id": "disp_h1i2j3k4",
+    "status": "LOST",
+    "payment_id": "pay_a1b2c3d4",
+    "amount": {
+      "value": 100.00,
+      "currency": "USD"
+    },
+    "resolved_at": "2026-02-20T10:00:00.000Z"
+  }
+}
+```
+
+---
+
+## BaaS Events
+
+### Entity Events
+
+#### baas.entity.created
+
+A new BaaS entity has been created.
+
+**Trigger:** An entity (individual or business) is created via the BaaS API.
+
+```json
+{
+  "id": "evt_baas_entity_created_001",
+  "event": "baas.entity.created",
+  "timestamp": "2026-01-15T14:30:00.000Z",
+  "data": {
+    "id": "ent_l1m2n3o4",
+    "type": "INDIVIDUAL",
+    "status": "CREATED",
+    "country": "BR",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+#### baas.entity.updated
+
+A BaaS entity's information has been updated.
+
+**Trigger:** Entity details are modified via the BaaS API.
+
+```json
+{
+  "id": "evt_baas_entity_updated_001",
+  "event": "baas.entity.updated",
+  "timestamp": "2026-01-20T10:00:00.000Z",
+  "data": {
+    "id": "ent_l1m2n3o4",
+    "type": "INDIVIDUAL",
+    "status": "ACTIVE",
+    "country": "BR",
+    "updated_at": "2026-01-20T10:00:00.000Z"
+  }
+}
+```
+
+### Onboarding Events
+
+#### baas.onboarding.created
+
+A new onboarding process has been initiated.
+
+**Trigger:** An onboarding application is submitted via the BaaS API.
+
+```json
+{
+  "id": "evt_baas_onb_created_001",
+  "event": "baas.onboarding.created",
+  "timestamp": "2026-01-15T14:30:00.000Z",
+  "data": {
+    "id": "onb_p1q2r3s4",
+    "entity_id": "ent_l1m2n3o4",
+    "status": "PENDING",
+    "created_at": "2026-01-15T14:30:00.000Z"
+  }
+}
+```
+
+#### baas.onboarding.updated
+
+An onboarding process status has changed.
+
+**Trigger:** The onboarding process progresses or additional information is submitted.
+
+```json
+{
+  "id": "evt_baas_onb_updated_001",
+  "event": "baas.onboarding.updated",
+  "timestamp": "2026-01-16T10:00:00.000Z",
+  "data": {
+    "id": "onb_p1q2r3s4",
+    "entity_id": "ent_l1m2n3o4",
+    "status": "IN_REVIEW",
+    "updated_at": "2026-01-16T10:00:00.000Z"
+  }
+}
+```
+
+#### baas.onboarding.approved
+
+An onboarding application has been approved.
+
+**Trigger:** The KYC/KYB review process approves the entity.
+
+```json
+{
+  "id": "evt_baas_onb_approved_001",
+  "event": "baas.onboarding.approved",
+  "timestamp": "2026-01-18T10:00:00.000Z",
+  "data": {
+    "id": "onb_p1q2r3s4",
+    "entity_id": "ent_l1m2n3o4",
+    "status": "APPROVED",
+    "approved_at": "2026-01-18T10:00:00.000Z"
+  }
+}
+```
+
+#### baas.onboarding.rejected
+
+An onboarding application has been rejected.
+
+**Trigger:** The KYC/KYB review process rejects the entity.
+
+```json
+{
+  "id": "evt_baas_onb_rejected_001",
+  "event": "baas.onboarding.rejected",
+  "timestamp": "2026-01-18T10:00:00.000Z",
+  "data": {
+    "id": "onb_p1q2r3s4",
+    "entity_id": "ent_l1m2n3o4",
+    "status": "REJECTED",
+    "rejection_reason": "Document verification failed",
+    "rejected_at": "2026-01-18T10:00:00.000Z"
+  }
+}
+```
+
+### Account Events
+
+#### baas.account.created
+
+A new BaaS account has been created.
+
+**Trigger:** An account is provisioned for an approved entity.
+
+```json
+{
+  "id": "evt_baas_acct_created_001",
+  "event": "baas.account.created",
+  "timestamp": "2026-01-19T10:00:00.000Z",
+  "data": {
+    "id": "acct_t1u2v3w4",
+    "entity_id": "ent_l1m2n3o4",
+    "status": "ACTIVE",
+    "currency": "BRL",
+    "country": "BR",
+    "created_at": "2026-01-19T10:00:00.000Z"
+  }
+}
+```
+
+#### baas.account.updated
+
+A BaaS account has been updated.
+
+**Trigger:** Account details or status are modified.
+
+```json
+{
+  "id": "evt_baas_acct_updated_001",
+  "event": "baas.account.updated",
+  "timestamp": "2026-01-20T10:00:00.000Z",
+  "data": {
+    "id": "acct_t1u2v3w4",
+    "entity_id": "ent_l1m2n3o4",
+    "status": "ACTIVE",
+    "updated_at": "2026-01-20T10:00:00.000Z"
+  }
+}
+```
+
+#### baas.account.closed
+
+A BaaS account has been closed.
+
+**Trigger:** The account is closed by the entity or the platform.
+
+```json
+{
+  "id": "evt_baas_acct_closed_001",
+  "event": "baas.account.closed",
+  "timestamp": "2026-02-01T10:00:00.000Z",
+  "data": {
+    "id": "acct_t1u2v3w4",
+    "entity_id": "ent_l1m2n3o4",
+    "status": "CLOSED",
+    "closure_reason": "Entity request",
+    "closed_at": "2026-02-01T10:00:00.000Z"
+  }
+}
+```
+
+### Transfer Events
+
+#### baas.transfer.created
+
+A new BaaS transfer has been initiated.
+
+**Trigger:** A transfer is created between accounts or to an external destination.
+
+```json
+{
+  "id": "evt_baas_xfer_created_001",
+  "event": "baas.transfer.created",
+  "timestamp": "2026-01-20T14:30:00.000Z",
+  "data": {
+    "id": "xfer_x1y2z3a4",
+    "status": "PENDING",
+    "amount": {
+      "value": 1000.00,
+      "currency": "BRL"
+    },
+    "source_account_id": "acct_t1u2v3w4",
+    "destination": {
+      "type": "EXTERNAL",
+      "bank_code": "001",
+      "account_number": "****5678"
+    },
+    "created_at": "2026-01-20T14:30:00.000Z"
+  }
+}
+```
+
+#### baas.transfer.completed
+
+A BaaS transfer has been completed successfully.
+
+**Trigger:** The transfer is confirmed by the banking provider.
+
+```json
+{
+  "id": "evt_baas_xfer_done_001",
+  "event": "baas.transfer.completed",
+  "timestamp": "2026-01-20T15:00:00.000Z",
+  "data": {
+    "id": "xfer_x1y2z3a4",
+    "status": "COMPLETED",
+    "amount": {
+      "value": 1000.00,
+      "currency": "BRL"
+    },
+    "source_account_id": "acct_t1u2v3w4",
+    "completed_at": "2026-01-20T15:00:00.000Z",
+    "created_at": "2026-01-20T14:30:00.000Z"
+  }
+}
+```
+
+#### baas.transfer.failed
+
+A BaaS transfer has failed.
+
+**Trigger:** The transfer is rejected by the banking provider or a processing error occurs.
+
+```json
+{
+  "id": "evt_baas_xfer_fail_001",
+  "event": "baas.transfer.failed",
+  "timestamp": "2026-01-20T15:00:00.000Z",
+  "data": {
+    "id": "xfer_x1y2z3a4",
+    "status": "FAILED",
+    "amount": {
+      "value": 1000.00,
+      "currency": "BRL"
+    },
+    "source_account_id": "acct_t1u2v3w4",
+    "error": {
+      "code": "INSUFFICIENT_BALANCE",
+      "message": "Account balance is insufficient for this transfer"
+    },
+    "created_at": "2026-01-20T14:30:00.000Z"
+  }
+}
+```
+
+#### baas.transfer.cancelled
+
+A BaaS transfer has been cancelled before completion.
+
+**Trigger:** The transfer is cancelled by the entity or the platform.
+
+```json
+{
+  "id": "evt_baas_xfer_cancel_001",
+  "event": "baas.transfer.cancelled",
+  "timestamp": "2026-01-20T14:45:00.000Z",
+  "data": {
+    "id": "xfer_x1y2z3a4",
+    "status": "CANCELLED",
+    "amount": {
+      "value": 1000.00,
+      "currency": "BRL"
+    },
+    "source_account_id": "acct_t1u2v3w4",
+    "cancellation_reason": "Entity request",
+    "cancelled_at": "2026-01-20T14:45:00.000Z",
+    "created_at": "2026-01-20T14:30:00.000Z"
+  }
+}
+```
+
+---
+
+## Event Reference Table
+
+| Event | Category | Description |
+|-------|----------|-------------|
+| `payment.created` | Payment | New payment initiated |
+| `payment.authorized` | Payment | Payment authorized, capture pending |
+| `payment.succeeded` | Payment | Payment completed successfully |
+| `payment.failed` | Payment | Payment processing failed |
+| `payment.declined` | Payment | Payment declined by provider/issuer |
+| `payment.cancelled` | Payment | Payment cancelled or voided |
+| `payment.expired` | Payment | Payment authorization expired |
+| `payment.refunded` | Payment | Full refund processed |
+| `payment.partially_refunded` | Payment | Partial refund processed |
+| `subscription.created` | Subscription | New subscription created |
+| `subscription.updated` | Subscription | Subscription configuration changed |
+| `subscription.paused` | Subscription | Subscription paused |
+| `subscription.resumed` | Subscription | Subscription resumed |
+| `subscription.cancelled` | Subscription | Subscription cancelled |
+| `subscription.payment.succeeded` | Subscription | Recurring payment succeeded |
+| `subscription.payment.failed` | Subscription | Recurring payment failed |
+| `subscription.retry_scheduled` | Subscription | Retry scheduled after failure |
+| `subscription.retry_succeeded` | Subscription | Retry attempt succeeded |
+| `subscription.retry_failed` | Subscription | Retry attempt failed |
+| `subscription.dunning.final_action` | Subscription | Final dunning action taken |
+| `payout.created` | Payout | Payout initiated |
+| `payout.succeeded` | Payout | Payout completed |
+| `payout.failed` | Payout | Payout failed |
+| `customer.created` | Customer | Customer record created |
+| `customer.updated` | Customer | Customer information updated |
+| `customer.deleted` | Customer | Customer record deleted |
+| `dispute.created` | Dispute | Chargeback dispute opened |
+| `dispute.updated` | Dispute | Dispute evidence/status updated |
+| `dispute.won` | Dispute | Dispute resolved for merchant |
+| `dispute.lost` | Dispute | Dispute resolved for cardholder |
+| `baas.entity.created` | BaaS | Entity created |
+| `baas.entity.updated` | BaaS | Entity updated |
+| `baas.onboarding.created` | BaaS | Onboarding initiated |
+| `baas.onboarding.updated` | BaaS | Onboarding status changed |
+| `baas.onboarding.approved` | BaaS | Onboarding approved |
+| `baas.onboarding.rejected` | BaaS | Onboarding rejected |
+| `baas.account.created` | BaaS | Account provisioned |
+| `baas.account.updated` | BaaS | Account updated |
+| `baas.account.closed` | BaaS | Account closed |
+| `baas.transfer.created` | BaaS | Transfer initiated |
+| `baas.transfer.completed` | BaaS | Transfer completed |
+| `baas.transfer.failed` | BaaS | Transfer failed |
+| `baas.transfer.cancelled` | BaaS | Transfer cancelled |
+
+## Best Practices
+
+- **Process idempotently.** Use the event `id` to detect and skip duplicate deliveries.
+- **Handle out-of-order events.** Use the `timestamp` field to ensure you process events in the correct sequence. A `payment.succeeded` event may arrive before `payment.created` in rare cases.
+- **Verify signatures.** Validate the webhook signature header to confirm events originate from Yuno.
+- **Respond quickly.** Return a `200` status within 5 seconds. Process events asynchronously if your logic takes longer.
+- **Log all events.** Store raw event payloads for debugging and audit purposes.
+- **Handle retries.** Yuno retries failed deliveries with exponential backoff. If your endpoint returns a non-2xx status, Yuno will retry up to 5 times.

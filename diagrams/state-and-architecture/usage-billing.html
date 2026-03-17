@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Usage-Based Billing</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  .node {
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a0a0a;
+    text-align: center;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+  }
+
+  .node.blue   { border-color: #2563eb; background: #ffffff; }
+  .node.red    { border-color: #dc2626; background: #fff1f2; }
+  .node.orange { border-color: #f97316; background: #fff7ed; }
+  .node.green  { border-color: #16a34a; background: #f0fdf4; }
+  .node.indigo { border-color: #6366f1; background: #eef2ff; }
+
+  .diamond {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    background: #ffffff;
+    border: 1.5px solid #64748b;
+    border-radius: 4px;
+    transform: translateX(-50%) rotate(45deg);
+    z-index: 5;
+  }
+  .diamond-label {
+    position: absolute;
+    font-size: 10px;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    z-index: 6;
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<!--
+  COORDINATE SYSTEM (Base 1 style top-down flowchart)
+
+  Nodes:
+    "Service Usage"         cx=770  top=80
+    Decision "Prepaid?"     cx=770  top=200
+    "Deduct Credits"(green) cx=400  top=340
+    "Accrue Overage"(orange)cx=1100 top=340
+    "End of Period"(indigo) cx=770  top=480
+    "Charge Base+Overages"  cx=770  top=600
+    Fork decision           cx=770  top=700
+    "Approved" (green)      cx=500  top=760
+    "Dunning" (red)         cx=1040 top=760
+-->
+
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.08)"/>
+    </filter>
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#94a3b8"/>
+    </marker>
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background card ──────────────────────────────────────── -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.6"/>
+
+  <!-- ── Dashed grid — vertical ─────────────────────────────── -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="190"  y1="48" x2="190"  y2="826"/>
+    <line x1="340"  y1="48" x2="340"  y2="826"/>
+    <line x1="490"  y1="48" x2="490"  y2="826"/>
+    <line x1="640"  y1="48" x2="640"  y2="826"/>
+    <line x1="790"  y1="48" x2="790"  y2="826"/>
+    <line x1="940"  y1="48" x2="940"  y2="826"/>
+    <line x1="1090" y1="48" x2="1090" y2="826"/>
+    <line x1="1240" y1="48" x2="1240" y2="826"/>
+    <line x1="1390" y1="48" x2="1390" y2="826"/>
+  </g>
+
+  <!-- ── Dashed grid — horizontal ──────────────────────────── -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="40" y1="135" x2="1500" y2="135"/>
+    <line x1="40" y1="285" x2="1500" y2="285"/>
+    <line x1="40" y1="435" x2="1500" y2="435"/>
+    <line x1="40" y1="585" x2="1500" y2="585"/>
+    <line x1="40" y1="735" x2="1500" y2="735"/>
+  </g>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CONNECTOR PATHS
+  ════════════════════════════════════════════════════════════════ -->
+
+  <!-- p0: Service Usage → Decision -->
+  <path id="p0" d="M 770,116 L 770,200"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p1a: Decision → Deduct Credits (Yes, left) -->
+  <path id="p1a" d="M 752,218 C 752,280 400,280 400,340"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p1b: Decision → Accrue Overage (No, right) -->
+  <path id="p1b" d="M 788,218 C 788,280 1100,280 1100,340"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p2a: Deduct Credits → End of Period (down-center) -->
+  <path id="p2a" d="M 400,376 C 400,430 770,430 770,480"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p2b: Accrue Overage → End of Period (down-center) -->
+  <path id="p2b" d="M 1100,376 C 1100,430 770,430 770,480"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p3: End of Period → Charge Base + Overages -->
+  <path id="p3" d="M 770,516 L 770,600"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p4: Charge → Fork decision -->
+  <path id="p4" d="M 770,636 L 770,700"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p5a: Fork → Approved (left) -->
+  <path id="p5a" d="M 752,718 C 680,740 500,740 500,760"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p5b: Fork → Dunning (right) -->
+  <path id="p5b" d="M 788,718 C 860,740 1040,740 1040,760"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ANIMATED SPARKS
+  ════════════════════════════════════════════════════════════════ -->
+  <g clip-path="url(#diagram-clip)">
+
+    <!-- p0: → Decision (blue) -->
+    <circle r="3.5" fill="#2563eb" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.0s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p0"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p1a: → Deduct Credits (green) -->
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="0.5s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p1a"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p1b: → Accrue Overage (orange) -->
+    <circle r="3.5" fill="#f97316" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="0.5s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p1b"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p2a: Deduct → End of Period (indigo) -->
+    <circle r="3.5" fill="#6366f1" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="1.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p2a"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p2b: Accrue → End of Period (indigo) -->
+    <circle r="3.5" fill="#6366f1" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="1.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p2b"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p3: End of Period → Charge (blue) -->
+    <circle r="3.5" fill="#2563eb" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.0s" begin="2.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p5a: → Approved (green) -->
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.2s" begin="3.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p5a"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p5b: → Dunning (red) -->
+    <circle r="3.5" fill="#dc2626" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.2s" begin="3.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p5b"/>
+      </animateMotion>
+    </circle>
+
+  </g>
+</svg>
+
+<!-- ════════════════════════════════════════════════════════════════
+     HTML NODES
+════════════════════════════════════════════════════════════════ -->
+
+<!-- Service Usage: cx=770, top=80 -->
+<div class="node blue" style="left:770px; top:80px;">Service Usage</div>
+
+<!-- Decision: Prepaid Credits? -->
+<div class="diamond" style="left:770px; top:200px;"></div>
+<div class="diamond-label" style="left:700px; top:206px;">Prepaid Credits?</div>
+
+<!-- Deduct Credits: cx=400, top=340 -->
+<div class="node green" style="left:400px; top:340px;">Deduct Credits</div>
+
+<!-- Accrue Overage: cx=1100, top=340 -->
+<div class="node orange" style="left:1100px; top:340px;">Accrue Overage</div>
+
+<!-- End of Period: cx=770, top=480 -->
+<div class="node indigo" style="left:770px; top:480px;">End of Period</div>
+
+<!-- Charge Base + Overages: cx=770, top=600 -->
+<div class="node blue" style="left:770px; top:600px;">Charge Base + Overages</div>
+
+<!-- Fork decision -->
+<div class="diamond" style="left:770px; top:700px;"></div>
+
+<!-- Approved: cx=500, top=760 -->
+<div class="node green" style="left:500px; top:760px;">Approved</div>
+
+<!-- Dunning: cx=1040, top=760 -->
+<div class="node red" style="left:1040px; top:760px;">Dunning</div>
+
+<!-- Yes/No labels -->
+<span style="position:absolute; left:540px; top:240px; font-size:10px; font-weight:600; color:#16a34a; font-family:'Inter',sans-serif;">Yes</span>
+<span style="position:absolute; left:950px; top:240px; font-size:10px; font-weight:600; color:#f97316; font-family:'Inter',sans-serif;">No</span>
+
+<span style="position:absolute; left:630px; top:722px; font-size:10px; font-weight:600; color:#16a34a; font-family:'Inter',sans-serif;">Approved</span>
+<span style="position:absolute; left:880px; top:722px; font-size:10px; font-weight:600; color:#dc2626; font-family:'Inter',sans-serif;">Declined</span>
+
+</div><!-- /diagram -->
+</div><!-- /scroll-wrapper -->
+</body>
+</html>

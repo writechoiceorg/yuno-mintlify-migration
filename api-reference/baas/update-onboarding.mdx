@@ -1,0 +1,47 @@
+---
+title: "Update Onboarding"
+description: "Submit additional documentation or update an existing onboarding"
+api: "PATCH https://api-sandbox.y.uno/v1/baas/entities/{entity_id}/onboardings/{onboarding_id}"
+---
+
+## Path parameters
+
+<ParamField path="entity_id" type="string" required>
+  The entity identifier.
+</ParamField>
+
+<ParamField path="onboarding_id" type="string" required>
+  The onboarding identifier.
+</ParamField>
+
+## Body
+
+Use this endpoint to submit additional documentation when the onboarding status is `PENDING_ADDITIONAL_DOCUMENTATION`.
+
+<ParamField body="documents" type="array">
+  Array of documents to submit. Each document includes:
+  - `type` — Document type (e.g., `PROOF_OF_ADDRESS`, `IDENTITY_DOCUMENT`)
+  - `file_name` — Name of the file
+  - `content_type` — MIME type (e.g., `image/jpeg`, `application/pdf`)
+  - `content` — Base64-encoded file content
+</ParamField>
+
+## Response
+
+Returns the updated onboarding object.
+
+<ResponseExample>
+```json 200 OK
+{
+  "id": "onb_990e8400-e29b-41d4-a716-446655440000",
+  "entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "yuno_account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "onboarding_type": "ONE_STEP",
+  "status": "UNDER_REVIEW",
+  "requirements": [],
+  "created_at": "2026-02-01T10:00:00Z",
+  "updated_at": "2026-02-02T09:00:00Z",
+  "expires_at": "2026-02-08T10:00:00Z"
+}
+```
+</ResponseExample>

@@ -1,0 +1,93 @@
+---
+title: "Error Codes"
+description: "Complete reference of Yuno API error codes with causes and resolutions"
+---
+
+## Overview
+
+When a Yuno API request fails, the response includes an error object with a `code` and `message` that identifies the specific issue. Use this reference to diagnose and resolve errors quickly.
+
+## Error Response Format
+
+```json
+{
+  "error": {
+    "code": "INVALID_FIELD",
+    "message": "customer.document is required for PIX",
+    "details": [
+      {
+        "field": "customer.document",
+        "reason": "required"
+      }
+    ]
+  }
+}
+```
+
+## Validation Errors (HTTP 400)
+
+| Error Code | Message | Cause | Resolution |
+|------------|---------|-------|------------|
+| `INVALID_FIELD` | Field validation failed | Missing or malformed required field | Check field name, type, and format against API docs |
+| `INVALID_FORMAT` | Value format is invalid | Incorrect data format (e.g., date, currency) | Use ISO 4217 for currency, ISO 8601 for dates |
+| `MISSING_FIELD` | Required field is missing | Payload lacks a mandatory field | Add the required field per endpoint specification |
+| `INVALID_ENUM` | Value not in allowed list | Field value not in accepted enum values | Check docs for valid enum values |
+| `INVALID_AMOUNT` | Amount validation failed | Amount is zero, negative, or exceeds limits | Ensure amount is positive and within provider limits |
+| `INVALID_CURRENCY` | Currency not supported | Currency code not recognized or not enabled | Use ISO 4217 codes; verify currency is enabled |
+| `INVALID_COUNTRY` | Country not supported | Country code not recognized | Use ISO 3166-1 alpha-2 country codes |
+| `INVALID_JSON` | Malformed JSON body | Request body is not valid JSON | Validate JSON syntax before sending |
+| `DUPLICATE_REQUEST` | Idempotency conflict | Same idempotency key with different payload | Use unique idempotency keys per request |
+
+## Authentication Errors (HTTP 401)
+
+| Error Code | Message | Cause | Resolution |
+|------------|---------|-------|------------|
+| `INVALID_API_KEY` | API key is invalid | Key does not exist or is revoked | Verify key in Dashboard > Settings > API Keys |
+| `MISSING_AUTH` | Authentication required | Missing auth headers | Include `public-api-key` and `private-secret-key` |
+| `EXPIRED_KEY` | API key has expired | Key was rotated and old key expired | Use the current active API key |
+
+## Authorization Errors (HTTP 403)
+
+| Error Code | Message | Cause | Resolution |
+|------------|---------|-------|------------|
+| `METHOD_NOT_ENABLED` | Payment method not available | Method not enabled for merchant/country | Enable in Dashboard > Connections |
+| `COUNTRY_NOT_ENABLED` | Country not configured | Merchant not configured for this country | Configure country in Dashboard |
+| `PERMISSION_DENIED` | Insufficient permissions | API key lacks required permissions | Check API key scope and role |
+
+## Not Found Errors (HTTP 404)
+
+| Error Code | Message | Cause | Resolution |
+|------------|---------|-------|------------|
+| `RESOURCE_NOT_FOUND` | Resource does not exist | Invalid ID or resource was deleted | Verify the resource ID is correct |
+| `SESSION_NOT_FOUND` | Checkout session not found | Session expired or invalid | Create a new checkout session |
+| `PAYMENT_NOT_FOUND` | Payment not found | Invalid payment ID | Verify the payment ID from creation response |
+
+## Conflict Errors (HTTP 409)
+
+| Error Code | Message | Cause | Resolution |
+|------------|---------|-------|------------|
+| `INVALID_STATE` | Invalid state transition | Action not allowed for current status | Check payment status before action |
+| `ALREADY_CAPTURED` | Payment already captured | Attempting to capture twice | Verify capture status before retrying |
+| `ALREADY_REFUNDED` | Payment already refunded | Full refund already processed | Check refund history |
+
+## Rate Limit Errors (HTTP 429)
+
+| Error Code | Message | Cause | Resolution |
+|------------|---------|-------|------------|
+| `RATE_LIMIT_EXCEEDED` | Too many requests | Request rate exceeds allowed limit | Implement exponential backoff retry logic |
+
+<Note>
+Rate limits are per API key. The `Retry-After` header indicates how many seconds to wait before retrying.
+</Note>
+
+## Server Errors (HTTP 500)
+
+| Error Code | Message | Cause | Resolution |
+|------------|---------|-------|------------|
+| `INTERNAL_ERROR` | Internal server error | Unexpected server issue | Retry with backoff; if persistent, contact support |
+| `PROVIDER_ERROR` | Provider communication failed | Downstream provider issue | Check [provider errors](/troubleshooting/provider-errors) |
+| `TIMEOUT` | Request timed out | Provider or network timeout | Retry; check provider status |
+
+<Warning>
+For persistent 500 errors, escalate to Yuno support with the request ID from the response headers (`x-request-id`).
+</Warning>

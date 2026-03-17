@@ -1,0 +1,186 @@
+---
+title: "The Report Object"
+description: "Represents a generated report for payments, transactions, reconciliation, or settlements."
+---
+
+The Report object represents an asynchronous report generation request. Reports are created with filters and parameters, processed in the background, and made available for download once complete. Use reports for reconciliation, accounting, and operational analysis.
+
+<Info>
+  **Asynchronous processing** — Reports are generated asynchronously. After creating a report, poll the [Get Report](/api-reference/reports/get) endpoint until `status` transitions to `SUCCEEDED`, then use the `download_url` to retrieve the file. Large reports may take several minutes to process.
+</Info>
+
+## Report Types
+
+Yuno supports eleven report types, each designed for a specific reconciliation or analysis use case:
+
+| Type | Description | Typical Use Case |
+|------|-------------|------------------|
+| `PAYMENT` | Payment-level summary including status, amounts, and metadata | Daily sales reconciliation, merchant dashboards |
+| `TRANSACTION` | Transaction-level detail including provider responses and retry attempts | Debugging declines, provider performance analysis |
+| `TRANSACTION_RECONCILIATION` | Matches Yuno transactions against provider settlement records | Finance reconciliation, dispute resolution |
+| `SETTLEMENT` | Provider settlement batches with net amounts and fees | Accounting, cash flow management |
+| `COMMUNICATIONS` | Webhook and notification delivery logs | Debugging webhook failures, delivery monitoring |
+| `FRAUD_TRANSACTIONS` | Fraud screening results and risk assessment data | Fraud analysis, risk rule tuning |
+| `PAYOUTS` | Payout transaction data including beneficiary and withdrawal details | Payout reconciliation, beneficiary audits |
+| `FEES` | Processing fees charged per transaction | Cost analysis, provider fee comparison |
+| `AGENDA` | Schedule of expected future settlements and receivables | Cash flow forecasting, receivables planning |
+| `SALES_CONCILIATION` | Matches sales records with provider confirmations | Sales vs. provider reconciliation |
+| `ADVANCEMENTS` | Early receipt of future receivables from providers | Advancement tracking, fee analysis |
+
+See [Reports Fields](/api-reference/reports/fields) for the complete column reference for each report type.
+
+## Object Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier of the report (UUID).
+
+  Example: `rpt_e1f2a3b4-c5d6-7890-ef12-3456789abcde`
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  The report type, determining the data schema and available columns.
+
+  Values: `PAYMENT`, `TRANSACTION`, `TRANSACTION_RECONCILIATION`, `SETTLEMENT`, `COMMUNICATIONS`, `FRAUD_TRANSACTIONS`, `PAYOUTS`, `FEES`, `AGENDA`, `SALES_CONCILIATION`, `ADVANCEMENTS`
+
+  Example: `TRANSACTION`
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current report generation status.
+
+  Values: `PROCESSING`, `SUCCEEDED`, `FAILED`
+
+  - `PROCESSING` — Report is being generated. Poll until status changes.
+  - `SUCCEEDED` — Report is ready for download via `download_url`.
+  - `FAILED` — Generation failed (invalid filters, internal error). Check `date_range` and `filters` for issues.
+
+  Example: `SUCCEEDED`
+</ResponseField>
+
+<ResponseField name="date_range" type="object">
+  The time window for data included in the report.
+  <Expandable title="date_range">
+    <ResponseField name="from" type="string">
+      Start of the date range (ISO 8601, inclusive).
+
+      Example: `2026-03-01T00:00:00.000Z`
+    </ResponseField>
+    <ResponseField name="to" type="string">
+      End of the date range (ISO 8601, exclusive).
+
+      Example: `2026-03-10T00:00:00.000Z`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="filters" type="object">
+  Optional filters applied to narrow the report data. Available filters vary by report type.
+  <Expandable title="filters">
+    <ResponseField name="payment_status" type="array">
+      Filter by payment statuses. Applicable to `PAYMENT` and `TRANSACTION` types.
+
+      Example: `["SUCCEEDED", "REFUNDED"]`
+    </ResponseField>
+    <ResponseField name="currency" type="array">
+      Filter by ISO 4217 currency codes.
+
+      Example: `["USD", "EUR"]`
+    </ResponseField>
+    <ResponseField name="country" type="array">
+      Filter by ISO 3166-1 alpha-2 country codes.
+
+      Example: `["US"]`
+    </ResponseField>
+    <ResponseField name="payment_method_type" type="array">
+      Filter by payment method types.
+
+      Example: `["CARD", "BANK_TRANSFER"]`
+    </ResponseField>
+    <ResponseField name="provider" type="array">
+      Filter by provider names.
+
+      Example: `["ADYEN", "STRIPE"]`
+    </ResponseField>
+    <ResponseField name="merchant_order_id" type="string">
+      Filter by a specific merchant order identifier.
+
+      Example: `order-20260301-001`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="columns" type="array">
+  The columns included in the report output. If not specified at creation, all available columns for the report type are included.
+
+  Example: `["payment_id", "status", "amount", "currency", "provider", "created_at"]`
+</ResponseField>
+
+<ResponseField name="download_url" type="string">
+  Pre-signed URL to download the report file. Only present when `status` is `SUCCEEDED`. The URL expires after 24 hours.
+
+  Example: `https://reports.y.uno/downloads/rpt_e1f2a3b4-c5d6-7890-ef12-3456789abcde.csv?token=eyJ...`
+</ResponseField>
+
+<ResponseField name="format" type="string">
+  The file format of the generated report.
+
+  Values: `CSV`, `ZIP`
+
+  - `CSV` — Single CSV file. Best for smaller reports.
+  - `ZIP` — Compressed archive containing the CSV. Used automatically for large reports.
+
+  Example: `CSV`
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the report was requested.
+
+  Example: `2026-03-10T09:00:00.000Z`
+</ResponseField>
+
+## Example
+
+```json
+{
+  "id": "rpt_e1f2a3b4-c5d6-7890-ef12-3456789abcde",
+  "type": "TRANSACTION",
+  "status": "SUCCEEDED",
+  "date_range": {
+    "from": "2026-03-01T00:00:00.000Z",
+    "to": "2026-03-10T00:00:00.000Z"
+  },
+  "filters": {
+    "payment_status": ["SUCCEEDED", "REFUNDED"],
+    "currency": ["USD"],
+    "country": ["US"],
+    "payment_method_type": ["CARD", "BANK_TRANSFER"],
+    "provider": null,
+    "merchant_order_id": null
+  },
+  "columns": [
+    "payment_id",
+    "transaction_id",
+    "type",
+    "status",
+    "amount",
+    "currency",
+    "provider",
+    "response_code",
+    "created_at"
+  ],
+  "download_url": "https://reports.y.uno/downloads/rpt_e1f2a3b4-c5d6-7890-ef12-3456789abcde.csv?token=eyJ...",
+  "format": "CSV",
+  "created_at": "2026-03-10T09:00:00.000Z"
+}
+```
+
+## Related Endpoints
+
+- [Create Report](/api-reference/reports/create) — `POST /v1/reports`
+- [Get Report](/api-reference/reports/get) — `GET /v1/reports/{report_id}`
+- [List Reports](/api-reference/reports/list) — `GET /v1/reports`
+- [Download Report](/api-reference/reports/download) — `GET /v1/reports/{report_id}/download`
+
+## Related Concepts
+
+- [Reports](/guides/reports/overview) — How to generate and use reports in Yuno

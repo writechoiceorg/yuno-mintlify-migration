@@ -1,0 +1,226 @@
+---
+title: "Payment Methods"
+description: "Supported payment methods, enrollment, and payment-method-specific requirements"
+---
+
+## Overview
+
+Yuno supports a wide range of payment methods across regions. The available methods for a given transaction depend on the country, currency, and your merchant configuration in the Dashboard.
+
+## Supported Payment Method Types
+
+### Global
+
+| Type | Description | Examples | Regions |
+|------|-------------|----------|---------|
+| `CARD` | Credit and debit cards | Visa, Mastercard, Amex, Discover, JCB, UnionPay | Global |
+| `BANK_TRANSFER` | Generic bank transfer | Varies by country | Multiple |
+| `WALLET` | Digital wallets | Apple Pay, Google Pay, regional wallets | Global |
+| `BNPL` | Buy now, pay later | Klarna, Afterpay, Zip, regional providers | Multiple |
+
+### Americas
+
+| Type | Description | Examples | Regions |
+|------|-------------|----------|---------|
+| `PIX` | Instant bank transfer via QR code | PIX (Central Bank of Brazil) | BR |
+| `BOLETO` | Printable bank slip / voucher | Boleto Bancário | BR |
+| `OXXO` | Cash voucher at convenience stores | OXXO (20,000+ locations) | MX |
+| `SPEI` | Interbank transfer (instant) | SPEI (Banco de México) | MX |
+| `PSE` | Online bank transfer | PSE (ACH Colombia) | CO |
+| `EFECTY` | Cash voucher at retail stores | Efecty, Baloto | CO |
+| `WEBPAY` | Debit/credit via Transbank | Webpay Plus | CL |
+| `PAGO_EFECTIVO` | Cash voucher / bank transfer | PagoEfectivo | PE |
+| `RAPIPAGO` | Cash voucher at retail stores | Rapipago, PagoFácil | AR |
+
+### Europe
+
+| Type | Description | Examples | Regions |
+|------|-------------|----------|---------|
+| `SEPA_DIRECT_DEBIT` | EUR bank-to-bank direct debit | SEPA (36 countries) | EU |
+| `IDEAL` | Bank transfer (Netherlands) | iDEAL (~60% of Dutch e-commerce) | NL |
+| `BANCONTACT` | Debit card network (Belgium) | Bancontact / Mister Cash | BE |
+| `SOFORT` | Real-time bank transfer | Sofort / Klarna Pay Now | DE, AT, CH |
+| `GIROPAY` | Online banking transfer | giropay (Germany) | DE |
+| `MULTIBANCO` | Bank reference payment | Multibanco (Portugal) | PT |
+| `MBWAY` | Mobile payment | MB WAY (Portugal) | PT |
+
+### Asia-Pacific
+
+| Type | Description | Examples | Regions |
+|------|-------------|----------|---------|
+| `UPI` | Unified Payments Interface | Google Pay UPI, PhonePe, Paytm | IN |
+| `NETBANKING` | Online banking redirect | Major Indian banks | IN |
+| `GRABPAY` | Super-app digital wallet | GrabPay | SG, MY, PH |
+| `DANA` | Digital wallet (Indonesia) | DANA | ID |
+| `OVO` | Digital wallet (Indonesia) | OVO | ID |
+| `PROMPTPAY` | Instant transfer (Thailand) | PromptPay QR | TH |
+
+<Tip>
+See the [Payment Methods by Region](/guides/payment-methods/by-region) guide for detailed requirements per country, or the [Coverage page](/reference/coverage) for provider availability.
+</Tip>
+
+## Payment-Method-Specific Requirements
+
+Different payment methods require different fields in the payment request.
+
+### Cards
+
+```json
+{
+  "payment_method": {
+    "type": "CARD",
+    "card": {
+      "number": "4111111111111111",
+      "expiration_month": "12",
+      "expiration_year": "2028",
+      "security_code": "123",
+      "holder_name": "JOHN SMITH"
+    }
+  }
+}
+```
+
+<Warning>
+  Sending raw card data via the API requires PCI DSS compliance. Use the Yuno SDK with tokenization to avoid PCI scope.
+</Warning>
+
+### PIX (Brazil)
+
+```json
+{
+  "payment_method": { "type": "PIX" },
+  "country": "BR",
+  "amount": { "currency": "BRL", "value": 100.00 },
+  "customer": {
+    "document": {
+      "document_type": "CPF",
+      "document_number": "12345678901"
+    }
+  }
+}
+```
+
+<Note>
+  PIX requires `customer.document` with a valid CPF (individuals) or CNPJ (businesses). The response includes a QR code and a copy-paste code for the customer.
+</Note>
+
+### Boleto (Brazil)
+
+```json
+{
+  "payment_method": { "type": "BOLETO" },
+  "country": "BR",
+  "amount": { "currency": "BRL", "value": 200.00 },
+  "customer": {
+    "document": {
+      "document_type": "CPF",
+      "document_number": "12345678901"
+    },
+    "email": "customer@example.com"
+  }
+}
+```
+
+Boleto payments are asynchronous -- the customer receives a bank slip and pays at a bank branch or online banking. Use [webhooks](/core-concepts/webhooks) to receive the payment confirmation.
+
+### SEPA Direct Debit (Europe)
+
+```json
+{
+  "payment_method": { "type": "SEPA_DIRECT_DEBIT" },
+  "country": "DE",
+  "amount": { "currency": "EUR", "value": 49.99 },
+  "customer": {
+    "email": "kunde@example.com",
+    "iban": "DE89370400440532013000"
+  }
+}
+```
+
+<Note>
+SEPA Direct Debit covers 36 European countries using EUR. The customer's IBAN is required. Mandates and settlement follow the SEPA Core scheme (typically D+1 settlement).
+</Note>
+
+### iDEAL (Netherlands)
+
+```json
+{
+  "payment_method": { "type": "IDEAL" },
+  "country": "NL",
+  "amount": { "currency": "EUR", "value": 75.00 },
+  "customer": {
+    "email": "klant@example.com"
+  }
+}
+```
+
+iDEAL redirects the customer to their Dutch bank to authorize the transfer. The response includes a `redirect_url`. Use [webhooks](/core-concepts/webhooks) for definitive payment confirmation.
+
+### UPI (India)
+
+```json
+{
+  "payment_method": { "type": "UPI" },
+  "country": "IN",
+  "amount": { "currency": "INR", "value": 999.00 },
+  "customer": {
+    "email": "customer@example.com",
+    "vpa": "customer@upi"
+  }
+}
+```
+
+<Note>
+UPI requires a Virtual Payment Address (VPA), e.g., `customer@upi` or `customer@paytm`. The customer receives a payment request in their UPI app and authorizes it with their PIN.
+</Note>
+
+### Digital Wallets (Global)
+
+```json
+{
+  "payment_method": {
+    "type": "WALLET",
+    "wallet_type": "APPLE_PAY",
+    "token": "wallet-token-from-sdk"
+  },
+  "country": "US",
+  "amount": { "currency": "USD", "value": 29.99 },
+  "customer": {
+    "email": "customer@example.com"
+  }
+}
+```
+
+Digital wallets (Apple Pay, Google Pay, GrabPay) require SDK-based tokenization. The wallet token is obtained client-side and passed to the API. See [Digital Wallets](/features/digital-wallets/overview) for setup guides.
+
+## Enrolling (Vaulting) Payment Methods
+
+To save a payment method for future use, include `"vaulted_token": true` in the payment request along with a `customer_id`. See [Tokens](/core-concepts/tokens) for details.
+
+## Listing Enrolled Methods
+
+Retrieve all saved payment methods for a customer:
+
+```bash
+curl -X GET https://api-sandbox.y.uno/v1/customers/{customer_id}/payment-methods \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code"
+```
+
+The response includes masked details (last 4 digits for cards, masked keys for PIX) and the vaulted token ID for use in one-click payments.
+
+## Checking Available Methods
+
+The checkout session response includes `available_payment_methods`, which lists methods available for the given country, currency, and merchant configuration:
+
+```json
+{
+  "checkout_session": "cs_abc123",
+  "available_payment_methods": ["CARD", "PIX", "BOLETO"]
+}
+```
+
+<Note>
+  If a payment method you expect is missing from this list, verify it is enabled in **Dashboard > Settings > Payment Methods** for the target country.
+</Note>

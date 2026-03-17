@@ -1,0 +1,116 @@
+---
+title: "Web SDK Changelog"
+description: "Release notes for @yuno-payments/sdk-web"
+---
+
+## Overview
+
+Release history for the Yuno Web SDK (`@yuno-payments/sdk-web`). Install or update via npm:
+
+```bash
+npm install @yuno-payments/sdk-web@latest
+```
+
+---
+
+## v2.5.0 (February 2026)
+
+### New Features
+- **Secure Fields styling API v2:** Full CSS property support including `::placeholder`, `:focus`, and `:hover` pseudo-selectors
+- **Field-level validation events:** `onFieldChange` now includes `isValid`, `isEmpty`, and `cardBrand` properties
+- **Auto-detect card brand:** Card number field emits brand detection as the user types
+
+### Improvements
+- Reduced SDK bundle size by 18% (tree-shaking improvements)
+- Improved 3DS challenge iframe rendering on mobile Safari
+
+### Bug Fixes
+- Fixed `mountLiteCheckout` failing silently when `elementSelector` contains special characters
+- Resolved memory leak when calling `unmount()` and re-mounting multiple times
+
+---
+
+## v2.4.0 (January 2026)
+
+### New Features
+- **Dark mode support:** Pass `theme.mode: 'dark'` to automatically adjust all UI elements
+- **Language detection:** SDK auto-detects browser locale and sets language (overridable)
+- **Enrollment widget:** `mountEnrollment()` method for card vaulting flows
+
+### Improvements
+- 3DS challenge popup now respects `prefers-color-scheme` media query
+- Improved accessibility: ARIA labels, keyboard navigation, screen reader support
+
+### Bug Fixes
+- Fixed race condition when `continuePayment()` is called before SDK initialization completes
+- Resolved CORS preflight issue with certain CDN configurations
+
+---
+
+## v2.3.0 (December 2025)
+
+### Bug Fixes
+- Fixed 3DS challenge iframe not displaying on iOS 17+ when content blockers are enabled
+- Resolved TypeScript type definitions for `onPaymentSuccess` callback data
+- Fixed `generateToken()` rejecting valid Amex card numbers
+
+---
+
+## v2.2.0 (November 2025)
+
+### New Features
+- **Installment selector:** Full Checkout and Lite Checkout display installment options for supported countries
+- **Payment method filtering:** Pass `allowedPaymentMethods` to limit displayed methods
+
+```javascript
+yuno.mountLiteCheckout({
+  elementSelector: '#form',
+  allowedPaymentMethods: ['CARD', 'PIX'],
+});
+```
+
+### Improvements
+- Improved loading performance: SDK initialization is 40% faster
+- Added TypeScript generics for callback types
+
+---
+
+## v2.1.0 (October 2025)
+
+### New Features
+- **Compact mode:** Reduce checkout form height with `layout.compactMode: true`
+- **Custom fonts:** Support for Google Fonts and custom `@font-face` declarations in theme
+
+### Bug Fixes
+- Fixed `onPaymentError` not firing for network timeouts
+- Resolved z-index conflict with common CSS frameworks (Bootstrap, Tailwind)
+
+---
+
+## v2.0.0 (September 2025)
+
+### Features
+- Built-in TypeScript support via `@yuno-payments/sdk-web-types`
+- Improved error messages for invalid API keys and sessions
+
+### Current API
+
+The SDK uses the following initialization and checkout pattern:
+
+```javascript
+// Initialize with public API key (string argument)
+const yuno = Yuno.initialize('public-key');
+
+// Configure and mount checkout
+yuno.startCheckout({
+  checkoutSession: 'id',
+  countryCode: 'BR',
+  language: 'en',
+  elementSelector: '#form',
+  yunoCreatePayment: async (oneTimeToken, tokenWithInfo) => {
+    // Create payment server-side, then continue
+    yuno.continuePayment();
+  },
+});
+yuno.mountCheckout();
+```

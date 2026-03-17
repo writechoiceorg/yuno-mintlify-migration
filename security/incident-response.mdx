@@ -1,0 +1,364 @@
+---
+title: "Incident Response Playbook"
+description: "Procedures for handling security incidents, data breaches, and fraud spikes in your Yuno payment integration."
+---
+
+
+## Overview
+
+A well-defined incident response plan is critical for any organization processing payments. This playbook provides structured procedures for identifying, containing, and recovering from security incidents affecting your Yuno integration, including card data compromises, data breaches, and fraud spikes.
+
+<Warning>
+  This playbook is a guide for your internal incident response procedures. You must adapt it to your organization's specific requirements, regulatory obligations, and risk profile. Consult legal counsel for jurisdiction-specific breach notification requirements.
+</Warning>
+
+## Incident Severity Classification
+
+Classify every incident immediately upon detection to determine the appropriate response level.
+
+| Severity | Definition | Response Time | Examples |
+|----------|-----------|---------------|----------|
+| **P1 - Critical** | Active data breach, mass fraud, or complete payment system failure | Immediate (< 15 min) | Card data exfiltration, API key compromise, payment system down |
+| **P2 - High** | Significant security event with potential data exposure or major financial impact | < 1 hour | Unusual spike in declines, suspicious API access patterns, provider outage |
+| **P3 - Medium** | Security concern requiring investigation, limited immediate impact | < 4 hours | Single account compromise, minor configuration vulnerability, elevated chargeback rate |
+| **P4 - Low** | Informational or minor issue with no immediate security impact | < 24 hours | Failed login attempts, minor logging gaps, policy review needed |
+
+### Severity Escalation Triggers
+
+A P3 or P4 incident must be escalated to a higher severity if any of these conditions are met:
+
+- Evidence of data exfiltration is discovered
+- The scope of affected accounts exceeds initial estimates by 10x or more
+- A regulatory notification deadline is at risk
+- Media or public attention is imminent
+
+## Card Compromise Procedures
+
+### Immediate Steps (First 30 Minutes)
+
+<Steps>
+  <Step title="Contain the exposure">
+    Revoke compromised API keys immediately via **Dashboard > Settings > API Keys**. Generate new keys and update all integration endpoints. If the compromise involves Yuno-issued tokens, contact Yuno support to invalidate the affected token pool.
+  </Step>
+  <Step title="Preserve evidence">
+    Before making any system changes beyond containment, capture the current state:
+    - Export application and access logs for the past 72 hours
+    - Screenshot Dashboard activity showing anomalous transactions
+    - Record the timeline of events as known at this point
+    - Do not restart or wipe servers involved in the incident
+  </Step>
+  <Step title="Assess scope">
+    Determine the extent of the compromise:
+    - Number of cards or tokens potentially exposed
+    - Time window of unauthorized access
+    - Which systems, endpoints, or providers are affected
+    - Whether customer PII beyond card data was accessed
+  </Step>
+  <Step title="Notify Yuno">
+    Contact Yuno's security team immediately using the escalation template below. Yuno will coordinate with affected payment providers and card networks as needed.
+  </Step>
+</Steps>
+
+### Containment Checklist
+
+| Action | Owner | Completed |
+|--------|-------|-----------|
+| Revoke and rotate all API keys | Engineering | [ ] |
+| Disable compromised payment methods | Operations | [ ] |
+| Block suspicious IP addresses at the firewall | Infrastructure | [ ] |
+| Enable enhanced logging on all payment endpoints | Engineering | [ ] |
+| Review and restrict Dashboard user access | Security | [ ] |
+| Notify payment providers of potential compromise | Security / Yuno | [ ] |
+
+### Investigation Phase
+
+After containment, conduct a thorough investigation:
+
+1. **Access log analysis**: Review API access logs for unauthorized calls, unusual patterns, or access from unexpected IP addresses or geolocations.
+2. **Transaction review**: Identify transactions during the compromise window. Flag those with anomalous characteristics (unusual amounts, high velocity, new countries).
+3. **Credential audit**: Determine how credentials were compromised (phishing, code repository exposure, insider threat, application vulnerability).
+4. **Scope determination**: Establish the definitive list of affected cards, customers, and data elements.
+
+<Note>
+  If you process more than 6 million transactions annually (PCI Level 1), you are required to engage a PCI Forensic Investigator (PFI) for any confirmed card data breach. Contact your acquiring bank for PFI recommendations.
+</Note>
+
+## Data Breach Notification Requirements
+
+Notification requirements vary by jurisdiction. The following are the primary regulations applicable to Yuno merchants.
+
+### GDPR (European Union / EEA)
+
+| Requirement | Details |
+|-------------|---------|
+| **Supervisory authority notification** | Within **72 hours** of becoming aware of the breach |
+| **Data subject notification** | "Without undue delay" if high risk to individuals |
+| **Content requirements** | Nature of breach, categories and number of data subjects, likely consequences, measures taken |
+| **Documentation** | All breaches must be documented regardless of notification requirement |
+
+<Warning>
+  The 72-hour clock starts when you become **aware** of the breach, not when the breach occurred. Delayed detection does not extend the notification window. Failure to notify within 72 hours requires a written explanation for the delay.
+</Warning>
+
+### LGPD (Brazil)
+
+| Requirement | Details |
+|-------------|---------|
+| **ANPD notification** | Within a "reasonable timeframe" (ANPD recommends 2 business days) |
+| **Data subject notification** | Required when the breach may cause significant risk or harm |
+| **Content requirements** | Description of affected data, risks, measures adopted, recommendation for data subjects |
+| **Data Protection Officer** | Must be involved in breach assessment and notification |
+
+### PCI DSS Requirements
+
+| Requirement | Details |
+|-------------|---------|
+| **Forensic investigation** | Engage a PCI Forensic Investigator (PFI) for confirmed cardholder data breaches |
+| **Card network notification** | Notify Visa and Mastercard through your acquiring bank within 24 hours |
+| **CAMS/TC-40 reports** | Monitor for fraud reports on potentially compromised cards |
+| **Re-certification** | May be required to undergo on-site PCI assessment after a breach |
+
+### Notification Timeline Summary
+
+| Regulation | Notify Authority | Notify Affected Individuals | Notify Card Networks |
+|-----------|-----------------|----------------------------|---------------------|
+| GDPR | 72 hours | Without undue delay (if high risk) | N/A |
+| LGPD | ~2 business days | When significant risk exists | N/A |
+| PCI DSS | N/A (via acquirer) | Per applicable privacy law | 24 hours (via acquirer) |
+
+## Forensics and Logging Requirements
+
+### What to Preserve
+
+Maintain the following records with their integrity intact during and after an incident:
+
+| Log Type | Minimum Retention | Purpose |
+|----------|------------------|---------|
+| API access logs | 12 months | Identify unauthorized API calls and access patterns |
+| Authentication logs | 12 months | Track credential usage, failed attempts, and privilege changes |
+| Transaction logs | 7 years | Regulatory requirement; trace fraudulent transactions |
+| Network/firewall logs | 6 months | Identify unauthorized network access and data exfiltration |
+| Application error logs | 6 months | Detect exploitation attempts and application-level attacks |
+| Dashboard audit trail | 12 months | Track configuration changes and user actions |
+
+### Chain of Custody
+
+When preserving evidence for a forensic investigation:
+
+1. **Create forensic copies**: Use write-blocked disk images rather than working on original systems.
+2. **Hash all evidence**: Generate SHA-256 hashes of all collected evidence at the time of collection.
+3. **Document handling**: Record who accessed evidence, when, and what actions were taken.
+4. **Secure storage**: Store evidence in a restricted-access location separate from production systems.
+5. **Legal hold**: Notify your legal team to implement litigation hold on relevant data if regulatory action is possible.
+
+<Info>
+  Yuno retains its own audit logs for API access, transaction processing, and Dashboard activity. Contact Yuno support to request relevant logs for your account during an investigation.
+</Info>
+
+## Fraud Spike Escalation Procedures
+
+### Detection Thresholds
+
+Monitor these metrics continuously and trigger escalation when thresholds are exceeded:
+
+| Metric | Normal Range | Warning Threshold | Critical Threshold |
+|--------|-------------|-------------------|-------------------|
+| Chargeback rate | < 0.5% | 0.5% - 0.9% | > 0.9% |
+| Decline rate (sudden change) | Baseline +/- 5% | > 15% increase | > 30% increase |
+| Fraud-flagged transactions | < 1% | 1% - 3% | > 3% |
+| Velocity (txn per card/hour) | < 3 | 3 - 10 | > 10 |
+| Geographic anomalies | Baseline countries | New country > 5% volume | New country > 15% volume |
+
+### Escalation Matrix
+
+| Threshold Reached | Action | Owner | Timeline |
+|-------------------|--------|-------|----------|
+| **Warning** | Investigate root cause, enable enhanced monitoring | Fraud Analyst | Same business day |
+| **Critical** | Implement temporary controls (velocity limits, country blocks), notify Yuno | Fraud Manager | Immediate |
+| **Sustained Critical (>24h)** | Engage Yuno support, consider pausing affected payment methods | VP Engineering / CISO | Immediate |
+
+### Temporary Fraud Controls via Yuno
+
+During a fraud spike, you can implement these controls through Yuno:
+
+1. **Enable 3DS on all transactions**: Force challenge flow via the `three_d_secure.enabled: true` parameter.
+2. **Restrict countries**: Limit transactions to expected countries via Dashboard routing rules.
+3. **Lower transaction limits**: Reduce maximum transaction amounts temporarily.
+4. **Block BIN ranges**: If specific card BINs are associated with fraud, request BIN-level blocks through Yuno support.
+
+## Provider Failover During Incidents
+
+If an incident is linked to a specific payment provider, implement failover:
+
+<Steps>
+  <Step title="Identify the affected provider">
+    Use **Dashboard > Transactions** to filter by provider and confirm which provider is experiencing issues.
+  </Step>
+  <Step title="Activate backup provider">
+    Navigate to **Dashboard > Routing > Rules** and adjust routing priority to direct traffic to your backup provider. Ensure the backup provider supports the same payment methods and countries.
+  </Step>
+  <Step title="Monitor the switchover">
+    Watch approval rates and error rates on the backup provider for the first 30 minutes to ensure it handles the additional volume without degradation.
+  </Step>
+  <Step title="Coordinate with Yuno">
+    Notify Yuno support of the provider issue and your failover action so they can investigate on their end and advise on resolution timing.
+  </Step>
+</Steps>
+
+<Note>
+  Provider failover is only effective if you have pre-configured backup providers in your Yuno routing rules. Configure at least one backup provider for each critical payment method before an incident occurs.
+</Note>
+
+## Communication Templates
+
+### Internal Escalation Template
+
+```
+SUBJECT: [P1/P2/P3/P4] Security Incident - [Brief Description]
+SEVERITY: [P1-P4]
+DETECTED: [ISO 8601 timestamp]
+DETECTED BY: [Person/System]
+
+SUMMARY:
+[2-3 sentence description of the incident]
+
+SCOPE:
+- Affected systems: [List]
+- Estimated affected records: [Number or range]
+- Time window: [Start - End or ongoing]
+
+CURRENT STATUS:
+- Containment: [Complete / In Progress / Not Started]
+- Investigation: [Complete / In Progress / Not Started]
+
+IMMEDIATE ACTIONS TAKEN:
+1. [Action taken]
+2. [Action taken]
+
+NEXT STEPS:
+1. [Planned action with owner and timeline]
+2. [Planned action with owner and timeline]
+
+ESCALATION NEEDED: [Yes/No - specify what]
+```
+
+### Yuno Support Escalation Template
+
+```
+SUBJECT: [URGENT/HIGH] Security Incident - Merchant [Anonymized ID]
+ENVIRONMENT: [Sandbox / Production]
+MERCHANT ID: [Your Merchant ID]
+TIMESTAMP: [ISO 8601 - when incident was detected]
+
+INCIDENT TYPE: [Card Compromise / Fraud Spike / Provider Issue / Data Breach]
+
+DESCRIPTION:
+[Detailed description of the incident]
+
+AFFECTED SCOPE:
+- Transaction volume affected: [Number]
+- Time window: [Start - End]
+- Payment methods: [List]
+- Countries: [List]
+
+EVIDENCE:
+- [API logs, transaction IDs, error codes]
+
+ACTIONS TAKEN:
+1. [Action taken]
+
+REQUEST:
+[What you need from Yuno - log access, provider coordination, token invalidation]
+```
+
+### Customer Notification Template (Data Breach)
+
+```
+Subject: Important Security Notice Regarding Your Payment Information
+
+Dear [Customer Name],
+
+We are writing to inform you of a security incident that may have
+affected your payment information used with [Merchant Name].
+
+WHAT HAPPENED:
+[Brief, clear description of the incident]
+
+WHAT INFORMATION WAS INVOLVED:
+[Specific data elements affected]
+
+WHAT WE ARE DOING:
+[Steps taken to address the incident]
+
+WHAT YOU CAN DO:
+- Monitor your card statements for unauthorized charges
+- Report suspicious activity to your card issuer
+- [Additional specific steps]
+
+Contact us at [support email] if you have questions.
+
+[Merchant Name] Security Team
+```
+
+## Post-Incident Review
+
+Conduct a post-incident review within 5 business days of incident closure.
+
+### Review Agenda
+
+| Topic | Questions to Address |
+|-------|---------------------|
+| **Detection** | How was the incident detected? Could we have detected it sooner? |
+| **Response** | Was the response timely and effective? Were procedures followed? |
+| **Communication** | Were the right people notified at the right time? |
+| **Impact** | What was the actual financial, operational, and reputational impact? |
+| **Root cause** | What was the underlying cause? Was it preventable? |
+| **Improvements** | What specific changes will prevent recurrence? |
+
+### Review Deliverables
+
+1. **Incident timeline**: Minute-by-minute account from detection to resolution.
+2. **Root cause analysis**: Technical and process factors that contributed to the incident.
+3. **Action items**: Specific, assigned, and time-bound remediation tasks.
+4. **Updated procedures**: Revised playbook sections based on lessons learned.
+5. **Metrics update**: Adjust detection thresholds if current thresholds missed the incident.
+
+## Compliance Documentation Requirements
+
+Maintain these records for regulatory and audit purposes:
+
+| Document | Retention Period | Purpose |
+|----------|-----------------|---------|
+| Incident response plan (this document) | Current + 3 years of prior versions | Demonstrate preparedness |
+| Incident reports | 7 years | Regulatory and legal compliance |
+| Breach notifications sent | 7 years | Prove notification compliance |
+| Forensic investigation reports | 7 years | PCI DSS and regulatory requirement |
+| Post-incident review reports | 5 years | Continuous improvement evidence |
+| Training records | 3 years | Demonstrate staff preparedness |
+
+## Emergency Contacts and Escalation Paths
+
+Configure these contacts before an incident occurs:
+
+| Role | Contact | When to Engage |
+|------|---------|---------------|
+| **Yuno Support** | support@y.uno or Dashboard support chat | All payment-related incidents |
+| **Yuno Security** | security@y.uno | Confirmed or suspected data breaches |
+| **Your Acquiring Bank** | [Configure internally] | Card data breaches, network notifications |
+| **PCI Forensic Investigator** | [Pre-select a PFI] | Confirmed cardholder data compromise |
+| **Legal Counsel** | [Configure internally] | Breach notification decisions, regulatory response |
+| **GDPR Supervisory Authority** | [Identify your relevant authority] | Personal data breaches affecting EU residents |
+| **ANPD (Brazil)** | [ANPD contact] | Personal data breaches affecting Brazilian residents |
+
+<Warning>
+  Do not wait until an incident occurs to identify your PCI Forensic Investigator or legal counsel. Pre-establish these relationships so you can engage them immediately when needed.
+</Warning>
+
+## Best Practices
+
+- **Test your incident response plan** at least annually with tabletop exercises simulating P1 and P2 scenarios.
+- **Maintain a 24/7 on-call rotation** for engineering and security teams with access to Yuno Dashboard and API key management.
+- **Pre-configure provider failover** routes in Yuno so you can switch providers within minutes, not hours.
+- **Automate detection**: Use Yuno webhooks and your monitoring stack to alert on anomalous transaction patterns in real time.
+- **Document everything**: During an incident, designate one person to maintain the incident timeline. Memories are unreliable under pressure.
+- **Train regularly**: Ensure all team members know their role in the incident response plan and can execute it without referring to this document.

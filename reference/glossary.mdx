@@ -1,0 +1,225 @@
+---
+title: "Glossary"
+description: "Key terms and concepts used throughout the Yuno documentation"
+---
+
+## A
+
+**Account Code**
+A unique identifier for your merchant account, required in all API requests as the `account-code` header.
+
+**ACS (Access Control Server)**
+A server operated by the card issuer that performs cardholder authentication during 3D Secure flows. The ACS evaluates risk and determines whether to approve frictionless authentication or present a challenge.
+
+**Acquiring Bank**
+The financial institution that processes card payments on behalf of the merchant. The acquirer communicates with card networks and issuing banks to authorize and settle transactions.
+
+**APM (Alternative Payment Method)**
+Any payment method other than traditional credit/debit cards. Examples include PIX, bank transfers, digital wallets, and cash vouchers.
+
+**Approval Rate**
+The percentage of payment attempts that are successfully approved by the provider/issuer. Higher is better.
+
+**Authorization**
+The first step in a two-step payment flow where funds are reserved on the customer's card but not yet transferred. See [Capture and Cancel](/guides/direct-api/capture-and-cancel).
+
+**AVS (Address Verification System)**
+A fraud prevention system that verifies the billing address provided by the cardholder against the address on file with the card issuer. AVS checks return match codes indicating full, partial, or no match.
+
+## B
+
+**BACEN (Banco Central do Brasil)**
+The Central Bank of Brazil, the regulatory authority that oversees PIX and other Brazilian payment systems. BACEN sets the rules for instant payment processing in Brazil.
+
+**BIN (Bank Identification Number)**
+The first 6-8 digits of a payment card number that identify the issuing bank, card brand, and card type (credit, debit, prepaid). BIN data is used for routing decisions and fraud detection.
+
+**Boleto**
+A Brazilian payment method where customers receive a barcode-based voucher that can be paid at banks, ATMs, or authorized retail locations. Boleto payments are asynchronous and typically settle within 1-3 business days.
+
+## C
+
+**Capture**
+The second step in a two-step payment flow where authorized (reserved) funds are transferred from the customer to the merchant.
+
+**Card Scheme**
+A payment network that sets the rules and infrastructure for card transactions. Major schemes include Visa, Mastercard, American Express, and local schemes like Elo (Brazil) and Carnet (Mexico).
+
+**Chargeback**
+A forced reversal of a payment initiated by the cardholder's issuing bank, typically due to fraud disputes or merchant service issues. Chargebacks carry fees and can affect a merchant's processing ability if rates are too high.
+
+**Checkout Session**
+A server-side object that groups transaction context (amount, currency, country) for a payment attempt. Every payment flow starts with creating a checkout session.
+
+**Clearing**
+The process of exchanging transaction details between the acquiring bank and the issuing bank through the card network, leading to final settlement of funds.
+
+**CNPJ**
+Cadastro Nacional da Pessoa Juridica. The Brazilian tax identification number for businesses (14 digits). Required for PIX and other Brazilian payment methods when the payer is a business entity.
+
+**Connection**
+A configured link between your Yuno account and a payment provider, including the provider's API credentials and enabled payment methods.
+
+**CPF**
+Cadastro de Pessoas Fisicas. The Brazilian tax identification number for individuals (11 digits). Required for PIX and other Brazilian payment methods when the payer is an individual.
+
+## D
+
+**DCC (Dynamic Currency Conversion)**
+A service that allows international cardholders to pay in their home currency rather than the merchant's local currency. The exchange rate and any markup are applied at the point of sale.
+
+**Decline**
+A payment that was rejected by the provider, issuer, or risk engine. Declines are classified as soft (temporary, retriable) or hard (permanent). See [Provider Errors](/troubleshooting/provider-errors).
+
+**Dispute**
+A formal disagreement between a cardholder and a merchant regarding a transaction. Disputes can escalate to chargebacks if not resolved. The dispute process involves evidence submission and arbitration by the card network.
+
+## E
+
+**Enrollment**
+The process of securely storing (vaulting) a customer's payment method for future use. See [Card Enrollment](/guides/sdk/enrollment).
+
+## F
+
+**Frictionless Flow**
+A 3D Secure authentication outcome where the issuer silently authenticates the cardholder based on risk signals without requiring customer interaction (no challenge screen or SMS code).
+
+**Full Checkout**
+An SDK integration mode where Yuno renders a complete, pre-built checkout UI with all enabled payment methods. See [Full Checkout](/guides/sdk/full-checkout).
+
+**FX (Foreign Exchange)**
+Currency conversion applied when a transaction involves different currencies between the merchant and the customer. FX rates and fees vary by provider and payment method.
+
+## G
+
+**Gateway**
+A technology platform that connects merchants to payment processors and acquirers. Yuno acts as a payment orchestration layer that routes transactions across multiple gateways and processors.
+
+## H
+
+**Hard Decline**
+A permanent payment decline that will not succeed on retry (e.g., invalid card number, stolen card).
+
+## I
+
+**Idempotency Key**
+A unique identifier sent with API requests to prevent duplicate processing. If the same key is sent twice, Yuno returns the original response.
+
+**Interchange**
+The fee paid by the acquiring bank to the issuing bank for each card transaction. Interchange rates vary by card type, merchant category, and transaction characteristics. These fees are a major component of payment processing costs.
+
+**ISO 8583**
+An international standard for financial transaction messaging used by card networks and processors. It defines the format for authorization, clearing, and settlement messages exchanged between payment system participants.
+
+**Issuer**
+The bank or financial institution that issued the customer's payment card.
+
+## L
+
+**Level 2/3 Data**
+Enhanced transaction data (tax amounts, line-item details, shipping info) submitted with card payments to qualify for lower interchange rates. Level 2 includes tax and merchant reference; Level 3 adds item-level details.
+
+**Lite Checkout**
+An SDK integration mode that embeds a lightweight payment form into your checkout page. See [Lite Checkout](/guides/sdk/lite-checkout).
+
+## M
+
+**MCC (Merchant Category Code)**
+A four-digit code assigned to merchants by card networks that classifies the type of business. Some issuers restrict transactions based on MCC.
+
+**MID (Merchant Identifier)**
+A unique identifier assigned to a merchant by an acquiring bank or payment processor. The MID is used to route transactions and track settlement for a specific merchant account.
+
+## N
+
+**Network Token**
+A token issued by a card network (Visa, Mastercard) that replaces the actual card number (PAN) for secure storage and recurring transactions. Network tokens update automatically when a card is reissued, reducing decline rates.
+
+**NFC (Near Field Communication)**
+A short-range wireless technology used for contactless payments. NFC enables tap-to-pay functionality on compatible cards and mobile devices at physical point-of-sale terminals.
+
+## O
+
+**One-Time Token**
+A single-use token generated by the SDK or API that represents sensitive payment data (e.g., card details). Used in place of raw card data when creating payments.
+
+**Orchestration**
+The process of routing, retrying, and optimizing payment transactions across multiple providers through a single integration point.
+
+## P
+
+**PAN (Primary Account Number)**
+The full card number (typically 16 digits) printed or embossed on a payment card. PANs are sensitive data subject to PCI DSS requirements and should never be stored in plain text.
+
+**PCI DSS (Payment Card Industry Data Security Standard)**
+A security standard for organizations that handle card data. Integration type determines compliance level: SAQ-A (SDK) or SAQ-D Level 1 (Direct API).
+
+**PIN (Personal Identification Number)**
+A numeric code used to authenticate a cardholder during in-person (card-present) transactions. PIN verification adds an additional layer of security beyond card possession.
+
+**POS (Point of Sale)**
+The physical or digital location where a payment transaction occurs. In-store POS terminals handle card-present transactions, while online checkouts serve as virtual POS systems.
+
+**Provider**
+A payment processor or gateway that Yuno connects to for transaction processing (e.g., Stripe, Adyen, Mercado Pago).
+
+**PSD2 (Payment Services Directive 2)**
+A European Union regulation that mandates Strong Customer Authentication (SCA) for electronic payments. PSD2 requires multi-factor authentication for most online card transactions within the EEA.
+
+## R
+
+**Recurring Payment**
+A payment that is automatically charged on a schedule (e.g., monthly subscription) using a stored payment method (vaulted token). Recurring payments require initial customer consent and may use network tokens for improved success rates.
+
+**Representment**
+The process by which a merchant disputes a chargeback by submitting evidence to the card network proving the transaction was legitimate. Successful representment reverses the chargeback and returns funds to the merchant.
+
+**Routing Rules**
+Configuration that determines which provider processes a transaction based on conditions like country, payment method, amount, or card attributes. See [Routing](/platform/dashboard/routing).
+
+## S
+
+**SAQ (Self-Assessment Questionnaire)**
+A PCI DSS compliance validation tool. SAQ-A is the simplest (SDK integrations); SAQ-D is the most comprehensive (Direct API).
+
+**Sandbox**
+An isolated testing environment that simulates payment processing without real funds. See [Sandbox Guide](/guides/testing/sandbox-guide).
+
+**SCA (Strong Customer Authentication)**
+A requirement under PSD2 that mandates multi-factor authentication for online payments using at least two of three factors: something the customer knows (password), has (phone), or is (biometric).
+
+**Scheme Token**
+A payment credential issued by a card scheme (Visa, Mastercard) that replaces card details for specific merchant-cardholder relationships. Scheme tokens are automatically updated when cards are replaced, reducing payment failures.
+
+**Secure Fields**
+An SDK integration mode that embeds individual PCI-compliant card input fields (number, expiry, CVV) as secure iframes. See [Secure Fields](/guides/sdk/secure-fields).
+
+**Settlement**
+The final transfer of funds from the acquiring bank to the merchant's bank account after clearing is complete. Settlement timing varies by provider and payment method (same-day to several business days).
+
+**Soft Decline**
+A temporary payment decline that may succeed on retry (e.g., insufficient funds, issuer timeout).
+
+## T
+
+**3DS (3D Secure)**
+An authentication protocol for online card payments that adds a verification step (e.g., SMS code, biometric) to reduce fraud. Supported versions: 3DS1 and 3DS2.
+
+**TID (Terminal Identifier)**
+A unique identifier assigned to a specific payment terminal or virtual terminal instance. TIDs are used by acquirers to track and reconcile transactions from individual points of sale.
+
+**Tokenization**
+The process of replacing sensitive payment data with a non-sensitive token. Yuno handles tokenization through the SDK or Tokens API.
+
+## V
+
+**Vaulted Token**
+A persistent, reusable token representing a customer's stored payment method. Used for returning customer payments without re-entering card details. See [Card Enrollment](/guides/sdk/enrollment).
+
+**Void**
+Cancelling an authorized payment before capture, releasing the hold on the customer's funds. Also referred to as "cancel."
+
+## W
+
+**Webhook**
+An HTTP callback that Yuno sends to your server when payment events occur (e.g., payment succeeded, refund completed). See [Webhook Setup](/guides/webhooks/setup).

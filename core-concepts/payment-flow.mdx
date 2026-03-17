@@ -1,0 +1,105 @@
+---
+title: "Payment Flow"
+description: "Understand the Yuno payment lifecycle from checkout session to settlement"
+---
+
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/payment-flow-overview.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+
+## Payment Lifecycle
+
+A Yuno payment moves through a defined set of statuses from creation to final resolution. Understanding these statuses is essential for building correct payment handling logic.
+
+## Payment Statuses
+
+| Status | Description | Terminal? |
+|--------|-------------|-----------|
+| `PENDING` | Payment created, awaiting customer action or provider confirmation | No |
+| `AUTHORIZED` | Funds reserved on the customer's instrument (auth-only capture mode) | No |
+| `SUCCEEDED` | Payment completed and funds captured | Yes |
+| `DECLINED` | Provider or issuer declined the transaction | Yes |
+| `REJECTED` | Yuno rejected the request due to validation or fraud rules | Yes |
+| `CANCELLED` | Payment cancelled by merchant or customer before completion | Yes |
+| `REFUNDED` | Captured funds returned to the customer | Yes |
+
+## Status State Machine
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/status-state-machine.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/status-state-machine.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+## Capture Modes
+
+Yuno supports two capture strategies that determine when funds are actually transferred.
+
+### Auto-Capture (Default)
+
+When you create a payment via `POST /v1/payments`, Yuno authorizes and captures in a single step. The payment moves directly from `PENDING` to `SUCCEEDED` (or `DECLINED`). This is the default behavior for standard e-commerce purchases.
+
+### Auth-Only (Two-Step Flow)
+
+For scenarios where the final amount may differ (hotel bookings, car rentals, pre-orders), use a two-step flow:
+
+1. **Create the payment** via `POST /v1/payments` — payment is created in `PENDING` status
+2. **Authorize** via `POST /v1/payments/{payment_id}/authorize` — funds are reserved, status moves to `AUTHORIZED`
+3. **Capture** via `POST /v1/payments/{payment_id}/transactions/{transaction_id}/capture` — funds are transferred, status moves to `SUCCEEDED`
+
+```bash
+# Step 1: Create payment
+curl -X POST https://api-sandbox.y.uno/v1/payments \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code" \
+  -H "Content-Type: application/json" \
+  -d '{ "checkout_session": "cs_abc123", ... }'
+
+# Step 2: Authorize (response includes transaction_id)
+curl -X POST https://api-sandbox.y.uno/v1/payments/{payment_id}/authorize \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code"
+
+# Step 3: Capture (use transaction_id from authorize response)
+curl -X POST https://api-sandbox.y.uno/v1/payments/{payment_id}/transactions/{transaction_id}/capture \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code"
+```
+
+<Warning>
+  Authorized payments that are not captured within the provider's hold period (typically 5-7 days for cards) will be automatically voided.
+</Warning>
+
+## Integration Patterns
+
+| Pattern | Description | Use Case |
+|---------|-------------|----------|
+| **Full Checkout SDK** | Yuno renders the entire checkout UI | Fastest integration, least customization |
+| **Lite SDK** | Yuno handles payment input, you control the page layout | Balanced control and speed |
+| **Direct API** | You build the UI and call Yuno APIs directly | Maximum control, PCI scope implications |
+
+<Note>
+  Direct API integration for card payments requires PCI DSS compliance since your servers handle raw card data. Use the SDK with tokenization to avoid PCI scope.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Checkout Sessions" icon="cart-shopping" href="/core-concepts/checkout-sessions">
+    Learn how checkout sessions initialize payment intents.
+  </Card>
+  <Card title="Transactions" icon="arrow-right-arrow-left" href="/core-concepts/transactions">
+    Understand the relationship between payments and transactions.
+  </Card>
+</CardGroup>

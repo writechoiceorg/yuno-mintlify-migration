@@ -1,0 +1,218 @@
+---
+title: "Monitors"
+description: "Real-time payment monitoring, anomaly detection, and automatic failover"
+---
+
+## Overview
+
+Monitors continuously watch your payment processing health in real time, tracking approval rates, latency, and error rates across providers. When metrics breach configured thresholds, monitors trigger alerts and can automatically redirect traffic to fallback providers to minimize payment disruption.
+
+Navigate to **Dashboard > Routing > Monitors** to create and manage monitors.
+
+## What Monitors Track
+
+| Metric | Description | Default Window |
+|--------|-------------|----------------|
+| **Approval Rate** | Percentage of successful transactions over a rolling window | 15 minutes |
+| **Response Time** | Average provider response latency in milliseconds | 5 minutes |
+| **Error Rate** | Percentage of transactions returning provider or network errors | 10 minutes |
+| **Timeout Rate** | Percentage of transactions exceeding the configured timeout threshold | 5 minutes |
+
+Monitors evaluate metrics over configurable rolling time windows. Shorter windows detect issues faster but may trigger false positives on low transaction volumes.
+
+<Note>
+Monitors require a minimum transaction volume within the evaluation window to produce statistically meaningful results. Yuno recommends at least 50 transactions per window for reliable anomaly detection.
+</Note>
+
+## Monitor Types
+
+| Type | Scope | Use Case |
+|------|-------|----------|
+| **Per-Provider** | Single provider connection | Detect degradation on a specific processor |
+| **Per-Country** | All transactions for a country | Identify regional issues (e.g., bank outages) |
+| **Per-Payment-Method** | Specific payment method | Catch method-specific failures (e.g., PIX downtime) |
+| **Composite** | Provider + Country + Method | Granular monitoring for critical routes |
+
+## Creating a Monitor
+
+<Steps>
+  <Step title="Navigate to Monitors">
+    Go to **Dashboard > Routing > Monitors** and click **Create Monitor**.
+  </Step>
+
+  <Step title="Select monitor scope">
+    Choose the monitor type and the specific resources to watch:
+
+    - **Provider:** Select one or more provider connections
+    - **Country:** Select target countries (or all)
+    - **Payment Method:** Select payment methods (or all)
+  </Step>
+
+  <Step title="Configure thresholds">
+    Define the conditions that trigger an alert. Each threshold specifies a metric, operator, and value:
+
+    | Threshold | Example | Meaning |
+    |-----------|---------|---------|
+    | Approval rate below | `< 70%` | Alert when approval rate drops below 70% |
+    | Response time above | `> 5000ms` | Alert when average latency exceeds 5 seconds |
+    | Error rate above | `> 15%` | Alert when error rate exceeds 15% |
+
+    You can combine multiple thresholds with AND/OR logic:
+
+    ```
+    Monitor: Brazil Card Payments — Provider A
+    Trigger when:
+      Approval rate < 60% OR Error rate > 20%
+    Evaluation window: 15 minutes
+    Minimum transactions: 50
+    ```
+  </Step>
+
+  <Step title="Configure alert channels">
+    Select where alerts are delivered when thresholds are breached.
+  </Step>
+
+  <Step title="Configure automatic actions (optional)">
+    Enable traffic redirection to automatically reroute payments when the monitor triggers. See [Automatic Traffic Redirection](#automatic-traffic-redirection).
+  </Step>
+
+  <Step title="Activate the monitor">
+    Toggle the monitor to **Active**. Monitors begin evaluating immediately upon activation.
+  </Step>
+</Steps>
+
+## Alert Channels
+
+Configure one or more channels for each monitor under the **Alerts** tab:
+
+| Channel | Setup | Details |
+|---------|-------|---------|
+| **Email** | Enter recipient email addresses | Supports multiple recipients; sends once per trigger event |
+| **Slack** | Connect via **Settings > Integrations > Slack** | Sends to a selected Slack channel with metric details |
+| **Opsgenie** | Provide Opsgenie API key and team | Creates an Opsgenie alert with severity mapped to monitor threshold |
+| **Webhook** | Enter a webhook URL | Sends a JSON payload with monitor event details |
+
+### Webhook Payload Example
+
+```json
+{
+  "event": "monitor.triggered",
+  "monitor_id": "mon_abc123",
+  "monitor_name": "Brazil Card Payments — Provider A",
+  "triggered_at": "2026-01-15T14:32:00Z",
+  "metric": "approval_rate",
+  "threshold": 60,
+  "current_value": 48.5,
+  "evaluation_window_minutes": 15,
+  "scope": {
+    "provider": "provider_a",
+    "country": "BR",
+    "payment_method": "CARD"
+  },
+  "action_taken": "traffic_redirected"
+}
+```
+
+### Alert Cooldown
+
+To avoid alert fatigue, monitors enforce a cooldown period after firing. During cooldown, the monitor continues evaluating but does not send duplicate alerts.
+
+| Setting | Default | Range |
+|---------|---------|-------|
+| **Alert cooldown** | 15 minutes | 5–60 minutes |
+
+## Automatic Traffic Redirection
+
+When a monitor detects anomalies, it can automatically redirect payment traffic from the degraded provider to a fallback provider. This reduces failed transactions without manual intervention.
+
+<Steps>
+  <Step title="Enable automatic action">
+    In the monitor configuration, toggle **Automatic Traffic Redirection** to on.
+  </Step>
+
+  <Step title="Select fallback providers">
+    Choose one or more fallback providers from your active connections. Fallback providers are used in the order specified.
+
+    ```
+    Primary: Provider A
+    Fallback 1: Provider B
+    Fallback 2: Provider C
+    ```
+  </Step>
+
+  <Step title="Set redirection percentage">
+    Choose how much traffic to redirect:
+
+    | Option | Behavior |
+    |--------|----------|
+    | **Full (100%)** | All traffic moves to fallback immediately |
+    | **Gradual (50%)** | Half of traffic shifts to fallback; useful for validating fallback health |
+  </Step>
+</Steps>
+
+<Warning>
+Automatic redirection only applies to new transactions. In-flight transactions continue processing on the original provider.
+</Warning>
+
+## Route Recovery
+
+When the degraded provider recovers, Yuno can automatically restore the original routing configuration.
+
+| Recovery Setting | Description |
+|------------------|-------------|
+| **Automatic recovery** | Restore original routing when metrics return above thresholds for a sustained period |
+| **Manual recovery** | Require a team member to manually re-enable the original route in the Dashboard |
+| **Recovery evaluation window** | Duration metrics must stay healthy before restoring (default: 30 minutes) |
+
+<Note>
+Automatic recovery evaluates the same thresholds that triggered the redirect. The provider must maintain healthy metrics for the full recovery window before traffic is restored.
+</Note>
+
+## Monitors Within Routing Rules
+
+You can attach a monitor directly to a routing rule to tie monitoring and failover to a specific route:
+
+1. Navigate to **Dashboard > Routing Rules**
+2. Edit an existing rule or create a new one
+3. In the rule configuration, expand the **Monitor** section
+4. Configure thresholds and fallback behavior specific to that rule
+
+Monitors created within routing rules inherit the rule's conditions (country, payment method, etc.) and only evaluate transactions matching that rule.
+
+## Example Configuration
+
+A complete monitor setup for a critical Brazil card processing route:
+
+```
+Monitor: Brazil Cards — Critical Route
+Type: Per-Provider
+Provider: Provider A
+Country: BR
+Payment Method: CARD
+
+Thresholds:
+  - Approval rate < 65% (15-min window, min 50 txns)
+  - Error rate > 10% (10-min window, min 30 txns)
+
+Alerts:
+  - Opsgenie (Team: Payments, Priority: P1)
+  - Slack (#payments-alerts)
+
+Automatic Action:
+  - Redirect 100% to Provider B
+  - Recovery: Automatic after 30 minutes above thresholds
+  - Alert cooldown: 15 minutes
+```
+
+## Best Practices
+
+- **Set thresholds based on baseline data.** Review historical approval rates and latency in **Dashboard > Insights** before defining thresholds. Setting thresholds too tight causes false positives; too loose delays detection.
+- **Use composite monitors for critical routes.** Combine provider, country, and payment method scopes for high-value routes to avoid masking issues behind aggregate metrics.
+- **Configure multiple alert channels.** Use Opsgenie or PagerDuty for critical monitors and Slack for informational ones.
+- **Prefer automatic recovery with a conservative window.** A 30-minute recovery window prevents flapping between providers due to transient issues.
+- **Test monitors in sandbox first.** Simulate provider failures in sandbox to validate that alerts fire and redirection works before deploying to production.
+- **Review monitor performance weekly.** Check for false positives and adjust thresholds as your transaction patterns evolve.
+
+<Warning>
+Monitors with automatic redirection can shift significant transaction volume between providers. Ensure your fallback providers have sufficient capacity and are properly configured before enabling automatic actions in production.
+</Warning>

@@ -1,38 +1,66 @@
 ---
-title: "Shipping reference"
+title: "Shipping Reference"
+description: "Enum values for shipping types and carriers used in order details."
 ---
 
-On this page, you will find shipping information you may need when using Yuno API endpoints. It covers types and carriers. Use this page to understand and have access to standard values for each information category.
+Use these values when sending shipping information in the `additional_data.order.shipping` object of a payment request.
 
-## Type
+## Shipping Types
 
-| Type             |
-| :--------------- |
-| CUSTOM           |
-| MILITARY         |
-| ELECTRONIC       |
-| EXPRESS          |
-| STANDARD         |
-| SCHEDULED        |
-| ECONOMY          |
-| PRIORITY         |
-| SAME\_DAY        |
-| NEXT\_DAY        |
-| THIRD\_DAY       |
-| STORE\_PICK\_UP  |
-| LOCKER\_PICK\_UP |
-| OTHER            |
+Use in the `additional_data.order.shipping.type` field.
 
-## Carrier list
+| Type | Description |
+|------|-------------|
+| `CUSTOM` | Custom shipping arrangement |
+| `MILITARY` | Military-specific shipping |
+| `ELECTRONIC` | Electronic delivery (digital goods) |
+| `EXPRESS` | Expedited delivery service |
+| `STANDARD` | Regular shipping method |
+| `SCHEDULED` | Pre-arranged delivery date |
+| `ECONOMY` | Cost-effective shipping option |
+| `PRIORITY` | Higher priority handling |
+| `SAME_DAY` | Same-day delivery |
+| `NEXT_DAY` | Next business day delivery |
+| `THIRD_DAY` | Three-day delivery window |
+| `STORE_PICK_UP` | Customer pickup at retail location |
+| `LOCKER_PICK_UP` | Customer pickup at automated locker |
+| `OTHER` | Unspecified shipping method |
 
-| Carrier               |
-| :-------------------- |
-| UPS                   |
-| USPS                  |
-| FEDEX                 |
-| DHL                   |
-| PUROLATOR             |
-| GREYHOUND             |
-| AR\_CORREO\_ARGENTINO |
-| AR\_OCA               |
-| OTHER                 |
+## Shipping Carriers
+
+Use in the `additional_data.order.shipping.carrier` field.
+
+| Carrier | Description |
+|---------|-------------|
+| `UPS` | United Parcel Service |
+| `USPS` | United States Postal Service |
+| `FEDEX` | Federal Express |
+| `DHL` | DHL Express |
+| `PUROLATOR` | Canadian courier service |
+| `GREYHOUND` | Greyhound package service |
+| `AR_CORREO_ARGENTINO` | Argentine postal service (Correo Argentino) |
+| `AR_OCA` | Argentine courier (OCA) |
+| `OTHER` | Alternative carrier |
+
+## Usage Example
+
+```json
+{
+  "additional_data": {
+    "order": {
+      "shipping_amount": 15.00,
+      "shipping": {
+        "type": "EXPRESS",
+        "carrier": "FEDEX",
+        "description": "2-day express delivery",
+        "deliver_at": "2026-03-12T18:00:00.000Z"
+      }
+    }
+  }
+}
+```
+
+## Related Pages
+
+- [Payment Object](/api-reference/payments/object) — Where shipping details are used
+- [Items Category](/reference/items-category) — Item category enum values

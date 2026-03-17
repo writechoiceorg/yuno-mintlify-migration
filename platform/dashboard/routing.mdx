@@ -1,0 +1,106 @@
+---
+title: "Routing Rules"
+description: "Configure payment routing strategies to optimize cost, success rates, and availability"
+---
+
+## Overview
+
+Routing Rules define how Yuno distributes payment transactions across your configured providers. Use routing to optimize for cost, success rates, or availability based on transaction attributes like country, payment method, amount, or card BIN.
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/routing-decision-tree.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/routing-decision-tree.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## Routing Strategies
+
+| Strategy | Description | Best For |
+|----------|-------------|----------|
+| **Priority** | Route to providers in a fixed order | Simple setups, preferred providers |
+| **Cost** | Route to the lowest-cost provider | High-volume merchants |
+| **Success Rate** | Route to the provider with the highest approval rate | Maximizing conversions |
+| **Round Robin** | Distribute equally across providers | Load balancing, A/B testing |
+
+## Creating a Routing Rule
+
+<Steps>
+  <Step title="Navigate to Routing Rules">
+    Go to **Dashboard > Routing Rules** and click **Create Rule**.
+  </Step>
+
+  <Step title="Define conditions">
+    Set the conditions that trigger this rule. Conditions can be combined with AND/OR logic:
+
+    | Condition | Examples |
+    |-----------|---------|
+    | **Country** | BR, CO, MX |
+    | **Payment Method** | CARD, PIX, BANK_TRANSFER |
+    | **Currency** | BRL, USD, COP |
+    | **Amount Range** | Min/max transaction value |
+    | **Card Brand** | Visa, Mastercard, Amex |
+    | **Card BIN** | First 6-8 digits of card number |
+    | **Customer Attribute** | Email domain, document type |
+  </Step>
+
+  <Step title="Select providers and strategy">
+    Choose which connections handle matching transactions and the routing strategy:
+
+    ```
+    Rule: Brazil Card Payments
+    Conditions: country = BR AND payment_method = CARD
+    Strategy: Priority
+    Providers:
+      1. Provider A (primary)
+      2. Provider B (fallback)
+    ```
+  </Step>
+
+  <Step title="Set fallback behavior">
+    Define what happens when the primary provider declines or is unavailable:
+
+    | Fallback | Behavior |
+    |----------|----------|
+    | **Retry next** | Automatically try the next provider in the list |
+    | **Stop** | Return the decline to the customer |
+
+    <Note>
+    Automatic retries only apply to soft declines and provider errors. Hard declines (e.g., stolen card, invalid number) are never retried.
+    </Note>
+  </Step>
+
+  <Step title="Activate the rule">
+    Toggle the rule to **Active**. Rules are evaluated in order of priority; the first matching rule is applied.
+  </Step>
+</Steps>
+
+## Rule Priority
+
+Rules are evaluated top-to-bottom. Drag and drop to reorder:
+
+```
+1. [High Priority] Brazil PIX → Provider X
+2. [Medium Priority] Brazil Cards → Provider A, Provider B
+3. [Low Priority] All Countries → Default Provider
+```
+
+<Warning>
+Ensure a catch-all rule exists at the bottom to handle transactions that do not match any specific rule. Without a catch-all, unmatched transactions will fail.
+</Warning>
+
+## Advanced: AI-Powered Routing
+
+Yuno's [Aida AI Agent](/ai/aida-agent) can optimize routing automatically based on historical performance data. When enabled, Aida dynamically adjusts provider selection to maximize approval rates and minimize costs.
+
+## Monitoring
+
+Track routing performance in **Dashboard > Analytics**:
+
+- Approval rate by provider and rule
+- Cost per transaction by route
+- Failover frequency and success rates
+- Rule match distribution

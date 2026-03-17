@@ -1,0 +1,210 @@
+---
+title: "Payment Methods by Region"
+description: "Find the right payment methods for your target markets across Americas, Europe, and Asia-Pacific"
+---
+
+## Overview
+
+Yuno supports 300+ payment methods across 40+ countries. This guide helps you identify the most relevant methods for your target markets and understand region-specific requirements.
+
+<Tip>
+Use the [Coverage page](/reference/coverage) for a complete list of supported countries and payment methods per provider.
+</Tip>
+
+## Americas
+
+### North America (US, CA)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| Visa / Mastercard / Amex | Card | `email`, AVS recommended |
+| Discover | Card | `email` |
+| Apple Pay | Digital Wallet | Requires Apple Pay merchant setup |
+| Google Pay | Digital Wallet | Requires Google Pay merchant setup |
+
+**Notes:**
+- AVS (Address Verification) is widely used for fraud prevention in the US. Include `billing_address` for higher approval rates.
+- 3DS is optional but recommended for high-risk transactions.
+
+### Brazil (BR)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| PIX | Instant Transfer | `document` (CPF/CNPJ) |
+| Boleto Bancário | Cash Voucher | `document` (CPF/CNPJ), `address` |
+| Cards (Visa, MC, Elo, Hipercard) | Card | `document` recommended |
+
+**Notes:**
+- PIX is Brazil's most popular digital payment method with instant settlement.
+- CPF (11 digits) for individuals, CNPJ (14 digits) for businesses.
+- Local card brands Elo and Hipercard require Brazil-enabled providers.
+
+### Mexico (MX)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| OXXO | Cash Voucher | `email` |
+| SPEI | Bank Transfer | `email` |
+| Cards (Visa, MC, Amex) | Card | `document` (CURP/RFC) recommended |
+
+**Notes:**
+- OXXO is Mexico's largest convenience store chain with 20,000+ locations.
+- SPEI transfers typically settle within minutes during banking hours.
+
+### Colombia (CO)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| PSE | Bank Transfer | `document` (CC/NIT) |
+| Efecty | Cash Voucher | `email` |
+| Cards (Visa, MC) | Card | `document` (CC) recommended |
+| Nequi | Digital Wallet | `phone` |
+
+**Notes:**
+- PSE redirects the customer to their bank for authorization.
+- CC (Cédula de Ciudadanía) for individuals, NIT for businesses.
+
+### Chile (CL)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| Webpay | Card/Debit | `document` (RUT) |
+| Cards (Visa, MC) | Card | `document` (RUT) recommended |
+| Servipag | Cash Voucher | `email` |
+
+### Peru (PE)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| PagoEfectivo | Cash Voucher | `document` (DNI) |
+| Cards (Visa, MC) | Card | `document` (DNI) recommended |
+
+### Argentina (AR)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| Cards (Visa, MC, Amex) | Card | `document` (DNI/CUIT) |
+| Rapipago / PagoFácil | Cash Voucher | `document` (DNI) |
+
+---
+
+## Europe
+
+### General Requirements
+
+<Warning>
+**PSD2/SCA Compliance:** All online card payments in the European Economic Area (EEA) require Strong Customer Authentication (3DS). Yuno handles 3DS automatically based on issuer requirements and your merchant configuration.
+</Warning>
+
+### Western Europe (DE, FR, ES, IT)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| Visa / Mastercard | Card + 3DS | `email`, `billing_address` |
+| SEPA Direct Debit | Bank Transfer | `iban` |
+| Sofort / Klarna | Bank Transfer / BNPL | `email` |
+| Apple Pay / Google Pay | Digital Wallet | Wallet merchant setup |
+
+### Netherlands (NL)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| iDEAL | Bank Transfer | `email` |
+| Cards (Visa, MC) | Card + 3DS | `email`, `billing_address` |
+
+**Notes:**
+- iDEAL accounts for ~60% of Dutch e-commerce transactions.
+- Customers select their bank and authorize via their banking app.
+
+### Belgium (BE)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| Bancontact | Card/Debit | `email` |
+| Cards (Visa, MC) | Card + 3DS | `email`, `billing_address` |
+
+### United Kingdom (GB)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| Cards (Visa, MC, Amex) | Card + 3DS | `email`, `billing_address` |
+| Open Banking | Bank Transfer | `email` |
+| Apple Pay / Google Pay | Digital Wallet | Wallet merchant setup |
+
+**Notes:**
+- UK follows PSD2-equivalent SCA rules post-Brexit.
+- Open Banking adoption is growing rapidly for both payments and payouts.
+
+---
+
+## Asia-Pacific
+
+### India (IN)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| UPI | Instant Transfer | `vpa` (Virtual Payment Address) |
+| Cards (Visa, MC, RuPay) | Card | `email` |
+| Netbanking | Bank Transfer | `email` |
+
+**Notes:**
+- UPI handles 10+ billion transactions per month in India.
+- RuPay is India's domestic card network.
+
+### Southeast Asia (SG, MY, PH, TH, ID)
+
+| Method | Type | Key Requirements |
+|--------|------|-----------------|
+| GrabPay | Digital Wallet | `email` |
+| DANA | Digital Wallet | `email`, `phone` |
+| OVO | Digital Wallet | `email`, `phone` |
+| Cards (Visa, MC) | Card | `email` |
+
+**Notes:**
+- Digital wallets dominate e-commerce in Southeast Asia.
+- GrabPay is available across Singapore, Malaysia, and Philippines.
+
+---
+
+## Regional Best Practices
+
+### Document Requirements by Country
+
+Many LATAM countries require a tax identification document for regulatory compliance. Always include the customer document when available:
+
+| Country | Document Type | Format | Example |
+|---------|--------------|--------|---------|
+| Brazil | CPF (individual) | 11 digits | `12345678901` |
+| Brazil | CNPJ (business) | 14 digits | `12345678000190` |
+| Colombia | CC (individual) | 6-10 digits | `1234567890` |
+| Colombia | NIT (business) | 9 digits + check | `900123456` |
+| Mexico | CURP (individual) | 18 chars | `GARM850101MDFRRL09` |
+| Mexico | RFC (business) | 12-13 chars | `GAR850101XXX` |
+| Chile | RUT | 8 digits + check | `12345678-9` |
+| Peru | DNI | 8 digits | `12345678` |
+| Argentina | DNI | 7-8 digits | `12345678` |
+| Argentina | CUIT (business) | 11 digits | `20123456789` |
+
+### Currency and Country Matching
+
+Always match `country` and `currency` correctly. Mismatches will result in validation errors:
+
+| Country | Expected Currency | Common Mistake |
+|---------|------------------|----------------|
+| US | USD | — |
+| BR | BRL | Using USD for PIX |
+| MX | MXN | Using USD for OXXO |
+| CO | COP | Using USD for PSE |
+| DE, FR, NL | EUR | Using local pre-euro currencies |
+| GB | GBP | Using EUR |
+| IN | INR | Using USD for UPI |
+
+### 3DS by Region
+
+| Region | 3DS Requirement | Details |
+|--------|----------------|---------|
+| Europe (EEA) | **Mandatory** | PSD2 requires SCA for all online payments |
+| UK | **Mandatory** | Post-Brexit SCA regulations |
+| LATAM | **Optional** | Recommended for high-value transactions |
+| US / Canada | **Optional** | Recommended for fraud reduction |
+| APAC | **Varies** | Mandatory in India (RBI mandate), optional elsewhere |

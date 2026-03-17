@@ -1,0 +1,104 @@
+---
+title: "Checkout Sessions"
+description: "Initialize purchase intents with checkout sessions before creating payments"
+---
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/checkout-session-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/checkout-session-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## What is a Checkout Session?
+
+A checkout session represents a purchase intent. It captures the amount, currency, country, and merchant order reference before any payment is created. Every payment in Yuno must be associated with a checkout session.
+
+Think of a checkout session as a container: it defines what the customer is buying, and the payment defines how they pay for it.
+
+## Session Lifecycle
+
+```
+Create Session  -->  Display Checkout  -->  Create Payment  -->  Session Completed
+   (server)          (client/SDK)            (server)              (automatic)
+```
+
+1. **Your server** creates a checkout session via the API
+2. **Your client** uses the session ID to initialize the SDK or display payment options
+3. **Your server** creates a payment referencing the session
+4. **Yuno** marks the session as completed once the payment reaches a terminal status
+
+## Creating a Checkout Session
+
+```bash
+curl -X POST https://api-sandbox.y.uno/v1/checkout/sessions \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": {
+      "currency": "USD",
+      "value": 250.00
+    },
+    "country": "US",
+    "merchant_order_id": "order-9876",
+    "payment_description": "Annual subscription",
+    "callback_url": "https://yoursite.com/payment/callback"
+  }'
+```
+
+## Required Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount.currency` | string | ISO 4217 currency code (e.g., `USD`, `BRL`, `MXN`) |
+| `amount.value` | number | Payment amount as a decimal |
+| `country` | string | ISO 3166-1 alpha-2 country code |
+| `merchant_order_id` | string | Your internal order reference |
+
+## Optional Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `payment_description` | string | Human-readable description shown to the customer |
+| `callback_url` | string | URL to redirect the customer after payment |
+| `customer_id` | string | Pre-created Yuno customer ID for one-click checkout |
+| `metadata` | object | Key-value pairs for your internal tracking |
+
+<Note>
+  The `POST /v1/checkout/sessions` endpoint returns HTTP **200** (not 201). This is by design -- the session is not a created resource in the traditional REST sense but an initialized flow.
+</Note>
+
+## Session Tokens
+
+The checkout session response includes a `checkout_session` token. This token is used to:
+
+- **Initialize the Yuno SDK** on the client side
+- **Reference the purchase intent** when creating the payment server-side
+- **Determine available payment methods** based on country, currency, and merchant configuration
+
+```json
+{
+  "checkout_session": "cs_abc123def456",
+  "amount": { "currency": "USD", "value": 250.00 },
+  "country": "US",
+  "available_payment_methods": ["CARD", "APPLE_PAY", "GOOGLE_PAY"]
+}
+```
+
+## Relationship to Payments
+
+| Aspect | Checkout Session | Payment |
+|--------|-----------------|---------|
+| **Purpose** | Defines what is being purchased | Defines how the purchase is paid |
+| **Created by** | Merchant server | Merchant server |
+| **Cardinality** | One per purchase attempt | One per checkout session |
+| **Contains** | Amount, currency, country | Payment method, customer, provider details |
+
+<Warning>
+  A checkout session can only be used for one payment. If a payment fails and the customer retries, create a new checkout session for the retry attempt.
+</Warning>

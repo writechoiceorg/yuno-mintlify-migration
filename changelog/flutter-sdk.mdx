@@ -1,0 +1,176 @@
+---
+title: "Flutter SDK Changelog"
+description: "Release notes for the Yuno Flutter SDK"
+---
+
+## Overview
+
+Release history for the Yuno Flutter SDK (`yuno_sdk_flutter`). Install or update via pub:
+
+```yaml
+# pubspec.yaml
+dependencies:
+  yuno_sdk_flutter: ^2.3.0
+```
+
+```bash
+flutter pub get
+```
+
+---
+
+## v2.3.0 (February 2026)
+
+### New Features
+- **Enrollment widget:** `YunoEnrollmentWidget` for card vaulting flows with returning customers
+- **Platform channel optimization:** Reduced communication overhead between Dart and native layers by 30%
+- **Custom error widgets:** `YunoErrorBuilder` callback for rendering custom error UI
+
+```dart
+YunoCheckoutWidget(
+  checkoutSession: 'session-id',
+  country: 'BR',
+  errorBuilder: (context, error) {
+    return CustomErrorCard(message: error.message);
+  },
+  onPaymentResult: (result) {
+    // Handle payment result
+  },
+)
+```
+
+### Improvements
+- Improved hot reload support during development
+- Added `YunoThemeData` for consistent theming across platforms
+- Reduced package size by removing unused platform-specific assets
+
+### Bug Fixes
+- Fixed widget not rebuilding when `checkoutSession` changes
+- Resolved iOS crash when using `YunoSecureFields` in a `ListView`
+- Fixed Android keyboard overlap with payment form fields
+
+---
+
+## v2.2.0 (January 2026)
+
+### New Features
+- **Dark mode support:** `YunoThemeData` now accepts `brightness` parameter
+- **Installment selector:** Display installment options for supported countries and providers
+- **Payment method icons:** Built-in high-resolution icons for all supported payment methods
+
+### Improvements
+- Upgraded internal Android SDK to v3.1.0
+- Upgraded internal iOS SDK to v3.0.0
+- Added null safety annotations to all public APIs
+
+### Bug Fixes
+- Fixed `onPaymentError` not called on Android when user cancels 3DS challenge
+- Resolved theme colors not applying on iOS when using Material 3
+
+---
+
+## v2.1.0 (November 2025)
+
+### New Features
+- **Secure Fields widgets:** Individual Flutter widgets for card number, expiry, and CVV
+- **Form validation:** Built-in real-time field validation with customizable error messages
+
+```dart
+Column(
+  children: [
+    YunoCardNumberField(
+      decoration: InputDecoration(labelText: 'Card Number'),
+      onChanged: (state) {
+        print('Brand: ${state.cardBrand}');
+        print('Valid: ${state.isValid}');
+      },
+    ),
+    YunoExpiryField(
+      decoration: InputDecoration(labelText: 'MM/YY'),
+    ),
+    YunoCVVField(
+      decoration: InputDecoration(labelText: 'CVV'),
+    ),
+  ],
+)
+```
+
+### Improvements
+- Improved animation performance for checkout transitions
+- Added support for Flutter 3.16+
+
+---
+
+## v2.0.0 (September 2025)
+
+### Breaking Changes
+
+<Warning>
+v2.0.0 requires Flutter 3.13+ and Dart 3.1+. Update your Flutter SDK before upgrading.
+</Warning>
+
+- **Widget-based API:** Replaced imperative `YunoPayment.start()` with declarative `YunoCheckoutWidget`
+- **Removed:** `YunoPayment` singleton class
+- **Renamed:** All callback typedefs prefixed with `Yuno`
+
+### Migration from v1.x
+
+```dart
+// v1.x (removed)
+final yuno = YunoPayment.instance;
+yuno.initialize('public-key');
+yuno.startCheckout(session: 'id', country: 'BR');
+
+// v2.x (current)
+YunoCheckoutWidget(
+  publicApiKey: 'public-key',
+  checkoutSession: 'session-id',
+  country: 'BR',
+  onPaymentResult: (result) => handleResult(result),
+)
+```
+
+### New Features
+- Declarative widget API following Flutter conventions
+- Full theming support via `YunoThemeData`
+- State management integration (Provider, Riverpod, Bloc compatible)
+
+---
+
+## v1.x (Legacy)
+
+<Note>
+v1.x is deprecated and will reach end-of-life in March 2026. Upgrade to v2.x using the migration guide above.
+</Note>
+
+---
+
+## Platform Requirements
+
+| SDK Version | Flutter | Dart | Android Min SDK | iOS Min |
+|-------------|---------|------|-----------------|---------|
+| 2.3.0 | 3.13+ | 3.1+ | 24 | 16 |
+| 2.0.0 | 3.13+ | 3.1+ | 24 | 16 |
+| 1.x | 3.0+ | 2.17+ | 21 | 13 |
+
+## Platform-Specific Notes
+
+<Accordion title="Android setup">
+Add the Yuno Maven repository to your `android/build.gradle`:
+```groovy
+allprojects {
+    repositories {
+        maven { url 'https://maven.y.uno/releases' }
+    }
+}
+```
+Ensure `minSdkVersion` is 24 or higher in `android/app/build.gradle`.
+</Accordion>
+
+<Accordion title="iOS setup">
+Ensure your `Podfile` specifies iOS 16+:
+```ruby
+platform :ios, '16.0'
+```
+Run `cd ios && pod install` after updating the SDK version.
+</Accordion>

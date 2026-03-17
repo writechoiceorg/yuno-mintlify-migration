@@ -1,0 +1,89 @@
+---
+title: "Dashboard Overview"
+description: "Navigate the Yuno Dashboard to manage payments, providers, and account settings"
+---
+
+## Overview
+
+The Yuno Dashboard is your central hub for managing payment integrations, monitoring transactions, configuring providers, and analyzing performance. Access it at [dashboard.y.uno](https://dashboard.y.uno).
+
+## Dashboard Sections
+
+<CardGroup cols={2}>
+  <Card title="Payments" icon="credit-card" href="/platform/dashboard/overview#payments">
+    View and search all transactions, filter by status, date, and payment method.
+  </Card>
+  <Card title="Connections" icon="plug" href="/platform/dashboard/connections">
+    Configure payment providers and processing connections.
+  </Card>
+  <Card title="Routing Rules" icon="route" href="/platform/dashboard/routing">
+    Define how payments are routed across providers.
+  </Card>
+  <Card title="Risk Conditions" icon="shield" href="/platform/dashboard/risk-conditions">
+    Set up fraud prevention rules and risk parameters.
+  </Card>
+  <Card title="Checkout Builder" icon="palette" href="/platform/dashboard/checkout-builder">
+    Customize your checkout appearance visually.
+  </Card>
+  <Card title="Settings" icon="gear" href="/platform/dashboard/settings">
+    Manage API keys, team members, and notifications.
+  </Card>
+</CardGroup>
+
+## Getting Started
+
+<Steps>
+  <Step title="Log in to the Dashboard">
+    Navigate to [dashboard.y.uno](https://dashboard.y.uno) and sign in with your credentials. New accounts start in the sandbox environment.
+  </Step>
+
+  <Step title="Select your environment">
+    Toggle between **Sandbox** and **Production** using the environment switcher in the top navigation bar. Each environment has separate API keys and configurations.
+
+    <Warning>
+    Changes made in sandbox do not affect production, and vice versa. Configure both environments independently.
+    </Warning>
+  </Step>
+
+  <Step title="Review your API keys">
+    Go to **Settings > API Keys** to find your `public-api-key`, `private-secret-key`, and `account-code`. You need these for API and SDK integration.
+  </Step>
+
+  <Step title="Configure a provider">
+    Navigate to **Connections** to set up at least one payment provider before processing transactions.
+  </Step>
+</Steps>
+
+## Payments Section
+
+The Payments section displays all transactions with filtering and search capabilities:
+
+| Filter | Options |
+|--------|---------|
+| **Status** | Succeeded, Pending, Failed, Cancelled, Refunded |
+| **Date Range** | Custom date picker |
+| **Payment Method** | Card, PIX, Bank Transfer, etc. |
+| **Country** | Filter by transaction country |
+| **Provider** | Filter by processing provider |
+| **Search** | By payment ID, merchant order ID, or customer email |
+
+Click any transaction to view full details including provider response, timeline, and associated events.
+
+## Environment Switcher
+
+| Environment | Purpose | Real Funds |
+|-------------|---------|------------|
+| **Sandbox** | Integration testing and development | No |
+| **Production** | Live payment processing | Yes |
+
+<Note>
+Always test thoroughly in sandbox before enabling production. The Dashboard provides identical functionality in both environments so your workflow remains consistent.
+</Note>
+
+## Reconciliations
+
+Access **Reconciliations** to match your payment records with provider settlement reports. See [Reconciliations](/platform/dashboard/reconciliations) for details.
+
+## Team Management
+
+Invite team members with role-based access under **Settings > Team**. Available roles: Admin, Developer, Viewer.

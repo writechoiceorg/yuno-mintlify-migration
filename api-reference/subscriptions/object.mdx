@@ -1,0 +1,163 @@
+---
+title: "The Subscription Object"
+description: "Represents a recurring payment agreement between a merchant and a customer."
+---
+
+The Subscription object represents a recurring payment agreement that automatically charges a customer at defined intervals. Subscriptions manage the full lifecycle from creation through cancellation, including automated retry logic for failed payments.
+
+<Info>
+  **Smart Retries** — When a subscription payment fails, Yuno automatically retries based on the `max_retries` configuration. The retry schedule uses intelligent spacing to maximize approval rates. See [Smart Retries](/guides/subscriptions/smart-retries) for details.
+</Info>
+
+## Object Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier of the subscription (UUID).
+
+  Example: `sub_7a1b2c3d-4e5f-6789-abcd-ef0123456789`
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current subscription status. Transitions are managed automatically based on payment outcomes and merchant actions.
+
+  Values: `ACTIVE`, `PAUSED`, `CANCELLED`, `EXPIRED`, `PAST_DUE`
+
+  - `ACTIVE` — Subscription is live and payments are being collected on schedule.
+  - `PAUSED` — Temporarily halted by the merchant; no charges until resumed.
+  - `CANCELLED` — Permanently terminated; cannot be reactivated.
+  - `EXPIRED` — Reached the `end_date` naturally.
+  - `PAST_DUE` — Most recent payment failed; retries are in progress.
+
+  Example: `ACTIVE`
+</ResponseField>
+
+<ResponseField name="amount" type="object">
+  The recurring charge amount.
+  <Expandable title="amount">
+    <ResponseField name="value" type="number">
+      The charge amount per billing cycle.
+
+      Example: `49.90`
+    </ResponseField>
+    <ResponseField name="currency" type="string">
+      ISO 4217 currency code.
+
+      Example: `BRL`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="interval" type="string">
+  The billing frequency unit. Combined with `interval_count` to define the billing cycle (e.g., `MONTHLY` with `interval_count: 1` charges once per month).
+
+  Values: `DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`
+
+  Example: `MONTHLY`
+</ResponseField>
+
+<ResponseField name="interval_count" type="integer">
+  The number of interval units between each billing cycle. For example, `interval: WEEKLY` with `interval_count: 2` charges every two weeks.
+
+  Example: `1`
+</ResponseField>
+
+<ResponseField name="customer_id" type="string">
+  ID of the associated customer. Links to the [Customer Object](/api-reference/customers/object).
+
+  Example: `c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f`
+</ResponseField>
+
+<ResponseField name="payment_method_id" type="string">
+  ID of the vaulted payment method used for recurring charges. Must be a tokenized card or payment method enrolled via the [Enrollment](/core-concepts/tokens) flow.
+
+  Example: `pm_d4e5f6a7-b8c9-0123-4567-89abcdef0123`
+</ResponseField>
+
+<ResponseField name="next_payment_date" type="string">
+  ISO 8601 date of the next scheduled charge. `null` when status is `CANCELLED`, `EXPIRED`, or `PAUSED`.
+
+  Example: `2026-04-10T00:00:00.000Z`
+</ResponseField>
+
+<ResponseField name="start_date" type="string">
+  ISO 8601 timestamp of when the subscription began (first charge date).
+
+  Example: `2026-03-10T00:00:00.000Z`
+</ResponseField>
+
+<ResponseField name="end_date" type="string">
+  ISO 8601 timestamp of when the subscription is set to expire. `null` for open-ended subscriptions.
+
+  Example: `2027-03-10T00:00:00.000Z`
+</ResponseField>
+
+<ResponseField name="retry_count" type="integer">
+  Number of retry attempts already made for the current billing cycle. Resets to `0` after a successful payment.
+
+  Example: `0`
+</ResponseField>
+
+<ResponseField name="max_retries" type="integer">
+  Maximum number of retry attempts before the subscription transitions to `CANCELLED`. Configurable at creation time.
+
+  Example: `3`
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Custom key-value pairs set by the merchant. Up to 50 keys, each key max 40 characters, each value max 500 characters.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the subscription was created.
+
+  Example: `2026-03-10T14:00:00.000Z`
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 timestamp of the last subscription update.
+
+  Example: `2026-03-10T14:00:01.000Z`
+</ResponseField>
+
+## Example
+
+```json
+{
+  "id": "sub_7a1b2c3d-4e5f-6789-abcd-ef0123456789",
+  "status": "ACTIVE",
+  "amount": {
+    "value": 49.90,
+    "currency": "USD"
+  },
+  "interval": "MONTHLY",
+  "interval_count": 1,
+  "customer_id": "c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f",
+  "payment_method_id": "pm_d4e5f6a7-b8c9-0123-4567-89abcdef0123",
+  "next_payment_date": "2026-04-10T00:00:00.000Z",
+  "start_date": "2026-03-10T00:00:00.000Z",
+  "end_date": "2027-03-10T00:00:00.000Z",
+  "retry_count": 0,
+  "max_retries": 3,
+  "metadata": {
+    "plan": "premium",
+    "internal_ref": "plan-us-001"
+  },
+  "created_at": "2026-03-10T14:00:00.000Z",
+  "updated_at": "2026-03-10T14:00:01.000Z"
+}
+```
+
+## Related Endpoints
+
+- [Create Subscription](/api-reference/subscriptions/create) — `POST /v1/subscriptions`
+- [Get Subscription](/api-reference/subscriptions/get) — `GET /v1/subscriptions/{subscription_id}`
+- [Update Subscription](/api-reference/subscriptions/update) — `PATCH /v1/subscriptions/{subscription_id}`
+- [Pause Subscription](/api-reference/subscriptions/pause) — `POST /v1/subscriptions/{subscription_id}/pause`
+- [Resume Subscription](/api-reference/subscriptions/resume) — `POST /v1/subscriptions/{subscription_id}/resume`
+- [Cancel Subscription](/api-reference/subscriptions/cancel) — `POST /v1/subscriptions/{subscription_id}/cancel`
+- [Retry Subscription](/api-reference/subscriptions/retry) — `POST /v1/subscriptions/{subscription_id}/retry`
+
+## Related Concepts
+
+- [Subscriptions Overview](/guides/subscriptions/overview) — How recurring payments work in Yuno
+- [Smart Retries](/guides/subscriptions/smart-retries) — Automated retry logic and configuration

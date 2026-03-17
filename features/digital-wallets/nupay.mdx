@@ -1,0 +1,130 @@
+---
+title: "NuPay"
+description: "Accept NuPay for Brazilian Nubank customers, enabling payments directly from their Nubank account."
+---
+
+
+## Overview
+
+NuPay is Nubank's digital wallet payment method that allows Brazilian customers to pay directly from their Nubank account balance or credit line. With over 90 million customers in Brazil, Nubank represents a significant payment channel for merchants targeting the Brazilian market.
+
+Through Yuno, you can integrate NuPay alongside other payment methods, offering Nubank customers a familiar and fast checkout experience.
+
+## How It Works
+
+1. The customer selects NuPay at checkout.
+2. They are redirected to the Nubank app for authentication.
+3. The customer confirms the payment using their Nubank app PIN or biometrics.
+4. Nubank processes the payment from the customer's balance or credit line.
+5. The merchant receives confirmation via webhook once the payment is completed.
+
+<Info>
+  NuPay transactions are confirmed in real-time after the customer approves in the Nubank app. Settlement follows Nubank's standard schedule.
+</Info>
+
+## Prerequisites
+
+<Steps>
+  <Step title="Nubank Partnership">
+    NuPay requires a commercial agreement between your business and Nubank, facilitated through Yuno.
+  </Step>
+  <Step title="Enable NuPay">
+    Activate NuPay in your Yuno Dashboard under **Settings > Payment Methods > Brazil > NuPay**.
+  </Step>
+  <Step title="Brazilian Entity">
+    Your merchant account must be configured for Brazil (country code BR, currency BRL).
+  </Step>
+</Steps>
+
+## Integration with Full Checkout SDK
+
+The Full Checkout SDK automatically displays the NuPay option for Brazilian transactions when enabled.
+
+```javascript
+const checkout = yuno.checkout({
+  countryCode: "BR",
+  currency: "BRL",
+  amount: "200.00",
+  checkoutSession: "session_nupay789",
+  customer: {
+    email: "customer@example.com",
+    document: {
+      document_type: "CPF",
+      document_number: "12345678901"
+    }
+  }
+});
+
+checkout.mount("#checkout-container");
+```
+
+## Direct API Integration
+
+```json
+POST /v1/payments
+{
+  "amount": {
+    "value": 200.00,
+    "currency": "BRL"
+  },
+  "country": "BR",
+  "payment_method": {
+    "type": "NUPAY"
+  },
+  "customer": {
+    "email": "customer@example.com",
+    "document": {
+      "document_type": "CPF",
+      "document_number": "12345678901"
+    }
+  }
+}
+```
+
+The response includes a redirect URL to the Nubank app:
+
+```json
+{
+  "id": "pay_nupay_abc123",
+  "status": "PENDING",
+  "redirect_url": "https://nupay.nubank.com.br/checkout/abc123",
+  "payment_method": {
+    "type": "NUPAY"
+  }
+}
+```
+
+<Warning>
+  The `customer.document` field with a valid CPF is mandatory for NuPay transactions. CNPJ is not supported for NuPay.
+</Warning>
+
+## Customer Experience
+
+| Step | Action | Channel |
+|------|--------|---------|
+| 1 | Select NuPay at checkout | Merchant website/app |
+| 2 | Redirect to Nubank | Browser/deep link |
+| 3 | Confirm payment | Nubank app |
+| 4 | Return to merchant | Redirect back |
+
+## Supported Configuration
+
+| Parameter | Value |
+|-----------|-------|
+| Country | BR (Brazil only) |
+| Currency | BRL (Brazilian Real only) |
+| Customer document | CPF (mandatory) |
+| Payment flow | Redirect |
+
+<Note>
+  NuPay is exclusively available for Brazilian transactions in BRL. It cannot be used for cross-border payments.
+</Note>
+
+## Troubleshooting
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| NuPay not showing | Not enabled for BR | Enable in Dashboard > Payment Methods > Brazil |
+| Redirect fails | Customer not a Nubank user | NuPay requires an active Nubank account |
+| Payment timeout | Customer did not confirm | Set appropriate timeout and handle expiration gracefully |
+| Missing CPF error | `customer.document` not provided | Include CPF in request body |

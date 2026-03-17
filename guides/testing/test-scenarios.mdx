@@ -1,0 +1,300 @@
+---
+title: "Test Scenarios"
+description: "Comprehensive test matrices, error simulation, and end-to-end testing checklists for Yuno payment integrations"
+---
+
+## Overview
+
+Thorough testing prevents production issues by validating every payment path before going live. This guide covers test card numbers, payment method matrices, error simulation, and end-to-end checklists for Yuno sandbox integrations.
+
+## Test Card Numbers
+
+Use these card numbers in the Yuno sandbox environment. All test cards use any future expiry date and any 3-digit CVV (or 4-digit for Amex).
+
+### Successful Payments
+
+| Card Number | Brand | Result | Notes |
+|-------------|-------|--------|-------|
+| `4111 1111 1111 1111` | Visa | Approved | Standard approval |
+| `5500 0000 0000 0004` | Mastercard | Approved | Standard approval |
+| `3400 0000 0000 009` | American Express | Approved | 4-digit CVV required |
+| `6011 0000 0000 0004` | Discover | Approved | Standard approval |
+| `3530 1113 3330 0000` | JCB | Approved | Standard approval |
+
+### Declined Payments
+
+| Card Number | Brand | Decline Code | Scenario |
+|-------------|-------|--------------|----------|
+| `4000 0000 0000 0002` | Visa | `INSUFFICIENT_FUNDS` | Soft decline, retriable |
+| `4000 0000 0000 0010` | Visa | `DO_NOT_HONOR` | Hard decline, do not retry |
+| `4000 0000 0000 0028` | Visa | `INVALID_CARD` | Hard decline, card invalid |
+| `4000 0000 0000 0036` | Visa | `EXPIRED_CARD` | Hard decline, card expired |
+| `4000 0000 0000 0044` | Visa | `STOLEN_CARD` | Hard decline, card reported stolen |
+| `5500 0000 0000 0012` | Mastercard | `GENERIC_DECLINE` | Soft decline |
+
+### Special Scenarios
+
+| Card Number | Brand | Behavior |
+|-------------|-------|----------|
+| `4000 0000 0000 0051` | Visa | Processing timeout (simulates slow provider) |
+| `4000 0000 0000 0069` | Visa | Gateway error (500 from provider) |
+| `4000 0000 0000 0077` | Visa | Pending status (async resolution) |
+
+<Note>
+Test card numbers only work in the sandbox environment. Using them in production will result in an error.
+</Note>
+
+## 3DS Test Flows
+
+3D Secure adds an authentication step to card payments. Yuno sandbox supports testing both frictionless and challenge flows.
+
+### Frictionless Flow (No Customer Interaction)
+
+The issuer authenticates the cardholder silently based on risk signals. No redirect or challenge is presented.
+
+| Card Number | 3DS Version | Result |
+|-------------|-------------|--------|
+| `4000 0000 0000 0085` | 3DS2 | Frictionless success |
+| `4000 0000 0000 0093` | 3DS2 | Frictionless failure (authentication denied) |
+
+**Expected flow:**
+1. Create payment with card token
+2. Response includes `status: SUCCEEDED` directly (no redirect)
+3. `payment_method.three_d_secure.status` = `AUTHENTICATED`
+
+### Challenge Flow (Customer Interaction Required)
+
+The issuer requires the customer to complete a challenge (SMS code, biometric, etc.).
+
+| Card Number | 3DS Version | Result |
+|-------------|-------------|--------|
+| `4000 0000 0000 0101` | 3DS2 | Challenge presented, user completes successfully |
+| `4000 0000 0000 0119` | 3DS2 | Challenge presented, user fails/abandons |
+
+**Expected flow:**
+1. Create payment with card token
+2. Response includes `status: PENDING` and `redirect_url`
+3. Redirect the customer to the `redirect_url`
+4. In sandbox, a simulated challenge page appears
+5. Customer completes (or fails) the challenge
+6. Customer is redirected back to your `callback_url`
+7. Final payment status delivered via webhook
+
+### Testing 3DS in your integration
+
+<CodeGroup>
+```javascript Node.js
+const response = await fetch('https://api-sandbox.y.uno/v1/payments', {
+  method: 'POST',
+  headers: {
+    'public-api-key': process.env.YUNO_PUBLIC_KEY,
+    'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+    'account-code': process.env.YUNO_ACCOUNT_CODE,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    checkout_session: 'session-id',
+    payment_method: { type: 'CARD', token: 'one-time-token' },
+    amount: { currency: 'USD', value: 50.00 },
+    country: 'CO',
+    customer: { email: 'customer@example.com' },
+    // 3DS is triggered automatically based on card and provider
+  }),
+});
+
+const payment = await response.json();
+
+if (payment.status === 'PENDING' && payment.redirect_url) {
+  // Redirect customer to 3DS challenge
+  console.log('Redirect to:', payment.redirect_url);
+} else if (payment.status === 'SUCCEEDED') {
+  // Frictionless flow, payment complete
+  console.log('Payment approved:', payment.id);
+}
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api-sandbox.y.uno/v1/payments',
+    headers={
+        'public-api-key': YUNO_PUBLIC_KEY,
+        'private-secret-key': YUNO_PRIVATE_KEY,
+        'account-code': YUNO_ACCOUNT_CODE,
+        'Content-Type': 'application/json',
+    },
+    json={
+        'checkout_session': 'session-id',
+        'payment_method': {'type': 'CARD', 'token': 'one-time-token'},
+        'amount': {'currency': 'USD', 'value': 50.00},
+        'country': 'CO',
+        'customer': {'email': 'customer@example.com'},
+    },
+)
+
+payment = response.json()
+
+if payment['status'] == 'PENDING' and payment.get('redirect_url'):
+    # Redirect customer to 3DS challenge
+    print('Redirect to:', payment['redirect_url'])
+elif payment['status'] == 'SUCCEEDED':
+    # Frictionless flow, payment complete
+    print('Payment approved:', payment['id'])
+```
+</CodeGroup>
+
+## Payment Method Test Matrix by Country
+
+### Brazil (BR / BRL)
+
+| Payment Method | Test Identifier | Expected Status | Notes |
+|---------------|----------------|-----------------|-------|
+| CARD (Visa) | `4111 1111 1111 1111` | SUCCEEDED | Standard card flow |
+| PIX | CPF: `12345678901` | PENDING | Returns QR code; auto-completes in sandbox after 30s |
+| Boleto | CPF: `12345678901` | PENDING | Returns boleto PDF URL; use Dashboard to simulate payment |
+
+### Mexico (MX / MXN)
+
+| Payment Method | Test Identifier | Expected Status | Notes |
+|---------------|----------------|-----------------|-------|
+| CARD (Visa) | `4111 1111 1111 1111` | SUCCEEDED | Standard card flow |
+| OXXO | Email required | PENDING | Returns voucher reference; simulate payment in Dashboard |
+
+### Colombia (CO / COP)
+
+| Payment Method | Test Identifier | Expected Status | Notes |
+|---------------|----------------|-----------------|-------|
+| CARD (Visa) | `4111 1111 1111 1111` | SUCCEEDED | Standard card flow |
+| BANK_TRANSFER | CC: `1234567890` | PENDING | Returns redirect URL to simulated bank |
+| PSE | CC: `1234567890` | PENDING | Bank selection + redirect flow |
+
+### Chile (CL / CLP)
+
+| Payment Method | Test Identifier | Expected Status | Notes |
+|---------------|----------------|-----------------|-------|
+| CARD (Visa) | `4111 1111 1111 1111` | SUCCEEDED | Standard card flow |
+| BANK_TRANSFER | RUT: `111111111` | PENDING | Redirect to simulated bank |
+
+### Argentina (AR / ARS)
+
+| Payment Method | Test Identifier | Expected Status | Notes |
+|---------------|----------------|-----------------|-------|
+| CARD (Visa) | `4111 1111 1111 1111` | SUCCEEDED | Standard card flow |
+| BANK_TRANSFER | DNI: `12345678` | PENDING | Redirect flow |
+
+## Error Simulation
+
+### HTTP error codes
+
+Simulate API-level errors by using specific values in your test requests:
+
+| Scenario | How to Trigger | Expected Response |
+|----------|---------------|-------------------|
+| Missing required field | Omit `customer.document` for PIX | 400 `INVALID_FIELD` |
+| Invalid currency | Use `currency: "XXX"` | 400 `INVALID_CURRENCY` |
+| Invalid country-method combo | PIX with `country: "MX"` | 400 `PAYMENT_METHOD_NOT_AVAILABLE` |
+| Invalid auth | Use wrong `private-secret-key` | 401 `UNAUTHORIZED` |
+| Method not enabled | Use a method not enabled in Dashboard | 403 `FORBIDDEN` |
+| Rate limit | Send >100 requests/minute | 429 `RATE_LIMITED` |
+
+### Provider-level errors
+
+Provider declines are simulated using specific test card numbers (see [Test Card Numbers](#test-card-numbers) above). These simulate real-world decline scenarios:
+
+- **Soft declines** (retriable): insufficient funds, issuer timeout, generic decline
+- **Hard declines** (do not retry): invalid card, expired card, stolen card
+- **Gateway errors**: provider unavailable, processing timeout
+
+### Timeout simulation
+
+To test your timeout handling:
+
+1. Use card number `4000 0000 0000 0051` (processing timeout)
+2. Your request will hang for 30 seconds, then return a timeout error
+3. Verify your client handles the timeout gracefully
+4. Check that your webhook handler processes the async status update
+
+## Non-Card Payment Method Testing
+
+### PIX (Brazil)
+
+1. Create a payment with `payment_method.type: "PIX"`
+2. Response returns `PENDING` status with `qr_code` and `qr_code_url`
+3. In sandbox, PIX payments auto-complete after approximately 30 seconds
+4. Verify your webhook handler receives `payment.succeeded`
+5. Check that your UI updates from the pending state
+
+### OXXO (Mexico)
+
+1. Create a payment with `payment_method.type: "OXXO"`
+2. Response returns `PENDING` status with voucher reference number
+3. In sandbox, simulate payment via **Dashboard > Payments > [payment] > Simulate Payment**
+4. Verify webhook delivery for `payment.succeeded`
+
+### Bank Transfer / PSE
+
+1. Create a payment with `payment_method.type: "BANK_TRANSFER"` or `"PSE"`
+2. Response returns `PENDING` status with `redirect_url`
+3. Redirect to the URL to see the simulated bank page
+4. Complete the simulated flow
+5. Verify redirect back to your `callback_url` and webhook delivery
+
+## End-to-End Test Checklist
+
+### Payment creation
+
+- [ ] Successful card payment (Visa, Mastercard)
+- [ ] Declined card payment (insufficient funds)
+- [ ] Hard declined card payment (invalid card)
+- [ ] PIX payment with QR code generation (BR)
+- [ ] OXXO voucher generation (MX)
+- [ ] Bank transfer redirect flow (CO)
+- [ ] Missing required fields return clear error messages
+- [ ] Invalid authentication returns 401
+
+### 3DS flows
+
+- [ ] Frictionless 3DS authentication succeeds
+- [ ] Challenge flow redirects correctly
+- [ ] Customer completes challenge successfully
+- [ ] Customer abandons challenge (payment fails)
+- [ ] Callback URL receives correct parameters
+
+### Two-step flows
+
+- [ ] Authorization creates payment with `AUTHORIZED` status
+- [ ] Full capture transitions to `SUCCEEDED`
+- [ ] Partial capture with reduced amount
+- [ ] Cancel (void) releases authorized funds
+- [ ] Expired authorization handled gracefully
+
+### Refunds
+
+- [ ] Full refund on succeeded payment
+- [ ] Partial refund with correct remaining amount
+- [ ] Multiple partial refunds up to original amount
+- [ ] Refund on uncaptured payment returns error
+
+### Webhooks
+
+- [ ] Webhook signature verification passes for valid events
+- [ ] Invalid signatures are rejected with 401
+- [ ] Duplicate events handled idempotently
+- [ ] All subscribed event types received and processed
+- [ ] Handler responds within 15 seconds
+
+### Error handling
+
+- [ ] Network timeouts handled with appropriate retry logic
+- [ ] Rate limiting (429) triggers exponential backoff
+- [ ] Provider errors (500) surface meaningful messages
+- [ ] Invalid payloads return descriptive validation errors
+
+### SDK integration (if applicable)
+
+- [ ] SDK initializes with correct checkout session
+- [ ] Payment form renders all enabled payment methods
+- [ ] Card tokenization produces valid one-time token
+- [ ] SDK callbacks fire for success, error, and cancel
+- [ ] SDK version matches server-side API version requirements

@@ -1,0 +1,41 @@
+---
+title: "Get Transfer Status"
+description: "Check the current status of a BaaS transfer"
+api: "GET https://api-sandbox.y.uno/v1/baas/transfers/{transfer_id}"
+---
+
+## Path parameters
+
+<ParamField path="transfer_id" type="string" required>
+  The transfer identifier.
+</ParamField>
+
+## Response
+
+Returns the transfer object with the same schema as the [Initiate Transfer](/api-reference/baas/create-transfer) response, reflecting the current status.
+
+<ResponseExample>
+```json 200 OK — Completed
+{
+  "id": "xfer_880e8400-e29b-41d4-a716-446655440000",
+  "account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "source_entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "destination_entity_id": "ent_770e8400-e29b-41d4-a716-446655440001",
+  "amount": 250.00,
+  "currency": "USD",
+  "status": "COMPLETED",
+  "payment_rail": "ACH_SAME_DAY",
+  "reference": "invoice_2026_001",
+  "created_at": "2026-02-01T16:00:00Z",
+  "updated_at": "2026-02-01T18:30:00Z"
+}
+```
+
+```json 404 Not Found
+{
+  "code": "TRANSFER_NOT_FOUND",
+  "messages": ["Transfer not found"],
+  "http_code": 404
+}
+```
+</ResponseExample>

@@ -1,0 +1,80 @@
+---
+title: "Transaction & Shipping Categories"
+description: "Transaction types, shipping methods, and purpose codes reference"
+---
+
+## Overview
+
+Yuno uses category codes to classify transactions, shipping methods, and payout purposes. These codes affect how providers process transactions, influence risk scoring, and determine regulatory compliance requirements.
+
+## Transaction Category Types
+
+The transaction category indicates the nature of the payment and affects how providers handle authorization, settlement, and risk assessment.
+
+| Category | Code | Description | Use Case |
+|----------|------|-------------|----------|
+| Purchase | `PURCHASE` | Standard one-time purchase of goods or services | E-commerce checkout, in-app purchase |
+| Recurring | `RECURRING` | Scheduled repeat charge on a stored payment method | Monthly subscriptions, membership fees |
+| Installment | `INSTALLMENT` | Purchase split into multiple scheduled payments | Buy-now-pay-later, installment plans |
+| Pre-authorization | `PRE_AUTH` | Funds reserved without immediate capture | Hotel check-in, car rental deposit |
+| Account funding | `ACCOUNT_FUNDING` | Transfer to a stored-value account or wallet | Digital wallet top-up, prepaid card load |
+| Quasi-cash | `QUASI_CASH` | Purchase of items convertible to cash | Gift cards, money orders, lottery tickets |
+
+Set the transaction category in the `transaction_type` field of the payment request.
+
+### When to Use Each Category
+
+**PURCHASE** — Use for all standard single-payment transactions. This is the default and most common category.
+
+**RECURRING** — Use when charging a customer on a schedule using a previously stored payment method. The first transaction in a recurring series should be flagged as the initial recurring payment. Subsequent charges reference the initial transaction. Card networks require clear disclosure of recurring terms to the cardholder.
+
+**INSTALLMENT** — Use when a single purchase is divided into multiple payments over time. The total number of installments and current installment number must be specified. Installment support varies by country and provider — it is widely used in Latin America (Brazil, Mexico, Colombia).
+
+**PRE_AUTH** — Use when you need to reserve funds before the final amount is known. Pre-authorizations must be captured or cancelled within the authorization window (typically 7 days for cards, varies by provider).
+
+**ACCOUNT_FUNDING** — Use for wallet top-ups and prepaid card loads. Some issuers apply different risk rules and limits to account funding transactions.
+
+**QUASI_CASH** — Use for items that can be readily converted to cash. These transactions may be subject to higher scrutiny and lower approval rates from some issuers.
+
+## Shipping Reference Types
+
+Shipping type codes indicate how purchased goods will be delivered. Providers and risk engines use this information for fraud scoring.
+
+| Shipping Type | Code | Description | Typical Delivery Time |
+|--------------|------|-------------|----------------------|
+| Same day | `SAME_DAY` | Delivery on the day of purchase | Hours |
+| Next day | `NEXT_DAY` | Delivery on the next business day | 1 business day |
+| Two day | `TWO_DAY` | Delivery within two business days | 2 business days |
+| Standard | `STANDARD` | Standard ground shipping | 3-7 business days |
+| International | `INTERNATIONAL` | Cross-border shipping | 7-30 business days |
+| Pick up | `PICK_UP` | Customer picks up from store or location | N/A |
+| Digital | `DIGITAL` | Electronic delivery (no physical shipment) | Immediate |
+
+Set the shipping type in the `shipping.type` field of the payment request.
+
+<Note>
+Transactions with `DIGITAL` shipping type and a physical shipping address may be flagged by fraud engines. Use `DIGITAL` only when there is no physical delivery component.
+</Note>
+
+## Purpose Codes for Payouts
+
+When processing payouts or disbursements, purpose codes indicate the reason for the transfer. These codes are required by some providers and regulators for compliance.
+
+| Purpose | Code | Description |
+|---------|------|-------------|
+| Salary | `SALARY` | Employee salary or wage payment |
+| Vendor | `VENDOR` | Payment to a vendor or supplier |
+| Refund | `REFUND` | Customer refund for returned goods or services |
+| Loan | `LOAN` | Loan disbursement or repayment |
+| Investment | `INVESTMENT` | Investment-related transfer |
+| Commission | `COMMISSION` | Commission payment to agent or affiliate |
+| Pension | `PENSION` | Pension or retirement fund payment |
+| Government | `GOVERNMENT` | Government benefit or tax payment |
+| Insurance | `INSURANCE` | Insurance premium or claim payment |
+| Other | `OTHER` | Purpose not covered by other categories |
+
+Set the purpose code in the `purpose` field of the payout request.
+
+<Warning>
+Using incorrect purpose codes may result in payout rejections or compliance issues. Some countries require specific purpose codes for cross-border transfers. Verify requirements with your provider for the target country.
+</Warning>

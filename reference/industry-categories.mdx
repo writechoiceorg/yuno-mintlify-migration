@@ -1,0 +1,109 @@
+---
+title: "Industry & Item Categories"
+description: "MCC codes, item categories, and industry classifications for payment transactions"
+---
+
+## Overview
+
+Merchant Category Codes (MCCs), item categories, and industry classifications affect how payment transactions are processed, what data is required, and what interchange rates apply. This reference covers the codes and categories relevant to Yuno payment integrations.
+
+## Merchant Category Codes (MCC)
+
+MCCs are four-digit codes assigned by card networks that classify a merchant's primary business type. Your MCC affects interchange rates, chargeback rules, and whether certain card types can be used for transactions.
+
+### Common E-Commerce MCCs
+
+| MCC | Category | Description |
+|-----|----------|-------------|
+| `4511` | Airlines | Scheduled passenger air transportation |
+| `4722` | Travel agencies | Travel agencies and tour operators |
+| `5411` | Grocery / Supermarkets | Grocery stores and supermarkets |
+| `5651` | Family clothing | Family clothing stores |
+| `5691` | Clothing stores | Men's and women's clothing stores |
+| `5699` | Apparel and accessories | Miscellaneous apparel and accessory shops |
+| `5812` | Restaurants | Eating places and restaurants |
+| `5912` | Drug stores | Drug stores and pharmacies |
+| `5942` | Book stores | Book stores |
+| `5999` | Miscellaneous retail | Miscellaneous and specialty retail stores |
+| `5816` | Digital goods | Digital goods — games, apps, software |
+| `5817` | Software | Computer software stores |
+| `5818` | Telecom | Digital goods — large digital goods merchants |
+| `7011` | Hotels / Lodging | Hotels, motels, and resorts |
+| `7372` | Computer software | Prepackaged computer software |
+| `7995` | Gambling | Betting, casino, lottery |
+| `8011` | Doctors | Doctors and physicians (not elsewhere classified) |
+| `8021` | Dentists | Dentists and orthodontists |
+| `8062` | Hospitals | Hospitals |
+| `8999` | Professional services | Professional services (not elsewhere classified) |
+
+<Note>
+Some MCCs are restricted by certain issuers or card networks. For example, MCC `7995` (gambling) may be blocked by some issuers. High-risk MCCs may also require additional underwriting from providers.
+</Note>
+
+### Setting MCC in Yuno
+
+Your MCC is typically configured at the provider/connection level during onboarding. To update your MCC:
+
+1. Navigate to **Dashboard > Connections**
+2. Select the provider connection
+3. Update the merchant category code in the provider settings
+4. Contact your Yuno account manager if the MCC field is not editable
+
+Some providers allow per-transaction MCC overrides for marketplace or platform use cases. Check with your provider for support.
+
+## Item Categories
+
+Item categories classify the type of goods or services being sold in a transaction. Some payment methods and providers use this information for risk assessment, tax calculation, and regulatory compliance.
+
+| Category | Code | Description | Example |
+|----------|------|-------------|---------|
+| Physical goods | `PHYSICAL` | Tangible items that require shipping | Electronics, clothing, books |
+| Digital goods | `DIGITAL` | Intangible items delivered electronically | Software licenses, e-books, streaming access |
+| Services | `SERVICE` | Professional or personal services | Consulting, repairs, subscriptions |
+| Donations | `DONATION` | Charitable contributions | Nonprofit donations |
+| Tickets / Events | `TICKET` | Admission to events or experiences | Concert tickets, museum passes |
+| Travel | `TRAVEL` | Travel-related purchases | Flights, hotel bookings |
+| Food / Beverage | `FOOD` | Food and drink orders | Restaurant orders, grocery delivery |
+
+Set the item category in the `items[].category` field of the payment request body.
+
+## Industry-Specific Requirements
+
+Certain industries require additional data fields in the payment request to qualify for lower interchange rates, meet regulatory requirements, or reduce chargeback risk.
+
+### Airlines (MCC 4511)
+
+Airlines must provide Level 2/3 data including passenger details and itinerary information. See [Airline Information](/reference/airline-information) for the complete field reference.
+
+**Required additional fields:**
+- Passenger name and ticket number
+- Departure and arrival airports
+- Travel dates and carrier codes
+- PNR (Passenger Name Record)
+
+### Hotels / Lodging (MCC 7011)
+
+**Required additional fields:**
+- Check-in and check-out dates
+- Guest name
+- Hotel folio number
+- Daily room rate
+
+### Recurring / Subscription Services
+
+**Required additional fields:**
+- Initial transaction reference (for subsequent charges)
+- Billing frequency
+- Subscription start and end dates
+- Stored credential indicator
+
+### Marketplaces / Platforms
+
+**Required additional fields:**
+- Sub-merchant identifier
+- Split payment configuration
+- Item-level seller information
+
+<Warning>
+Failing to provide industry-specific data may result in higher interchange rates or transaction declines from certain providers. Always include the relevant additional fields for your merchant category.
+</Warning>

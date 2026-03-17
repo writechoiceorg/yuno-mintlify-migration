@@ -1,0 +1,91 @@
+---
+title: "Subscriptions"
+description: "Automate recurring billing with subscription lifecycle management, automatic payment collection, and smart retry logic."
+---
+
+## Overview
+
+Yuno Subscriptions enable you to set up recurring billing that automatically collects payments from your customers on a defined schedule. Whether you are running a SaaS platform, streaming service, or membership program, subscriptions handle the complexity of recurring payments, including lifecycle management, payment retries, and dunning.
+
+## Key Capabilities
+
+| Capability | Description |
+|-----------|-------------|
+| **Flexible billing cycles** | Daily, weekly, monthly, quarterly, or annual intervals |
+| **Automatic collection** | Payments are charged automatically on schedule |
+| **Smart retries** | Failed payments are retried with configurable schedules |
+| **Lifecycle management** | Create, pause, resume, cancel, and upgrade subscriptions |
+| **Webhooks** | Real-time notifications for payment and subscription events |
+| **Multi-currency** | Bill in the customer's local currency |
+
+## How Subscriptions Work
+
+<Steps>
+  <Step title="Enroll Payment Method">
+    The customer provides a payment method (card, wallet, etc.) which is securely tokenized and stored for recurring use.
+  </Step>
+  <Step title="Create Subscription">
+    You create a subscription via the API, specifying the billing amount, interval, and start date.
+  </Step>
+  <Step title="Automatic Billing">
+    Yuno automatically charges the enrolled payment method on each billing cycle.
+  </Step>
+  <Step title="Handle Outcomes">
+    Successful payments advance the subscription. Failed payments trigger smart retries and dunning flows.
+  </Step>
+</Steps>
+
+## Subscription Lifecycle
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/subscription-lifecycle.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/subscription-lifecycle.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+| Status | Description |
+|--------|-------------|
+| `CREATED` | Subscription created but first payment not yet collected |
+| `ACTIVE` | Subscription is billing normally |
+| `PAST_DUE` | Payment failed, retries in progress |
+| `PAUSED` | Billing suspended, can be resumed |
+| `CANCELLED` | Subscription terminated (by merchant, customer, or dunning) |
+| `EXPIRED` | Subscription reached its end date |
+
+<Info>
+  A subscription enters `PAST_DUE` status after a payment failure. Smart retries will attempt to collect the payment according to your retry schedule. If all retries are exhausted, the subscription moves to `CANCELLED` unless you intervene.
+</Info>
+
+## Webhook Events
+
+Subscribe to these events for real-time subscription updates:
+
+| Event | Trigger |
+|-------|---------|
+| `subscription.created` | New subscription created |
+| `subscription.activated` | First payment collected successfully |
+| `subscription.payment.success` | Recurring payment succeeded |
+| `subscription.payment.failed` | Recurring payment failed |
+| `subscription.past_due` | Subscription entered past due status |
+| `subscription.cancelled` | Subscription cancelled |
+| `subscription.paused` | Subscription paused |
+| `subscription.resumed` | Subscription resumed from pause |
+
+<Warning>
+  Always implement webhook handlers for `subscription.payment.failed` and `subscription.past_due` to manage customer communication and access control.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Create a Subscription" icon="plus" href="/features/subscriptions/create-subscription">
+    Set up your first recurring billing flow with API examples.
+  </Card>
+  <Card title="Smart Retries" icon="rotate" href="/features/subscriptions/smart-retries">
+    Configure automatic retry schedules and dunning for failed payments.
+  </Card>
+</CardGroup>

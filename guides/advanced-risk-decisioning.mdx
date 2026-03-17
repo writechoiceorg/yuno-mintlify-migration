@@ -1,0 +1,323 @@
+---
+title: "Advanced Risk Decisioning"
+description: "Configure custom risk rules and leverage AI-powered fraud prevention"
+---
+
+
+## Overview
+
+Yuno's risk engine evaluates every transaction against multiple signals to produce a risk score between 0 (lowest risk) and 100 (highest risk). You can configure custom rules that use these signals to automatically approve, decline, send to manual review, or trigger 3DS challenges for transactions.
+
+<Info>
+Risk scoring runs automatically on every payment. No additional integration is required to benefit from baseline fraud detection. Custom rules extend the default behavior.
+</Info>
+
+## Risk Signals
+
+The risk engine collects and analyzes signals across several categories. Each signal contributes to the composite risk score.
+
+### Device Fingerprinting
+
+Device fingerprinting creates a unique identifier based on the customer's browser and device characteristics:
+
+| Signal | Description |
+|--------|-------------|
+| Browser type and version | Identifies the browser engine and release |
+| Operating system | OS type, version, and architecture |
+| Screen resolution | Display dimensions and pixel density |
+| Installed plugins | Active browser extensions and plugins |
+| Timezone and locale | System timezone offset and language settings |
+| Canvas fingerprint | Rendered graphics hash for device identification |
+| WebGL renderer | GPU and driver information |
+
+<Note>
+Device fingerprinting is collected automatically through the Yuno Web SDK. Direct API integrations must include the `device_fingerprint` field obtained from the SDK's `getDeviceFingerprint()` method.
+</Note>
+
+### Behavioral Analytics
+
+Behavioral signals analyze how the customer interacts with the checkout page:
+
+| Signal | Description | Risk Indicator |
+|--------|-------------|----------------|
+| Typing speed | Keystroke timing on form fields | Bot-like speed suggests automation |
+| Mouse patterns | Movement trajectories and click patterns | Linear paths suggest scripted input |
+| Session duration | Time from page load to payment submission | Very fast sessions indicate automated attacks |
+| Copy-paste detection | Whether card data was pasted vs. typed | Pasted data may indicate carding |
+| Field focus sequence | Order in which form fields are completed | Unusual sequences flag automated tools |
+
+### Velocity Checks
+
+Velocity checks detect unusual transaction volumes within time windows:
+
+| Check | Description |
+|-------|-------------|
+| Transactions per card | Number of transactions from the same card within a time period |
+| Transactions per email | Number of transactions from the same email address |
+| Transactions per IP | Number of transactions from the same IP address |
+| Transactions per device | Number of transactions from the same device fingerprint |
+| Amount per card per day | Total transaction value from a card within 24 hours |
+| Unique cards per email | Number of distinct cards used with the same email |
+| Unique emails per card | Number of distinct emails used with the same card |
+
+### Geolocation
+
+Geolocation compares the customer's IP-derived location against their billing and shipping information:
+
+| Signal | Description | Risk Indicator |
+|--------|-------------|----------------|
+| IP country vs. billing country | Location mismatch | High risk if countries differ significantly |
+| IP city vs. shipping city | Delivery location mismatch | Moderate risk if distant |
+| VPN/proxy detection | Whether the IP belongs to a known VPN or proxy | Higher risk with anonymous IPs |
+| IP reputation | Historical fraud association of the IP | Known bad IPs flag immediately |
+
+### BIN Analysis
+
+Bank Identification Number (BIN) analysis examines the first 6-8 digits of the card:
+
+| Signal | Description |
+|--------|-------------|
+| Card type | Credit, debit, or prepaid |
+| Issuing bank | The bank that issued the card |
+| Issuer country | Country where the card was issued |
+| Card level | Standard, gold, platinum, corporate |
+| Prepaid flag | Whether the card is prepaid (higher risk for some merchants) |
+
+## Aida Fraud Detection
+
+Aida is Yuno's AI-powered fraud detection engine. It uses machine learning models trained on aggregated transaction data across the Yuno network to detect fraud patterns.
+
+### How Aida Works
+
+1. **Feature extraction**: Aida extracts 200+ features from each transaction, combining raw signals with computed features (e.g., deviation from customer's normal spending pattern).
+2. **Model scoring**: Multiple models evaluate the transaction simultaneously, including supervised models trained on confirmed fraud and unsupervised models detecting anomalies.
+3. **Score aggregation**: Individual model scores are combined into a single risk score, weighted by model performance on your merchant segment.
+4. **Recommendation**: Aida outputs a recommendation (approve, decline, review) based on the composite score and your configured thresholds.
+
+<Note>
+Aida's models improve over time as more transactions flow through your account. Marking transactions as fraudulent in the Dashboard feeds the model and improves accuracy.
+</Note>
+
+## Configuring Custom Risk Rules
+
+Custom rules extend the default risk engine with merchant-specific logic. Configure rules in the Dashboard under **Risk > Rules**.
+
+### Rule Structure
+
+Each rule consists of:
+
+- **Conditions**: One or more checks that must evaluate to `true`
+- **Action**: What to do when all conditions are met
+- **Priority**: Execution order (lower number = higher priority)
+- **Status**: Enabled or disabled
+
+### Rule Actions
+
+| Action | Description |
+|--------|-------------|
+| `APPROVE` | Skip further risk checks and approve the transaction |
+| `DECLINE` | Reject the transaction immediately |
+| `REVIEW` | Flag for manual review in the Dashboard |
+| `3DS_CHALLENGE` | Trigger 3D Secure authentication before proceeding |
+
+### Creating a Rule
+
+<Steps>
+  <Step title="Navigate to Dashboard > Risk > Rules" />
+  <Step title="Click 'Create Rule'" />
+  <Step title="Define conditions using the field selector">
+    Select a field, operator, and value for each condition. Multiple conditions use AND logic.
+  </Step>
+  <Step title="Select the action to apply when conditions match" />
+  <Step title="Set priority (1 = highest)" />
+  <Step title="Enable the rule and save" />
+</Steps>
+
+### Rule Condition Operators
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `equals` | Exact match | `card.issuer_country equals US` |
+| `not_equals` | Not equal | `card.type not_equals PREPAID` |
+| `greater_than` | Numeric comparison | `amount.value greater_than 500` |
+| `less_than` | Numeric comparison | `risk_score less_than 20` |
+| `in` | Value in list | `customer.country in [BR, MX, CO]` |
+| `not_in` | Value not in list | `card.issuer_country not_in [NG, GH]` |
+| `contains` | String contains | `customer.email contains @tempmail` |
+| `regex` | Regular expression | `customer.phone regex ^\\+55` |
+
+## Common Risk Rule Examples
+
+| Rule | Conditions | Action | Use Case |
+|------|-----------|--------|----------|
+| Block disposable emails | `customer.email contains @tempmail OR @throwaway` | DECLINE | Prevent fraud from temporary emails |
+| Low-risk fast approval | `risk_score less_than 15 AND customer.is_returning equals true` | APPROVE | Speed up checkout for trusted customers |
+| High-value 3DS | `amount.value greater_than 1000` | 3DS_CHALLENGE | Extra verification for large purchases |
+| Prepaid card review | `card.type equals PREPAID AND amount.value greater_than 200` | REVIEW | Manual check for high-value prepaid card transactions |
+| Velocity block | `velocity.card_txn_1h greater_than 5` | DECLINE | Block rapid-fire card testing |
+| Country mismatch | `card.issuer_country not_equals customer.country` | 3DS_CHALLENGE | Verify cross-border card usage |
+| VPN detection | `device.is_vpn equals true AND risk_score greater_than 50` | REVIEW | Flag suspicious VPN usage |
+| New device + high amount | `device.is_new equals true AND amount.value greater_than 500` | 3DS_CHALLENGE | Extra check for unfamiliar devices |
+| Trusted BIN approval | `card.bin in [411111, 520000] AND risk_score less_than 30` | APPROVE | Fast-track known low-risk BINs |
+| Bot-like behavior | `behavior.session_duration_ms less_than 3000` | DECLINE | Block automated submissions |
+
+<Warning>
+Test new rules in sandbox environment before enabling in production. Overly aggressive rules can increase false positives and decline legitimate transactions.
+</Warning>
+
+## Monitoring Risk Performance
+
+Track the effectiveness of your risk configuration in the Dashboard under **Risk > Analytics**:
+
+### Key Metrics
+
+| Metric | Description | Target |
+|--------|-------------|--------|
+| **False positive rate** | Legitimate transactions incorrectly declined | Below 2% |
+| **Catch rate** | Fraudulent transactions correctly identified | Above 90% |
+| **Review rate** | Percentage of transactions sent to manual review | Below 5% |
+| **3DS challenge rate** | Percentage of transactions requiring 3DS | Below 15% |
+| **Chargeback rate** | Chargebacks as percentage of total transactions | Below 0.5% |
+
+### Performance Dashboard
+
+The risk analytics dashboard provides:
+
+- **Real-time score distribution**: Histogram of risk scores across transactions
+- **Rule hit rates**: How often each rule triggers
+- **Action breakdown**: Distribution of approve, decline, review, and 3DS actions
+- **Trend analysis**: Risk metrics over time (daily, weekly, monthly)
+- **False positive reports**: Transactions flagged for review that were later confirmed legitimate
+
+## Machine Learning Feedback Loop
+
+Improve Aida's accuracy by providing feedback on transaction outcomes:
+
+1. **Mark chargebacks**: When a chargeback is received, mark the original transaction in Dashboard > Payments.
+2. **Resolve reviews**: Approve or decline transactions in the manual review queue with the reason.
+3. **Report fraud**: Flag transactions identified as fraudulent through other channels.
+
+<Info>
+Feedback is incorporated into Aida's models during periodic retraining. Consistent feedback on both fraudulent and legitimate transactions produces the best model performance.
+</Info>
+
+## Best Practices
+
+- **Start with monitoring mode**: Enable new rules in "log only" mode before applying actions. Review the logged matches before activating enforcement.
+- **Layer rules by priority**: Use high-priority rules for known good/bad patterns and lower-priority rules for nuanced checks.
+- **Review regularly**: Audit rule performance monthly. Disable rules with high false positive rates.
+- **Combine signals**: Single-signal rules are prone to false positives. Combine multiple conditions (e.g., VPN + high amount + new device) for precision.
+- **Avoid over-blocking**: Declining too aggressively hurts revenue more than fraud. Prefer 3DS challenges and manual review over outright declines for borderline cases.
+- **Feed the model**: Consistently mark chargebacks and fraud in the Dashboard to improve Aida's accuracy over time.
+
+## Vertical-Specific Risk Profiles
+
+Different business verticals have fundamentally different risk profiles. Use these benchmarks to calibrate your risk thresholds and rule configurations based on your industry.
+
+| Vertical | Typical Fraud Rate | Typical Chargeback Rate | Recommended Risk Threshold | Key Risk Signals | Common Attack Vectors |
+|----------|-------------------|------------------------|---------------------------|-----------------|----------------------|
+| **Digital goods** | 1.5-3.0% | 0.8-1.5% | 55-65 | Device fingerprint, session speed, email age | Account takeover, resale of digital codes, bot purchases |
+| **Physical retail** | 0.3-0.8% | 0.2-0.5% | 70-80 | Shipping/billing mismatch, geolocation | Stolen cards with reshipping, friendly fraud |
+| **SaaS / Subscriptions** | 0.5-1.2% | 0.3-0.8% | 65-75 | Card testing velocity, free trial abuse, email domain | Card testing on trial signup, subscription fraud |
+| **Travel** | 1.0-2.5% | 0.5-1.2% | 60-70 | Booking lead time, one-way trips, last-minute purchases | Stolen cards for flights, loyalty fraud |
+| **Marketplace** | 0.8-2.0% | 0.4-1.0% | 60-70 | New seller velocity, price anomalies, buyer/seller collusion | Fake sellers, triangulation fraud |
+
+### Applying Vertical Profiles
+
+<Steps>
+  <Step title="Identify your primary vertical">
+    Select the vertical that best matches your business model. If you span multiple verticals (e.g., a marketplace selling digital goods), use the higher-risk profile as your baseline.
+  </Step>
+  <Step title="Set initial risk thresholds">
+    Configure your DECLINE threshold at the recommended level in **Dashboard > Risk > Thresholds**. Set your REVIEW threshold 10-15 points below the decline threshold (e.g., decline at 65, review at 50).
+  </Step>
+  <Step title="Configure vertical-specific rules">
+    Add custom rules targeting the key risk signals for your vertical. For example, digital goods merchants should add session duration and email age checks; travel merchants should add booking lead time rules.
+  </Step>
+  <Step title="Monitor and adjust over 30 days">
+    Track false positive rate, catch rate, and chargeback rate for 30 days. Adjust thresholds in 5-point increments based on results.
+  </Step>
+</Steps>
+
+<Tip>
+  Digital goods merchants should consider implementing a mandatory 3DS challenge for first-time buyers with risk scores above 40, rather than declining outright. This preserves conversion while adding verification for higher-risk transactions.
+</Tip>
+
+### Vertical-Specific Rule Examples
+
+| Vertical | Rule | Conditions | Action |
+|----------|------|-----------|--------|
+| Digital goods | Block instant delivery fraud | `session_duration_ms &lt;5000 AND amount.value greater_than 50 AND product_type equals DIGITAL` | DECLINE |
+| SaaS | Free trial card testing | `velocity.unique_cards_per_email_24h greater_than 2 AND payment_type equals TRIAL` | DECLINE |
+| Travel | Last-minute one-way booking | `booking_lead_days less_than 1 AND trip_type equals ONE_WAY AND amount.value greater_than 500` | 3DS_CHALLENGE |
+| Marketplace | New seller high-value | `seller.account_age_days less_than 30 AND amount.value greater_than 300` | REVIEW |
+
+## LatAm Regional Risk Patterns
+
+Latin American markets present unique fraud patterns that require region-specific rules. Configure these alongside your global risk rules for optimal protection.
+
+### Brazil
+
+Brazil has the highest digital payment fraud rates in LatAm, driven by the prevalence of CPF identity theft and sophisticated fraud rings targeting digital banks.
+
+| Pattern | Description | Recommended Rule |
+|---------|-------------|-----------------|
+| **CPF fraud** | Fraudsters use stolen CPF numbers to create accounts and make purchases. Validate CPF against customer identity. | `customer.document_type equals CPF AND device.is_new equals true AND amount.value greater_than 200` -> REVIEW |
+| **Digital bank velocity** | Neobank cards (Nubank, Inter, C6) see higher fraud velocity due to instant card issuance | `card.issuer in [NUBANK, INTER, C6_BANK] AND velocity.card_txn_1h greater_than 3` -> 3DS_CHALLENGE |
+| **PIX fraud** | Instant PIX transfers are used for quick fraud monetization | `payment_method equals PIX AND amount.value greater_than 1000 AND customer.account_age_days less_than 7` -> REVIEW |
+| **Boleto fraud** | Fraudulent boleto generation for money laundering | `payment_method equals BOLETO AND velocity.boleto_per_email_24h greater_than 3` -> DECLINE |
+
+**Brazil-specific velocity thresholds:**
+- Maximum 5 card transactions per hour per device (vs. 10 global default)
+- Maximum 3 PIX transactions per hour per CPF
+- Maximum R$5,000 total card spend per day per CPF
+
+### Mexico
+
+Mexico's fraud landscape is characterized by identity theft and credential stuffing attacks, particularly targeting e-commerce and digital services.
+
+| Pattern | Description | Recommended Rule |
+|---------|-------------|-----------------|
+| **CURP/INE identity theft** | Stolen government IDs used for account creation | `customer.country equals MX AND device.is_new equals true AND customer.account_age_days less_than 1` -> 3DS_CHALLENGE |
+| **Cross-border card fraud** | US-issued cards used with Mexican shipping addresses | `card.issuer_country equals US AND customer.country equals MX AND amount.value greater_than 300` -> REVIEW |
+| **OXXO voucher abuse** | Multiple OXXO vouchers generated to circumvent card limits | `payment_method equals OXXO AND velocity.oxxo_per_email_24h greater_than 2` -> DECLINE |
+| **Credential stuffing** | Automated login and purchase attempts | `behavior.session_duration_ms less_than 2000 AND device.is_vpn equals true` -> DECLINE |
+
+**Mexico-specific velocity thresholds:**
+- Maximum 3 OXXO vouchers per email per 24 hours
+- Maximum MXN 50,000 total card spend per day per device
+- Maximum 8 card transactions per hour per IP address
+
+### Colombia
+
+Colombia enforces strict CVV and 3DS requirements, and fraud patterns often involve social engineering and SIM swapping.
+
+| Pattern | Description | Recommended Rule |
+|---------|-------------|-----------------|
+| **CVV strictness** | Colombian issuers have zero tolerance for CVV mismatches; always send CVV | Ensure CVV is always collected and submitted for Colombian transactions |
+| **SIM swap fraud** | Fraudsters port phone numbers to intercept OTPs | `customer.country equals CO AND customer.phone_changed_days less_than 7 AND amount.value greater_than 500` -> REVIEW |
+| **PSE redirect fraud** | Fraudsters redirect PSE bank transfers using phishing | `payment_method equals PSE AND device.is_vpn equals true` -> DECLINE |
+
+**Colombia-specific velocity thresholds:**
+- Maximum 3 PSE transactions per email per 24 hours
+- Maximum COP 5,000,000 total spend per day per card
+- Maximum 5 card transactions per hour per device
+
+### Argentina
+
+Argentina's volatile economic environment and currency controls create unique fraud patterns, particularly around installment payments and parallel exchange rate arbitrage.
+
+| Pattern | Description | Recommended Rule |
+|---------|-------------|-----------------|
+| **Installment fraud** | Fraudsters exploit high-installment plans (12-18 months) with stolen cards, maximizing exposure before detection | `customer.country equals AR AND installments greater_than 6 AND device.is_new equals true` -> 3DS_CHALLENGE |
+| **Currency arbitrage** | Purchases made to exploit the gap between official and parallel exchange rates | `customer.country equals AR AND card.issuer_country not_equals AR AND amount.value greater_than 500` -> REVIEW |
+| **Prepaid card abuse** | Prepaid cards used for rapid fraud monetization | `card.type equals PREPAID AND customer.country equals AR AND amount.value greater_than 200` -> REVIEW |
+
+**Argentina-specific velocity thresholds:**
+- Maximum 3 installment purchases per card per 24 hours
+- Maximum ARS 500,000 total spend per day per card
+- Maximum 4 card transactions per hour per device
+
+<Warning>
+  LatAm fraud patterns evolve rapidly. Review and update regional rules quarterly. Monitor the chargeback rate per country in **Dashboard > Risk > Analytics** filtered by `customer.country` to detect emerging patterns.
+</Warning>

@@ -1,0 +1,85 @@
+---
+title: "How Payments Work"
+description: "End-to-end overview of the Yuno payment process from checkout to settlement"
+---
+
+## Payment Flow Overview
+
+Every Yuno payment follows a five-step process. Your server creates a checkout session, the customer selects a payment method, Yuno routes the transaction to the optimal provider, processes it, and notifies you of the result.
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/payment-flow-overview.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/payment-flow-overview.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+## Step-by-Step Breakdown
+
+### 1. Create a Checkout Session
+
+Your server calls `POST /v1/checkout/sessions` with the purchase amount, currency, and country. Yuno returns a `checkout_session` ID that represents this purchase intent.
+
+```json
+{
+  "amount": { "currency": "USD", "value": 150.00 },
+  "country": "US",
+  "merchant_order_id": "order-12345",
+  "payment_description": "Premium subscription"
+}
+```
+
+The checkout session determines which payment methods are available to the customer based on your configuration, the country, and the currency.
+
+### 2. Customer Selects a Payment Method
+
+Using the Yuno SDK or your own UI, the customer chooses how to pay (card, PIX, Boleto, etc.). If using the SDK, Yuno handles method display, input validation, and tokenization automatically.
+
+### 3. Create the Payment
+
+Your server sends `POST /v1/payments` with the checkout session ID, selected payment method, customer details, and any method-specific fields (e.g., `customer.document` for PIX).
+
+### 4. Yuno Routes and Processes
+
+This is where orchestration happens. Yuno:
+
+- **Selects the optimal provider** based on your routing rules (cost, approval rate, geographic preference)
+- **Handles 3DS authentication** for card payments when required by the issuer
+- **Retries with fallback providers** if the primary provider declines or times out
+- **Normalizes the response** so you receive a consistent format regardless of which provider processed the payment
+
+### 5. Webhook Notification
+
+Yuno sends a `POST` request to your configured webhook URL with the payment result. This is essential for asynchronous methods like PIX (where the customer pays after receiving a QR code) and Boleto (where the customer pays at a bank or convenience store).
+
+<Warning>
+  Always rely on webhooks for final payment status -- not the synchronous API response. Some payment methods confirm asynchronously, and the initial response may show `PENDING` before settling to `SUCCEEDED` or `DECLINED`.
+</Warning>
+
+## Key Components
+
+| Component | Role | Lifecycle |
+|-----------|------|-----------|
+| **Checkout Session** | Initializes purchase intent, determines available methods | Created once per purchase attempt |
+| **Payment** | Represents the charge against a payment method | One per checkout session (or retry) |
+| **Transaction** | Individual processing attempt within a payment | Multiple if retries or cascading occur |
+| **Provider** | External acquirer/processor that executes the charge | Selected by routing engine per transaction |
+| **Webhook** | Asynchronous notification of status changes | Delivered on every status transition |
+
+<Note>
+  A single payment can generate multiple transactions if Yuno cascades across providers. Each transaction represents one attempt with one provider.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/getting-started/quickstart">
+    Build your first payment integration end to end.
+  </Card>
+  <Card title="Payment Flow Details" icon="diagram-project" href="/core-concepts/payment-flow">
+    Deep dive into payment statuses, capture modes, and lifecycle.
+  </Card>
+</CardGroup>

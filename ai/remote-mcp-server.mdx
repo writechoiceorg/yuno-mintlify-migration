@@ -1,0 +1,195 @@
+---
+title: "Remote MCP Server Setup"
+description: "Configure Yuno's MCP server for AI-powered development tools"
+---
+
+## Overview
+
+Yuno provides both a local and remote MCP server for connecting AI development tools to the Yuno payment API. This guide covers configuration for each supported tool.
+
+## Server Options
+
+| Option | Description | Best For |
+|--------|-------------|----------|
+| **Local (npx)** | Runs on your machine | Individual developers |
+| **Remote (hosted)** | Yuno-hosted MCP endpoint | Teams, CI/CD pipelines |
+
+## Local Server Setup
+
+### Installation
+
+```bash
+npm install -g @yuno-payments/mcp-server
+```
+
+### Running the Server
+
+```bash
+yuno-mcp-server --port 3100
+```
+
+The server starts on `http://localhost:3100` and accepts MCP protocol connections.
+
+### Environment Configuration
+
+Create a `.env` file in your project root:
+
+```bash
+YUNO_PUBLIC_KEY=sandbox_pub_xxx
+YUNO_PRIVATE_KEY=sandbox_priv_xxx
+YUNO_ACCOUNT_CODE=sandbox_acc_xxx
+YUNO_ENVIRONMENT=sandbox
+YUNO_MCP_PORT=3100
+```
+
+<Warning>
+Never commit `.env` files containing API credentials to version control. Add `.env` to your `.gitignore`.
+</Warning>
+
+## Tool-Specific Configuration
+
+### Claude Code
+
+Add the Yuno MCP server to your Claude Code configuration:
+
+```json
+// .claude/settings.json
+{
+  "mcpServers": {
+    "yuno": {
+      "command": "npx",
+      "args": ["@yuno-payments/mcp-server"],
+      "env": {
+        "YUNO_PUBLIC_KEY": "sandbox_pub_xxx",
+        "YUNO_PRIVATE_KEY": "sandbox_priv_xxx",
+        "YUNO_ACCOUNT_CODE": "sandbox_acc_xxx",
+        "YUNO_ENVIRONMENT": "sandbox"
+      }
+    }
+  }
+}
+```
+
+### Cursor
+
+Configure in Cursor settings:
+
+<Steps>
+  <Step title="Open Cursor Settings">
+    Navigate to **Settings > MCP Servers**.
+  </Step>
+  <Step title="Add Yuno MCP">
+    Click **Add Server** and enter:
+
+    | Field | Value |
+    |-------|-------|
+    | Name | Yuno Payments |
+    | Command | `npx @yuno-payments/mcp-server` |
+    | Transport | stdio |
+  </Step>
+  <Step title="Set environment variables">
+    Add your sandbox credentials in the environment variables section.
+  </Step>
+</Steps>
+
+### Windsurf
+
+Add to your Windsurf MCP configuration:
+
+```json
+// .windsurf/mcp.json
+{
+  "servers": {
+    "yuno": {
+      "command": "npx",
+      "args": ["@yuno-payments/mcp-server"],
+      "env": {
+        "YUNO_PUBLIC_KEY": "sandbox_pub_xxx",
+        "YUNO_PRIVATE_KEY": "sandbox_priv_xxx",
+        "YUNO_ACCOUNT_CODE": "sandbox_acc_xxx"
+      }
+    }
+  }
+}
+```
+
+### VS Code with Continue
+
+```json
+// .continue/config.json
+{
+  "mcpServers": [
+    {
+      "name": "yuno",
+      "command": "npx",
+      "args": ["@yuno-payments/mcp-server"],
+      "env": {
+        "YUNO_PUBLIC_KEY": "sandbox_pub_xxx",
+        "YUNO_PRIVATE_KEY": "sandbox_priv_xxx",
+        "YUNO_ACCOUNT_CODE": "sandbox_acc_xxx"
+      }
+    }
+  ]
+}
+```
+
+## Remote Server (Hosted)
+
+For team environments, use Yuno's hosted MCP endpoint:
+
+```
+MCP Endpoint: https://mcp.y.uno/v1
+Authentication: Bearer token (your sandbox private-secret-key)
+```
+
+Configure your AI tool to connect to the remote endpoint instead of running a local server:
+
+```json
+{
+  "mcpServers": {
+    "yuno": {
+      "url": "https://mcp.y.uno/v1",
+      "headers": {
+        "Authorization": "Bearer sandbox_priv_xxx",
+        "x-account-code": "sandbox_acc_xxx"
+      }
+    }
+  }
+}
+```
+
+<Note>
+The remote MCP server connects directly to the Yuno sandbox API. No local server installation is needed. Ensure your network allows outbound HTTPS connections to `mcp.y.uno`.
+</Note>
+
+## Verifying the Connection
+
+After configuration, test the connection:
+
+1. Open your AI tool and start a new conversation
+2. Ask: "List available Yuno payment methods for Brazil"
+3. The AI should invoke the `get_payment_methods` MCP tool and return results
+
+If the connection fails, check:
+- Credentials are correct and for the sandbox environment
+- The MCP server process is running (for local setup)
+- Network connectivity to `mcp.y.uno` (for remote setup)
+- Your AI tool supports MCP protocol
+
+## Troubleshooting
+
+<Accordion title="MCP server fails to start">
+Check that Node.js 18+ is installed. Run `node --version` to verify. Reinstall the package with `npm install -g @yuno-payments/mcp-server`.
+</Accordion>
+
+<Accordion title="Authentication errors">
+Verify your sandbox credentials are correct. Test them with a direct API call first:
+```bash
+curl -H "public-api-key: YOUR_KEY" -H "private-secret-key: YOUR_SECRET" \
+  https://api-sandbox.y.uno/v1/payments?limit=1
+```
+</Accordion>
+
+<Accordion title="AI tool does not see MCP tools">
+Restart your AI tool after changing MCP configuration. Some tools require a full restart to detect new MCP servers.
+</Accordion>

@@ -1,0 +1,176 @@
+---
+title: "Google Pay"
+description: "Accept Google Pay on web and Android for one-tap checkout powered by Google accounts."
+---
+
+
+## Overview
+
+Google Pay allows customers to pay using cards stored in their Google account. With billions of Google accounts worldwide, Google Pay provides a massive reach for one-tap checkout experiences. Through Yuno, you can accept Google Pay on Chrome (web), Android apps, and other supported browsers.
+
+## Prerequisites
+
+<Steps>
+  <Step title="Google Merchant Account">
+    Register for a Google Pay merchant account through the [Google Pay Business Console](https://pay.google.com/business/console). Obtain your Google Merchant ID.
+  </Step>
+  <Step title="HTTPS Required">
+    Your checkout page must be served over HTTPS. Google Pay will not load on insecure pages.
+  </Step>
+  <Step title="Yuno Configuration">
+    Enable Google Pay in your Yuno Dashboard under **Settings > Digital Wallets > Google Pay**. Enter your Google Merchant ID.
+  </Step>
+</Steps>
+
+## Integration with Full Checkout SDK
+
+Yuno's Full Checkout SDK automatically renders the Google Pay button when the customer's browser supports it.
+
+```javascript
+const checkout = yuno.checkout({
+  countryCode: "MX",
+  currency: "MXN",
+  amount: "500.00",
+  checkoutSession: "session_xyz789",
+  // Google Pay button appears automatically on supported browsers
+});
+
+checkout.mount("#checkout-container");
+```
+
+## Direct API Integration
+
+For Direct API integrations, use the Google Pay JavaScript library to obtain a payment token, then pass it to Yuno.
+
+<CodeGroup>
+```javascript Web
+// 1. Initialize Google Pay client
+const paymentsClient = new google.payments.api.PaymentsClient({
+  environment: "TEST" // Use "PRODUCTION" for live
+});
+
+// 2. Define payment request
+const paymentDataRequest = {
+  apiVersion: 2,
+  apiVersionMinor: 0,
+  allowedPaymentMethods: [{
+    type: "CARD",
+    parameters: {
+      allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+      allowedCardNetworks: ["VISA", "MASTERCARD"]
+    },
+    tokenizationSpecification: {
+      type: "PAYMENT_GATEWAY",
+      parameters: {
+        gateway: "yuno",
+        gatewayMerchantId: "YOUR_YUNO_MERCHANT_ID"
+      }
+    }
+  }],
+  transactionInfo: {
+    totalPriceStatus: "FINAL",
+    totalPrice: "500.00",
+    currencyCode: "MXN",
+    countryCode: "MX"
+  }
+};
+
+// 3. Request payment data
+const paymentData = await paymentsClient.loadPaymentData(paymentDataRequest);
+const googlePayToken = paymentData.paymentMethodData.tokenizationData.token;
+
+// 4. Send token to Yuno via your backend
+await submitPayment({ type: "GOOGLE_PAY", token: googlePayToken });
+```
+</CodeGroup>
+
+## Supported Countries and Networks
+
+| Network | Countries |
+|---------|-----------|
+| Visa | US, BR, MX, CO, CL, AR, and 40+ more |
+| Mastercard | US, BR, MX, CO, CL, AR, and 40+ more |
+
+<Info>
+  Google Pay supports both credit and debit cards. Card eligibility depends on the issuing bank's participation in Google Pay.
+</Info>
+
+## Testing in Sandbox
+
+1. Use `environment: "TEST"` in the Google Pay client initialization.
+2. Google provides test card numbers that work in the TEST environment.
+3. Pair with your Yuno sandbox credentials for end-to-end testing.
+
+<Note>
+  In TEST mode, Google Pay returns a test token that will not process real charges. Switch to `"PRODUCTION"` and your live Yuno keys before going live.
+</Note>
+
+## Google Pay with PIX
+
+In Brazil, Google Pay can be used as a payment interface for PIX transactions. This combines Google Pay's wallet convenience with PIX's instant settlement capabilities.
+
+<Info>
+  Google Pay PIX is available in **Brazil only** with **BRL currency** exclusively.
+</Info>
+
+### How It Works
+
+Google Pay PIX uses Open Finance infrastructure to facilitate PIX payments through the Google Wallet. Instead of navigating to a banking app, customers authorize transfers directly within Google Pay.
+
+1. Customer selects Google Pay at checkout.
+2. Google Pay presents PIX as an available option.
+3. Customer authorizes payment through their bank credential.
+4. Yuno creates a `PENDING` payment and returns PIX artifacts.
+5. Customer completes the transfer via their banking app.
+6. Bank confirms the transaction to the provider.
+7. Provider notifies Yuno — webhook fires and status updates to `SUCCEEDED`.
+
+### Supported Providers
+
+- Adyen
+- Santander
+- Itau
+
+For additional providers, contact your Yuno account manager.
+
+### Payment Creation
+
+Set `payment_method.type` to `GOOGLE_PAY_PIX` (distinct from card-based `GOOGLE_PAY`):
+
+```json
+{
+  "country": "BR",
+  "amount": {
+    "value": 100.00,
+    "currency": "BRL"
+  },
+  "payment_method": {
+    "type": "GOOGLE_PAY_PIX"
+  }
+}
+```
+
+### Key Differences from Card-Based Google Pay
+
+| Factor | Google Pay (Cards) | Google Pay PIX |
+|--------|-------------------|----------------|
+| Processing | Typically synchronous | Asynchronous |
+| Settlement | Provider-dependent | Instant (PIX network) |
+| Geography | Global | Brazil only |
+| Recurring support | Yes (via tokens) | No |
+| Post-checkout action | None | Customer completes bank transfer |
+
+### Requirements
+
+- Customer must have a PIX-enabled bank account configured in their Google Wallet.
+- Transactions must be denominated in BRL.
+- Active Yuno account with a supported provider connection.
+
+## Troubleshooting
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| Button not showing | Browser not supported | Google Pay requires Chrome 61+ or compatible browser |
+| `DEVELOPER_ERROR` | Invalid merchant ID | Verify Google Merchant ID in Dashboard settings |
+| Token rejected | Wrong environment | Ensure Google Pay and Yuno environments match (test/prod) |
+| No cards available | User has no cards | Customer must add cards to their Google account |

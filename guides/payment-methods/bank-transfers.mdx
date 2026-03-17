@@ -1,0 +1,340 @@
+---
+title: "Bank Transfers"
+description: "Accept bank transfer payments across Latin America"
+---
+
+## Overview
+
+Bank transfers are a popular payment method across Latin America, with each country having its own interbank transfer system. Yuno provides a unified API to accept bank transfers across multiple countries while handling the country-specific requirements behind the scenes.
+
+Bank transfer methods supported:
+- **PSE** (Colombia) -- Online bank transfer via redirect
+- **SPEI** (Mexico) -- CLABE-based interbank transfer
+- **Transferencia 3.0** (Argentina) -- QR-based bank transfer
+- **Khipu** (Chile) -- Bank transfer aggregator via redirect
+
+## PSE (Colombia)
+
+### Overview
+
+PSE (Pagos Seguros en Linea) is Colombia's online bank transfer system, operated by ACH Colombia. The customer selects their bank, is redirected to their online banking portal, and authorizes the transfer.
+
+### Requirements
+
+| Field | Value | Description |
+|-------|-------|-------------|
+| `country` | `CO` | Colombia only |
+| `amount.currency` | `COP` | Colombian Peso only |
+| `customer.document.document_type` | `CC`, `CE`, `NIT` | Cedula de Ciudadania, Cedula de Extranjeria, or NIT |
+| `customer.document.document_number` | Valid document number | Digits only |
+| `customer.email` | Valid email | Required for notification |
+
+### Creating a PSE Payment
+
+<CodeGroup>
+```javascript Node.js
+const response = await fetch('https://api-sandbox.y.uno/v1/payments', {
+  method: 'POST',
+  headers: {
+    'public-api-key': process.env.YUNO_PUBLIC_KEY,
+    'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+    'account-code': process.env.YUNO_ACCOUNT_CODE,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    checkout_session: 'session-id',
+    payment_method: { type: 'PSE' },
+    amount: { currency: 'COP', value: 100000 },
+    country: 'CO',
+    customer: {
+      email: 'cliente@example.com',
+      first_name: 'Carlos',
+      last_name: 'Rodriguez',
+      document: {
+        document_type: 'CC',
+        document_number: '1234567890',
+      },
+    },
+    callback_url: 'https://your-store.com/payment/callback',
+  }),
+});
+const payment = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api-sandbox.y.uno/v1/payments',
+    headers={
+        'public-api-key': YUNO_PUBLIC_KEY,
+        'private-secret-key': YUNO_PRIVATE_KEY,
+        'account-code': YUNO_ACCOUNT_CODE,
+        'Content-Type': 'application/json',
+    },
+    json={
+        'checkout_session': 'session-id',
+        'payment_method': {'type': 'PSE'},
+        'amount': {'currency': 'COP', 'value': 100000},
+        'country': 'CO',
+        'customer': {
+            'email': 'cliente@example.com',
+            'first_name': 'Carlos',
+            'last_name': 'Rodriguez',
+            'document': {
+                'document_type': 'CC',
+                'document_number': '1234567890',
+            },
+        },
+        'callback_url': 'https://your-store.com/payment/callback',
+    },
+)
+payment = response.json()
+```
+</CodeGroup>
+
+### PSE Redirect Flow
+
+1. Create the payment -- the response includes a `redirect_url`
+2. Redirect the customer to the `redirect_url`
+3. Customer selects their bank and logs into online banking
+4. Customer authorizes the transfer
+5. Customer is redirected back to your `callback_url`
+6. Verify final status via webhook (do not rely on callback URL parameters alone)
+
+```json
+{
+  "id": "pay_pse_abc123",
+  "status": "PENDING",
+  "payment_method": {
+    "type": "PSE",
+    "redirect_url": "https://provider.com/pse/redirect/abc123"
+  }
+}
+```
+
+<Warning>
+PSE transfers can take up to 15 minutes to be confirmed. Always use webhooks for definitive payment status. The callback URL redirect may arrive before the payment is fully confirmed.
+</Warning>
+
+## SPEI (Mexico)
+
+### Overview
+
+SPEI (Sistema de Pagos Electronicos Interbancarios) is Mexico's real-time interbank transfer system operated by Banco de Mexico. Customers transfer funds using a CLABE (Clave Bancaria Estandarizada) number.
+
+### Requirements
+
+| Field | Value | Description |
+|-------|-------|-------------|
+| `country` | `MX` | Mexico only |
+| `amount.currency` | `MXN` | Mexican Peso only |
+| `customer.email` | Valid email | Required for notification |
+
+### Creating a SPEI Payment
+
+<CodeGroup>
+```javascript Node.js
+const response = await fetch('https://api-sandbox.y.uno/v1/payments', {
+  method: 'POST',
+  headers: {
+    'public-api-key': process.env.YUNO_PUBLIC_KEY,
+    'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+    'account-code': process.env.YUNO_ACCOUNT_CODE,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    checkout_session: 'session-id',
+    payment_method: { type: 'SPEI' },
+    amount: { currency: 'MXN', value: 1500.00 },
+    country: 'MX',
+    customer: {
+      email: 'cliente@example.com',
+      first_name: 'Ana',
+      last_name: 'Lopez',
+    },
+    description: 'Orden #654',
+  }),
+});
+const payment = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api-sandbox.y.uno/v1/payments',
+    headers={
+        'public-api-key': YUNO_PUBLIC_KEY,
+        'private-secret-key': YUNO_PRIVATE_KEY,
+        'account-code': YUNO_ACCOUNT_CODE,
+        'Content-Type': 'application/json',
+    },
+    json={
+        'checkout_session': 'session-id',
+        'payment_method': {'type': 'SPEI'},
+        'amount': {'currency': 'MXN', 'value': 1500.00},
+        'country': 'MX',
+        'customer': {
+            'email': 'cliente@example.com',
+            'first_name': 'Ana',
+            'last_name': 'Lopez',
+        },
+        'description': 'Orden #654',
+    },
+)
+payment = response.json()
+```
+</CodeGroup>
+
+### SPEI Response
+
+The response includes CLABE details for the customer to initiate the transfer:
+
+```json
+{
+  "id": "pay_spei_abc123",
+  "status": "PENDING",
+  "payment_method": {
+    "type": "SPEI",
+    "spei": {
+      "clabe": "646180157000000001",
+      "bank_name": "STP",
+      "beneficiary": "Yuno Payments",
+      "reference": "123456",
+      "expiration_date": "2026-03-02T23:59:59Z"
+    }
+  }
+}
+```
+
+Display the CLABE, beneficiary, amount, and reference to the customer so they can initiate the transfer from their banking app.
+
+## Transferencia 3.0 (Argentina)
+
+### Overview
+
+Transferencia 3.0 is Argentina's interoperable QR payment system, regulated by BCRA (Banco Central de la Republica Argentina). Customers scan a QR code with their banking or wallet app to transfer funds.
+
+### Requirements
+
+| Field | Value | Description |
+|-------|-------|-------------|
+| `country` | `AR` | Argentina only |
+| `amount.currency` | `ARS` | Argentine Peso only |
+| `customer.document.document_type` | `DNI` or `CUIT` | National ID or tax ID |
+| `customer.document.document_number` | Valid document number | Digits only |
+
+### Response
+
+The response includes a QR code for the customer to scan:
+
+```json
+{
+  "id": "pay_transf_abc123",
+  "status": "PENDING",
+  "payment_method": {
+    "type": "BANK_TRANSFER",
+    "bank_transfer": {
+      "qr_code": "data:image/png;base64,iVBORw0KGgo...",
+      "expiration_date": "2026-03-01T10:30:00Z"
+    }
+  }
+}
+```
+
+## Khipu (Chile)
+
+### Overview
+
+Khipu is a Chilean bank transfer aggregator that enables online payments through the customer's bank. It supports all major Chilean banks and provides a redirect-based flow.
+
+### Requirements
+
+| Field | Value | Description |
+|-------|-------|-------------|
+| `country` | `CL` | Chile only |
+| `amount.currency` | `CLP` | Chilean Peso only |
+| `customer.email` | Valid email | Required for notification |
+
+### Khipu Redirect Flow
+
+Khipu follows the same redirect pattern as PSE:
+
+1. Create the payment
+2. Redirect the customer to the `redirect_url`
+3. Customer selects their bank and authorizes the transfer
+4. Customer is redirected back to your `callback_url`
+5. Verify final status via webhook
+
+## Status Polling and Webhooks
+
+For all bank transfer methods, use webhooks as the primary mechanism for receiving payment status updates:
+
+| Event | Description |
+|-------|-------------|
+| `payment.pending` | Transfer instructions generated |
+| `payment.succeeded` | Funds received and confirmed |
+| `payment.failed` | Transfer failed or was rejected |
+| `payment.expired` | Transfer instructions expired |
+
+If needed, you can also poll payment status:
+
+```bash
+curl -X GET https://api-sandbox.y.uno/v1/payments/{payment_id} \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code"
+```
+
+<Note>
+Prefer webhooks over polling. Polling should only be used as a fallback. If polling, use a reasonable interval (every 30-60 seconds) and implement exponential backoff.
+</Note>
+
+## Settlement Timelines
+
+| Method | Country | Confirmation Time | Settlement Time |
+|--------|---------|-------------------|-----------------|
+| PSE | CO | Up to 15 minutes | 1-2 business days |
+| SPEI | MX | Minutes to hours | Same day or next business day |
+| Transferencia 3.0 | AR | Seconds to minutes | 1-2 business days |
+| Khipu | CL | Minutes to hours | 1-3 business days |
+
+## Common Issues
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| Missing `redirect_url` in response | PSE/Khipu requires `callback_url` | Add `callback_url` to the payment request |
+| Customer redirect fails | Invalid or unreachable `callback_url` | Verify `callback_url` is a valid, publicly accessible HTTPS URL |
+| Payment stuck in `PENDING` | Customer did not complete transfer | Check webhook events; contact customer if needed |
+| 400: `document is required` | Missing document for PSE/Transferencia 3.0 | Add `customer.document` with valid document type and number |
+
+## Response Handling
+
+### Redirect-Based Methods (PSE, iDEAL, SEPA)
+Bank transfer methods typically return a redirect URL:
+
+```json
+{
+  "id": "pay_abc123",
+  "status": "PENDING",
+  "payment_method": {
+    "type": "BANK_TRANSFER",
+    "redirect_url": "https://bank.example.com/authorize/..."
+  }
+}
+```
+
+Redirect the customer to `redirect_url` to authorize the transfer at their bank. After authorization, the customer is redirected back to your `return_url`.
+
+### Webhook Events
+
+| Event | Status | Action |
+|-------|--------|--------|
+| `payment.succeeded` | `SUCCEEDED` | Bank authorized the transfer — fulfill the order |
+| `payment.failed` | `FAILED` | Customer cancelled or bank declined — show error |
+| `payment.expired` | `EXPIRED` | Authorization window expired — offer retry |
+
+<Warning>
+Never rely on the redirect callback alone for payment confirmation. The customer may close their browser before being redirected back. Always use [webhooks](/guides/webhooks/setup) for definitive status updates.
+</Warning>

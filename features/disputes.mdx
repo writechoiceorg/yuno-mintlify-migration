@@ -1,0 +1,132 @@
+---
+title: "Disputes & Chargebacks"
+description: "Manage payment disputes and chargebacks through Yuno's Disputes API with evidence submission and lifecycle tracking."
+---
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/dispute-lifecycle.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/dispute-lifecycle.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## Overview
+
+Disputes occur when a cardholder contests a transaction with their issuing bank. Yuno provides a unified Disputes API to track, respond to, and manage chargebacks across all your payment providers. Timely and well-documented responses are critical to winning disputes and protecting your revenue.
+
+## Dispute Lifecycle
+
+| Status | Description | Merchant Action |
+|--------|-------------|-----------------|
+| `OPEN` | Dispute filed by cardholder | Review and prepare evidence |
+| `UNDER_REVIEW` | Evidence submitted, awaiting decision | Monitor for updates |
+| `WON` | Dispute resolved in merchant's favor | Funds returned to merchant |
+| `LOST` | Dispute resolved in cardholder's favor | Funds debited from merchant |
+| `EXPIRED` | Response deadline passed without action | Automatic loss, funds debited |
+
+<Warning>
+  Each dispute has a strict response deadline (typically 7-30 days depending on the card network). Failing to respond before the deadline results in an automatic loss.
+</Warning>
+
+## Viewing Disputes
+
+### List All Disputes
+
+```bash
+curl --request GET \
+  --url https://api.y.uno/v1/disputes \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+### Get Dispute Details
+
+```bash
+curl --request GET \
+  --url https://api.y.uno/v1/disputes/dsp_abc123 \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+```json
+{
+  "id": "dsp_abc123",
+  "payment_id": "pay_xyz789",
+  "status": "OPEN",
+  "reason": "FRAUDULENT",
+  "amount": {
+    "value": 250.00,
+    "currency": "USD"
+  },
+  "deadline": "2026-03-15T23:59:59Z",
+  "created_at": "2026-02-28T10:00:00Z"
+}
+```
+
+## Dispute Reason Codes
+
+| Reason | Description | Common Evidence |
+|--------|-------------|-----------------|
+| `FRAUDULENT` | Cardholder claims unauthorized use | 3DS proof, IP logs, delivery confirmation |
+| `PRODUCT_NOT_RECEIVED` | Customer did not receive goods | Shipping tracking, delivery proof |
+| `PRODUCT_UNACCEPTABLE` | Product/service not as described | Terms of service, product description |
+| `DUPLICATE` | Customer charged more than once | Transaction logs showing single charge |
+| `SUBSCRIPTION_CANCELLED` | Charged after cancellation | Cancellation policy, cancellation timestamp |
+| `CREDIT_NOT_PROCESSED` | Refund promised but not received | Refund records, communication logs |
+
+## Submitting Evidence
+
+Respond to a dispute by submitting evidence before the deadline.
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/disputes/dsp_abc123/evidence \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "evidence_type": "COMPELLING_EVIDENCE",
+    "description": "Customer authenticated via 3DS 2.0. Delivery confirmed.",
+    "documents": [
+      {
+        "type": "DELIVERY_PROOF",
+        "url": "https://yourdomain.com/evidence/delivery_proof.pdf"
+      },
+      {
+        "type": "TRANSACTION_LOG",
+        "url": "https://yourdomain.com/evidence/3ds_auth_log.pdf"
+      }
+    ]
+  }'
+```
+</CodeGroup>
+
+<Info>
+  Provide as much relevant evidence as possible in a single submission. Multiple submissions may not be allowed depending on the card network's dispute process.
+</Info>
+
+## Webhook Events
+
+| Event | Trigger |
+|-------|---------|
+| `dispute.created` | New dispute filed |
+| `dispute.updated` | Dispute status changed |
+| `dispute.won` | Resolved in merchant's favor |
+| `dispute.lost` | Resolved in cardholder's favor |
+| `dispute.deadline_approaching` | Response deadline within 48 hours |
+
+## Best Practices
+
+- **Respond promptly**: Submit evidence well before the deadline. Do not wait until the last day.
+- **Use 3D Secure**: Transactions authenticated with 3DS benefit from liability shift, which can resolve disputes in your favor automatically.
+- **Keep records**: Maintain delivery confirmations, customer communications, and transaction logs.
+- **Monitor `dispute.created` webhooks**: Set up alerts for immediate notification of new disputes.
+- **Track dispute rates**: A dispute rate above 1% can trigger card network monitoring programs.
+
+<Note>
+  You can also manage disputes through the Yuno Dashboard under **Payments > Disputes**, which provides a visual interface for reviewing dispute details and uploading evidence.
+</Note>

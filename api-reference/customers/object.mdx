@@ -1,0 +1,194 @@
+---
+title: "The Customer Object"
+description: "Represents a customer in Yuno's system, used across payments, enrollments, and subscriptions."
+---
+
+The Customer object stores buyer information used across checkout sessions, payments, enrollments, and subscriptions. Customers can be created explicitly via the API or implicitly during payment creation.
+
+<Info>
+  Customer records are shared across all payment methods and providers. Creating a customer once allows you to reference them in all subsequent transactions using their `id` or `merchant_customer_id`.
+</Info>
+
+## Object Fields
+
+<ResponseField name="id" type="string">
+  Yuno's unique customer identifier (UUID).
+
+  Example: `c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f`
+</ResponseField>
+
+<ResponseField name="merchant_customer_id" type="string">
+  Your own internal customer identifier, used for reconciliation between your system and Yuno.
+
+  Example: `cust-internal-001`
+</ResponseField>
+
+<ResponseField name="first_name" type="string">
+  Customer's first name.
+
+  Example: `Maria`
+</ResponseField>
+
+<ResponseField name="last_name" type="string">
+  Customer's last name.
+
+  Example: `Silva`
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  Customer's email address. Required for most payment methods (PIX, Boleto, OXXO).
+
+  Example: `maria.silva@example.com`
+</ResponseField>
+
+<ResponseField name="phone" type="string">
+  Customer's phone number in international format.
+
+  Example: `+5511999990000`
+</ResponseField>
+
+<ResponseField name="document" type="object">
+  Customer's identification document. Required for PIX, Boleto, and most Latin American payment methods.
+  <Expandable title="document">
+    <ResponseField name="document_type" type="string">
+      Type of identification document.
+
+      Values: `CPF`, `CNPJ`, `CC`, `CE`, `NIT`, `PP`, `TI`, `DNI`, `RG`, `CURP`, `RFC`, `RUC`, `CI`, `RUN`, `RUT`, `SSN`, `PASSPORT`, `NATIONAL_ID`, `OTHER`
+
+      Example: `CPF`
+    </ResponseField>
+    <ResponseField name="document_number" type="string">
+      Document number. Digits only, no formatting.
+
+      Example: `12345678901` (CPF — 11 digits)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="gender" type="string">
+  Customer's gender.
+
+  Values: `M`, `F`, `OTHER`
+</ResponseField>
+
+<ResponseField name="date_of_birth" type="string">
+  Date of birth in `YYYY-MM-DD` format.
+
+  Example: `1990-05-15`
+</ResponseField>
+
+<ResponseField name="nationality" type="string">
+  Customer's nationality. ISO 3166-1 alpha-2 country code.
+
+  Example: `BR`
+</ResponseField>
+
+<ResponseField name="address" type="object">
+  Customer's billing address.
+  <Expandable title="address">
+    <ResponseField name="address_line_1" type="string">
+      Street address (line 1).
+    </ResponseField>
+    <ResponseField name="address_line_2" type="string">
+      Additional address information (apartment, suite, etc.).
+    </ResponseField>
+    <ResponseField name="city" type="string">
+      City name.
+    </ResponseField>
+    <ResponseField name="state" type="string">
+      State or province code.
+    </ResponseField>
+    <ResponseField name="zip_code" type="string">
+      Postal code.
+    </ResponseField>
+    <ResponseField name="country" type="string">
+      ISO 3166-1 alpha-2 country code.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="shipping_address" type="object">
+  Customer's shipping address. Same structure as `address`.
+</ResponseField>
+
+<ResponseField name="merchant_customer_validations" type="object">
+  Boolean flags for merchant-side customer validations, used for fraud prevention.
+  <Expandable title="merchant_customer_validations">
+    <ResponseField name="email_verified" type="boolean">
+      Whether the merchant has verified the customer's email.
+    </ResponseField>
+    <ResponseField name="phone_verified" type="boolean">
+      Whether the merchant has verified the customer's phone.
+    </ResponseField>
+    <ResponseField name="document_verified" type="boolean">
+      Whether the merchant has verified the customer's identity document.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the customer record was created.
+
+  Example: `2026-03-01T10:00:00.000Z`
+</ResponseField>
+
+## Example
+
+```json
+{
+  "id": "c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f",
+  "merchant_customer_id": "cust-internal-001",
+  "first_name": "John",
+  "last_name": "Smith",
+  "email": "john.smith@example.com",
+  "phone": "+14155550100",
+  "document": {
+    "document_type": "NATIONAL_ID",
+    "document_number": "123456789"
+  },
+  "gender": "M",
+  "date_of_birth": "1990-05-15",
+  "nationality": "US",
+  "address": {
+    "address_line_1": "123 Main Street",
+    "address_line_2": "Apt 4B",
+    "city": "San Francisco",
+    "state": "CA",
+    "zip_code": "94102",
+    "country": "US"
+  },
+  "shipping_address": null,
+  "merchant_customer_validations": {
+    "email_verified": true,
+    "phone_verified": false,
+    "document_verified": true
+  },
+  "created_at": "2026-03-01T10:00:00.000Z"
+}
+```
+
+## Payment Method Requirements by Country
+
+The `document` field requirements vary by payment method and country:
+
+| Country | Payment Method | Required Document | Format |
+|---------|---------------|-------------------|--------|
+| Brazil | PIX, Boleto | CPF (individuals) or CNPJ (businesses) | 11 digits (CPF), 14 digits (CNPJ) |
+| Colombia | PSE, Nequi | CC, CE, NIT, or PP | Varies |
+| Mexico | OXXO, SPEI | CURP or RFC | 18 chars (CURP), 13 chars (RFC) |
+| Chile | Bank Transfer | RUN or RUT | 8-9 digits + check digit |
+| Peru | PagoEfectivo | DNI | 8 digits |
+
+## Related Endpoints
+
+- [Create Customer](/api-reference/customers/create) — `POST /v1/customers`
+- [Get Customer](/api-reference/customers/get) — `GET /v1/customers/{customer_id}`
+- [Get Customer by External ID](/api-reference/customers/get-by-external-id) — `GET /v1/customers/merchant-customer-id/{merchant_customer_id}`
+- [List Customers](/api-reference/customers/list) — `GET /v1/customers`
+- [Update Customer](/api-reference/customers/update) — `PATCH /v1/customers/{customer_id}`
+- [Delete Customer](/api-reference/customers/delete) — `DELETE /v1/customers/{customer_id}`
+
+## Related Concepts
+
+- [Customers](/core-concepts/customers) — How customers work in Yuno
+- [Tokens](/core-concepts/tokens) — How customer tokens and vaulting work

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – BIN Structure</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  .node {
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a0a0a;
+    text-align: center;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+  }
+
+  .node.blue   { border-color: #2563eb; background: #ffffff; }
+  .node.green  { border-color: #16a34a; background: #f0fdf4; }
+  .node.indigo { border-color: #6366f1; background: #eef2ff; }
+  .node.amber  { border-color: #b45309; background: #fef3c7; }
+
+  .card-number {
+    position: absolute;
+    transform: translateX(-50%);
+    font-family: 'Inter', monospace;
+    font-size: 32px;
+    font-weight: 700;
+    color: #0a0a0a;
+    letter-spacing: 4px;
+  }
+
+  .section-box {
+    position: absolute;
+    border: 2px solid;
+    border-radius: 8px;
+    padding: 16px 24px;
+    text-align: center;
+    transform: translateX(-50%);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .section-box .digits {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    font-family: 'Inter', monospace;
+  }
+
+  .section-box .label {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .section-box.bin-box {
+    border-color: #2563eb;
+    background: rgba(37, 99, 235, 0.06);
+  }
+  .section-box.bin-box .digits { color: #2563eb; }
+  .section-box.bin-box .label  { color: #1d4ed8; }
+
+  .section-box.acct-box {
+    border-color: #b45309;
+    background: rgba(180, 83, 9, 0.06);
+  }
+  .section-box.acct-box .digits { color: #b45309; }
+  .section-box.acct-box .label  { color: #92400e; }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.08)"/>
+    </filter>
+
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#94a3b8"/>
+    </marker>
+
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background card -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.6"/>
+
+  <!-- Dashed grid — vertical -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="190"  y1="48" x2="190"  y2="826"/>
+    <line x1="340"  y1="48" x2="340"  y2="826"/>
+    <line x1="490"  y1="48" x2="490"  y2="826"/>
+    <line x1="640"  y1="48" x2="640"  y2="826"/>
+    <line x1="790"  y1="48" x2="790"  y2="826"/>
+    <line x1="940"  y1="48" x2="940"  y2="826"/>
+    <line x1="1090" y1="48" x2="1090" y2="826"/>
+    <line x1="1240" y1="48" x2="1240" y2="826"/>
+    <line x1="1390" y1="48" x2="1390" y2="826"/>
+  </g>
+
+  <!-- Dashed grid — horizontal -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="40" y1="135" x2="1500" y2="135"/>
+    <line x1="40" y1="285" x2="1500" y2="285"/>
+    <line x1="40" y1="435" x2="1500" y2="435"/>
+    <line x1="40" y1="585" x2="1500" y2="585"/>
+    <line x1="40" y1="735" x2="1500" y2="735"/>
+  </g>
+
+  <!-- Bracket from card number to section boxes -->
+  <path d="M 520,170 L 520,210" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
+  <path d="M 1020,170 L 1020,210" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
+
+  <!-- Connector paths: BIN box to info nodes -->
+  <path id="p1" d="M 520,360 C 520,420 350,420 350,480"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <path id="p2" d="M 520,360 L 520,400 C 520,440 770,440 770,480"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <path id="p3" d="M 520,360 C 520,420 1190,420 1190,480"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Animated sparks -->
+  <g clip-path="url(#diagram-clip)">
+    <circle r="3.5" fill="#2563eb" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="2.0s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p1"/>
+      </animateMotion>
+    </circle>
+
+    <circle r="3.5" fill="#6366f1" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2.2s" begin="0.5s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p2"/>
+      </animateMotion>
+    </circle>
+
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2.8s" begin="1.0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p3"/>
+      </animateMotion>
+    </circle>
+  </g>
+</svg>
+
+<!-- Full card number label -->
+<div class="card-number" style="left:770px; top:110px;">4512 34XX XXXX XXXX</div>
+
+<!-- BIN section box -->
+<div class="section-box bin-box" style="left:520px; top:230px;">
+  <div class="digits">4512 34XX</div>
+  <div class="label">BIN &mdash; Bank Identification Number</div>
+</div>
+
+<!-- Account number section box -->
+<div class="section-box acct-box" style="left:1020px; top:230px;">
+  <div class="digits">XXXX XXXX</div>
+  <div class="label">Account Number</div>
+</div>
+
+<!-- Info nodes -->
+<div class="node blue" style="left:350px; top:490px;">Identifies Issuer</div>
+<div class="node indigo" style="left:770px; top:490px;">Identifies Network</div>
+<div class="node green" style="left:1190px; top:490px;">Routes to Acquirer</div>
+
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,123 @@
+---
+title: "AI-Powered Optimization"
+description: "Boost approval rates, reduce costs, and prevent fraud with Yuno's AI engine, Aida."
+---
+
+
+## Overview
+
+Yuno's AI engine, **Aida**, uses machine learning to optimize payment routing, maximize approval rates, minimize processing costs, and detect fraud in real-time. Aida analyzes transaction patterns across Yuno's network to make intelligent decisions that improve your payment performance without requiring manual configuration.
+
+## Core Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Smart Routing" icon="route">
+    Automatically route transactions to the provider most likely to approve them based on historical data, card type, issuer, and transaction characteristics.
+  </Card>
+  <Card title="Approval Rate Optimization" icon="chart-line">
+    Increase authorization rates by selecting optimal providers, retry paths, and transaction parameters.
+  </Card>
+  <Card title="Cost Optimization" icon="coins">
+    Minimize processing fees by routing to the most cost-effective provider while maintaining high approval rates.
+  </Card>
+  <Card title="Fraud Detection" icon="shield">
+    Real-time fraud scoring that blocks suspicious transactions without adding friction for legitimate customers.
+  </Card>
+</CardGroup>
+
+## Smart Routing
+
+Aida evaluates multiple factors in real-time to determine the best provider for each transaction:
+
+| Factor | Description |
+|--------|-------------|
+| **Card BIN** | Issuer-specific approval patterns |
+| **Transaction amount** | Provider performance by amount range |
+| **Country/currency** | Regional provider strengths |
+| **Payment method** | Method-specific routing rules |
+| **Historical performance** | Provider approval rates over time |
+| **Time of day** | Temporal patterns in approval rates |
+
+### How Smart Routing Works
+
+```
+Transaction arrives
+    │
+    ├── Aida evaluates all eligible providers
+    │     ├── Provider A: 94% predicted approval, $0.30 fee
+    │     ├── Provider B: 91% predicted approval, $0.25 fee
+    │     └── Provider C: 87% predicted approval, $0.20 fee
+    │
+    └── Routes to Provider A (highest predicted approval)
+```
+
+<Info>
+  Smart routing requires at least two payment providers configured for the same payment method and country. Aida continuously learns from each transaction to improve routing decisions.
+</Info>
+
+## Approval Rate Optimization
+
+Beyond routing, Aida optimizes transaction parameters to increase approval likelihood:
+
+- **Retry logic**: Automatically retries declined transactions on alternative providers when the decline is likely recoverable.
+- **Parameter optimization**: Adjusts transaction fields (e.g., soft descriptors, MCC codes) to improve issuer approval.
+- **Decline analysis**: Categorizes declines as soft or hard to determine retry eligibility.
+
+## Cost Optimization
+
+Aida balances approval rates against processing costs:
+
+| Strategy | Description |
+|----------|-------------|
+| **Cost-first** | Prioritize lowest fees while maintaining acceptable approval rates |
+| **Approval-first** | Prioritize highest approval rates regardless of cost |
+| **Balanced** | Optimize for best overall value (default) |
+
+<Note>
+  You can configure your optimization strategy in the Yuno Dashboard under **Settings > Smart Routing > Optimization Strategy**.
+</Note>
+
+## Fraud Detection
+
+Aida's fraud detection engine scores every transaction in real-time:
+
+| Risk Level | Score Range | Action |
+|-----------|-------------|--------|
+| Low | 0-30 | Transaction proceeds normally |
+| Medium | 31-70 | Transaction proceeds, flagged for review |
+| High | 71-100 | Transaction blocked or requires 3DS |
+
+### Fraud Signals
+
+Aida evaluates hundreds of signals including:
+
+- Device fingerprinting and behavioral analysis
+- Velocity checks (transaction frequency per card/device)
+- Geolocation consistency (IP vs. billing address)
+- Known fraud patterns from Yuno's network
+
+<Warning>
+  Fraud detection rules can be customized in the Dashboard. Be careful when adjusting thresholds -- overly aggressive rules may block legitimate transactions, while lenient rules increase fraud exposure.
+</Warning>
+
+## Monitoring Performance
+
+Track Aida's impact through the Dashboard analytics:
+
+- **Approval rate trends**: Before and after enabling smart routing
+- **Cost per transaction**: Average processing cost over time
+- **Fraud metrics**: Blocked transactions, false positive rate
+- **Provider performance**: Comparative analysis across providers
+
+## Enabling Aida
+
+Aida is available for merchants with multiple payment providers. To enable:
+
+1. Navigate to **Settings > Smart Routing** in the Yuno Dashboard.
+2. Enable **AI Optimization**.
+3. Select your optimization strategy (cost-first, approval-first, or balanced).
+4. Configure fraud detection thresholds if needed.
+
+<Info>
+  Aida requires a minimum transaction volume to build effective models. During the initial learning period (typically 2-4 weeks), routing may rely more heavily on default rules before Aida's predictions reach optimal accuracy.
+</Info>

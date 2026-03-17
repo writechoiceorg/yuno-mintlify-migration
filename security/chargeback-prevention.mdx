@@ -1,0 +1,321 @@
+---
+title: "Chargeback Prevention"
+description: "Reduce chargebacks with proactive prevention strategies and effective representment."
+---
+
+
+## Overview
+
+Chargebacks are a costly and operationally disruptive aspect of accepting card payments. Beyond the direct financial loss, excessive chargeback rates can result in monitoring programs, increased processing fees, and ultimately the termination of your merchant account. This guide covers prevention strategies, representment best practices, and how to use Yuno's tools to maintain healthy chargeback rates.
+
+## Chargeback Rate Benchmarks and Thresholds
+
+Card networks impose strict chargeback ratio thresholds. Exceeding these thresholds triggers monitoring programs with escalating consequences.
+
+### Visa (Visa Dispute Monitoring Program - VDMP)
+
+| Level | Chargeback Ratio | Monthly Disputes | Consequence |
+|-------|-----------------|------------------|-------------|
+| **Normal** | < 0.9% | < 100 | No action required |
+| **Standard (VDMP)** | 0.9% - 1.8% | >= 100 | 4-month remediation window, monthly reporting |
+| **Excessive (VDMP)** | > 1.8% | >= 1,000 | Fines starting at $25,000/month, potential termination |
+
+### Mastercard (Excessive Chargeback Program - ECP)
+
+| Level | Chargeback Ratio | Monthly Disputes | Consequence |
+|-------|-----------------|------------------|-------------|
+| **Normal** | < 1.5% | < 100 | No action required |
+| **Excessive Chargeback Merchant** | 1.5% - 3.0% | >= 100 | Remediation plan required, $1,000 per chargeback assessment |
+| **High Excessive** | > 3.0% | >= 300 | Increased assessments, potential termination |
+
+<Warning>
+  Chargeback ratio is calculated as: (chargebacks in current month) / (transactions in prior month). A single month above threshold can trigger monitoring. Both the ratio AND the minimum dispute count must be exceeded to enter a monitoring program.
+</Warning>
+
+### Consequences of Exceeding Thresholds
+
+| Phase | Timeline | Impact |
+|-------|----------|--------|
+| **Notification** | Month 1 | Network notifies acquirer; merchant must acknowledge |
+| **Remediation** | Months 2-4 | Merchant must submit action plan and demonstrate improvement |
+| **Financial penalties** | Months 5+ | Per-chargeback fines ($25-$100 per dispute depending on network) |
+| **Account review** | Months 8-12 | Risk of account termination by acquirer or network |
+| **MATCH/TMF listing** | Termination | Merchant placed on industry blacklist, making it difficult to obtain new processing |
+
+## Chargeback Types and Root Causes
+
+Understanding why chargebacks occur is essential to preventing them.
+
+### Friendly Fraud (60-80% of chargebacks)
+
+The cardholder made a legitimate purchase but disputes the charge.
+
+| Cause | Description | Example |
+|-------|-------------|---------|
+| Non-recognition | Cardholder does not recognize the billing descriptor | "YUNO*MERCHANT" appears unfamiliar |
+| Buyer's remorse | Customer regrets purchase and disputes instead of requesting refund | Digital goods or subscription charges |
+| Family fraud | Another household member used the card without the cardholder's knowledge | Child makes in-app purchase |
+| Subscription confusion | Customer forgot about recurring charge or did not understand terms | Free trial converts to paid |
+
+### True Fraud (15-25% of chargebacks)
+
+Unauthorized use of stolen card credentials.
+
+| Cause | Description | Indicators |
+|-------|-------------|------------|
+| Stolen credentials | Fraudster uses compromised card data | Unusual shipping address, high-value order, new customer |
+| Account takeover | Fraudster gains access to legitimate customer account | Password change followed by purchase |
+| Card testing | Fraudster validates stolen cards with small transactions | Multiple small transactions in rapid succession |
+
+### Merchant Error (5-10% of chargebacks)
+
+Operational mistakes that lead to legitimate disputes.
+
+| Cause | Description | Prevention |
+|-------|-------------|------------|
+| Duplicate processing | Same transaction charged twice | Implement idempotency keys in API calls |
+| Wrong amount | Charged amount differs from what customer agreed to | Validate amounts before submission |
+| Not delivered | Product or service not received | Track deliveries, send confirmation emails |
+| Refund not processed | Customer requested refund but did not receive it | Automate refund workflows, send confirmation |
+| Misleading description | Product does not match description | Accurate product descriptions and images |
+
+### Authorization Issues
+
+| Cause | Description | Prevention |
+|-------|-------------|------------|
+| Expired authorization | Transaction settled after authorization expired | Settle within authorization window (typically 7 days) |
+| Incorrect currency | Charged in unexpected currency | Display currency clearly before confirmation |
+| No authorization | Transaction processed without valid authorization | Always obtain authorization before settlement |
+
+## Prevention Strategies by Chargeback Type
+
+| Type | Strategy | Implementation |
+|------|----------|----------------|
+| **Friendly fraud** | Clear billing descriptors | Configure via **Dashboard > Settings > Billing Descriptor** |
+| **Friendly fraud** | Transaction receipts | Send email confirmations with order details for every transaction |
+| **Friendly fraud** | Easy refund process | Provide self-service refund options to reduce dispute incentive |
+| **Friendly fraud** | Subscription notifications | Send reminders before recurring charges, especially after trial periods |
+| **True fraud** | 3DS authentication | Enable via `three_d_secure.enabled: true` for liability shift |
+| **True fraud** | AVS verification | Include billing address in payment requests for AVS checks |
+| **True fraud** | Velocity controls | Limit transactions per card per time period |
+| **True fraud** | Device fingerprinting | Pass device data to Yuno for risk scoring |
+| **Merchant error** | Idempotency keys | Include `Idempotency-Key` header in all payment API calls |
+| **Merchant error** | Amount validation | Compare `amount.value` against order total before submission |
+| **Merchant error** | Delivery tracking | Associate tracking numbers with transaction records |
+| **Authorization** | Timely settlement | Settle within 2-3 days of authorization |
+
+## Evidence Submission Best Practices
+
+When a chargeback is filed, you have a limited window to submit compelling evidence for representment.
+
+### Response Deadlines
+
+| Network | Response Window | Extension Available |
+|---------|----------------|---------------------|
+| Visa | 30 calendar days | No |
+| Mastercard | 45 calendar days | No |
+
+<Warning>
+  Missing the response deadline means automatic loss of the dispute. Set up alerts in your dispute management system to track deadlines. Never rely on manual calendar tracking.
+</Warning>
+
+### Evidence Types by Reason Code
+
+| Dispute Category | Required Evidence | Supporting Evidence |
+|-----------------|-------------------|---------------------|
+| **Fraud (unauthorized)** | 3DS authentication proof, signed delivery confirmation | AVS/CVV match results, device fingerprint, IP geolocation |
+| **Not received** | Carrier tracking showing delivery, proof of delivery signature | Delivery confirmation email, customer communication |
+| **Not as described** | Product description as shown at purchase, terms of service | Customer communication, return policy |
+| **Duplicate** | Proof that charges are separate transactions | Separate order IDs, different items/services, timestamps |
+| **Subscription** | Terms of service, cancellation policy, usage logs | Customer acceptance of terms, prior successful charges |
+
+### Evidence Formatting Guidelines
+
+- **File formats**: PDF preferred; images in PNG or JPEG at minimum 300 DPI
+- **File size**: Keep under 10MB total per submission
+- **Organization**: Number documents sequentially and include a cover letter summarizing your case
+- **Clarity**: Highlight relevant sections in long documents
+- **Timestamps**: Ensure all timestamps include timezone information
+- **Redaction**: Redact sensitive data (full card numbers) but preserve enough for identification (last 4 digits)
+
+## Representment Strategy
+
+### When to Fight a Chargeback
+
+| Scenario | Recommendation | Expected Win Rate |
+|----------|---------------|-------------------|
+| 3DS-authenticated transaction with liability shift | Always represent | 85-95% |
+| Delivery confirmed with tracking and signature | Represent with evidence | 70-80% |
+| Digital goods with usage logs post-purchase | Represent with evidence | 50-60% |
+| No evidence available | Accept the chargeback | < 10% |
+| Refund already issued | Provide refund proof to resolve | 90%+ |
+| Legitimate customer complaint | Accept and improve process | N/A |
+
+<Info>
+  Representment has a cost -- your time and resources. For low-value chargebacks (under $25), the cost of gathering evidence and submitting a response may exceed the chargeback amount. Establish a minimum threshold for representment based on your operational costs.
+</Info>
+
+### Representment via Yuno
+
+Yuno provides dispute management through the Dashboard and API:
+
+```bash
+# Retrieve dispute details
+curl --request GET \
+  --url https://api.y.uno/v1/disputes/{dispute_id} \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+```bash
+# Submit evidence for representment
+curl --request POST \
+  --url https://api.y.uno/v1/disputes/{dispute_id}/evidence \
+  --header 'Content-Type: multipart/form-data' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --form 'evidence_type=delivery_proof' \
+  --form 'file=@delivery_confirmation.pdf' \
+  --form 'description=Signed delivery confirmation from carrier'
+```
+
+## Analytics Framework
+
+### Key Metrics to Track
+
+| Metric | Calculation | Target | Review Frequency |
+|--------|------------|--------|-----------------|
+| **Chargeback ratio** | Chargebacks / Prior month transactions | < 0.5% | Weekly |
+| **Win rate** | Won representments / Total representments | > 50% | Monthly |
+| **Fraud rate** | Fraud chargebacks / Total transactions | < 0.3% | Weekly |
+| **Time to respond** | Days between chargeback received and evidence submitted | < 10 days | Monthly |
+| **Reason code distribution** | Count per reason code / Total chargebacks | Varies | Monthly |
+| **Repeat offender rate** | Customers with 2+ chargebacks / Total disputing customers | < 5% | Monthly |
+
+### Root Cause Analysis Process
+
+<Steps>
+  <Step title="Aggregate chargeback data">
+    Export chargebacks from **Dashboard > Disputes** for the analysis period. Include reason codes, amounts, payment methods, and customer segments.
+  </Step>
+  <Step title="Categorize by reason code">
+    Group chargebacks by reason code to identify the dominant categories (fraud, non-receipt, not as described, etc.).
+  </Step>
+  <Step title="Identify patterns">
+    Look for correlations: specific products, customer segments, geographic regions, payment methods, time periods, or providers with elevated chargeback rates.
+  </Step>
+  <Step title="Implement targeted fixes">
+    Address the top 2-3 root causes with specific preventive measures. Prioritize actions with the highest expected chargeback reduction.
+  </Step>
+  <Step title="Monitor impact">
+    Track chargeback rates weekly after implementing changes. Allow 60-90 days for the impact to become visible, as chargebacks typically lag transactions by 30-45 days.
+  </Step>
+</Steps>
+
+## Descriptor Optimization
+
+Billing descriptors are the merchant name that appears on the cardholder's bank or card statement. Unrecognizable descriptors are a leading cause of friendly fraud chargebacks.
+
+### Descriptor Best Practices
+
+| Practice | Example | Benefit |
+|----------|---------|---------|
+| Use recognizable brand name | `ACME STORE` not `ACME HOLDINGS LLC` | Customer recognizes the charge |
+| Include location or website | `ACME STORE ACME.COM` | Customer can verify online |
+| Include contact information | Phone number in dynamic descriptor | Customer contacts you before disputing |
+| Be consistent | Same descriptor across all channels | Builds recognition over time |
+
+<Note>
+  Configure your billing descriptor in **Dashboard > Settings > Business Information > Billing Descriptor**. Changes may take 1-2 billing cycles to propagate to all issuers. Test by making a small transaction and checking how it appears on your statement.
+</Note>
+
+### Dynamic Descriptors
+
+Yuno supports dynamic descriptors that can vary per transaction:
+
+```json
+{
+  "amount": { "value": 99.99, "currency": "USD" },
+  "payment_method": { "type": "CARD", "token": "tok_abc123" },
+  "description": "Order #12345",
+  "statement_descriptor": "ACME STORE ORD12345"
+}
+```
+
+| Field | Max Length | Notes |
+|-------|-----------|-------|
+| `statement_descriptor` | 22 characters | Alphanumeric, spaces, and limited special characters |
+
+## Pre-Authorization and 3DS as Prevention Tools
+
+### 3DS for Liability Shift
+
+Enabling 3D Secure provides liability shift on authenticated transactions. If a cardholder disputes a 3DS-authenticated charge as fraudulent, the liability shifts to the card issuer rather than the merchant.
+
+| 3DS Result | Liability Shift | Chargeback Protection |
+|------------|----------------|----------------------|
+| Fully authenticated (ECI 05/02) | Yes | Protected from fraud chargebacks |
+| Authentication attempted (ECI 06/01) | Partial | Protected in most cases |
+| Not authenticated (ECI 07/00) | No | No protection |
+| Frictionless (authenticated without challenge) | Yes | Full protection with no friction |
+
+See [3DS Optimization](/security/3ds-optimization) for strategies to maximize frictionless authentication rates.
+
+### Pre-Authorization
+
+Use pre-authorization (auth-only) for transactions where the final amount may change or fulfillment is delayed:
+
+```json
+{
+  "amount": { "value": 100.00, "currency": "USD" },
+  "capture": false,
+  "payment_method": { "type": "CARD", "token": "tok_abc123" }
+}
+```
+
+Pre-authorization benefits:
+- Validates the card and confirms available funds before fulfillment
+- Reduces "not received" chargebacks by separating authorization from capture
+- Allows amount adjustment before settlement (e.g., partial shipment)
+
+## Chargeback Monitoring Dashboard Setup
+
+### Recommended Dashboard Configuration
+
+Set up these views in your **Dashboard > Disputes** section:
+
+| View | Filters | Purpose |
+|------|---------|---------|
+| **Daily disputes** | Date = today, Status = new | Triage new chargebacks daily |
+| **Approaching deadline** | Response deadline < 7 days, Status = open | Prevent missed deadlines |
+| **High-value disputes** | Amount > $500, Status = open | Prioritize high-impact cases |
+| **Chargeback trend** | Date range = last 90 days, grouped by week | Monitor ratio trends |
+| **By reason code** | Grouped by reason code, Date = last 30 days | Identify dominant causes |
+
+### Webhook Configuration
+
+Configure webhooks to receive real-time dispute notifications:
+
+```json
+{
+  "event": "dispute.created",
+  "url": "https://your-server.com/webhooks/disputes",
+  "headers": {
+    "Authorization": "Bearer your_webhook_secret"
+  }
+}
+```
+
+Available dispute events:
+- `dispute.created` -- New chargeback received
+- `dispute.updated` -- Dispute status changed
+- `dispute.deadline_approaching` -- Response deadline within 7 days
+- `dispute.resolved` -- Dispute resolved (won, lost, or accepted)
+
+## Best Practices
+
+- **Track your chargeback ratio weekly**: Do not wait for network notifications. By the time you receive a monitoring program notice, you have limited time to remediate.
+- **Respond to every representable chargeback**: Even if you lose, it demonstrates good faith and may influence future dispute outcomes.
+- **Invest in prevention over representment**: It is more cost-effective to prevent chargebacks than to fight them. A $1 investment in prevention saves $2-3 in chargeback costs.
+- **Implement refund-before-chargeback workflows**: When a customer contacts support, resolve complaints quickly with refunds when appropriate. A refund costs the transaction amount; a chargeback costs the transaction amount plus fees.
+- **Use 3DS strategically**: Enable 3DS for high-risk transactions (high value, first-time customers, cross-border) while allowing frictionless flows for low-risk transactions.
+- **Maintain a repeat-offender list**: Flag customers with prior chargebacks and apply additional verification for subsequent transactions.

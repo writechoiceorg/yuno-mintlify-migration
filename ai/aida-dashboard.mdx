@@ -1,0 +1,120 @@
+---
+title: "AI Dashboard"
+description: "Monitor AI-powered payment optimization in real time with metrics, recommendations, and performance insights"
+---
+
+## Overview
+
+The AI Dashboard provides real-time visibility into Aida's optimization performance. Monitor approval rate improvements, cost savings, retry effectiveness, and provider health from a single view.
+
+## Accessing the AI Dashboard
+
+Navigate to **Dashboard > AI > Performance** to view the AI optimization dashboard.
+
+## Key Metrics
+
+<CardGroup cols={3}>
+  <Card title="Approval Rate" icon="check">
+    Current approval rate vs. baseline (before Aida). Shows percentage lift.
+  </Card>
+  <Card title="Cost per Transaction" icon="dollar-sign">
+    Average processing cost with Aida vs. manual routing baseline.
+  </Card>
+  <Card title="Retry Recovery" icon="rotate">
+    Percentage of soft-declined transactions recovered through intelligent retry.
+  </Card>
+</CardGroup>
+
+## Dashboard Sections
+
+### Performance Overview
+
+The top-level view shows aggregate metrics over a configurable time period:
+
+| Metric | Description |
+|--------|-------------|
+| **Approval Rate** | Percentage of approved transactions |
+| **Approval Lift** | Improvement vs. pre-Aida baseline |
+| **Total Revenue Recovered** | Revenue from transactions approved via retry |
+| **Cost Savings** | Savings from optimized provider selection |
+| **Transactions Processed** | Total volume processed through Aida |
+
+### Provider Performance
+
+Compare provider performance side-by-side:
+
+| Column | Description |
+|--------|-------------|
+| **Provider** | Provider name |
+| **Volume** | Transaction count routed to this provider |
+| **Approval Rate** | Provider-specific approval rate |
+| **Avg. Cost** | Average processing cost per transaction |
+| **Aida Score** | AI-calculated quality score (0-100) |
+
+### Retry Analytics
+
+Detailed breakdown of Aida's retry performance:
+
+| Metric | Description |
+|--------|-------------|
+| **Retries Attempted** | Total soft-decline retries |
+| **Retries Succeeded** | Successfully recovered transactions |
+| **Recovery Rate** | Percentage of successful retries |
+| **Avg. Retry Latency** | Additional time added by retry flow |
+| **Top Recovery Paths** | Most effective provider failover combinations |
+
+### Recommendations
+
+Aida generates actionable recommendations based on observed patterns:
+
+<Accordion title="Example: Add a new provider">
+"Transactions from Brazil with Mastercard have a 15% higher decline rate than Visa. Adding Provider X (which has 95% Mastercard approval in BR) could improve overall approval by 3-5%."
+</Accordion>
+
+<Accordion title="Example: Adjust retry strategy">
+"Retry attempts for transactions over $500 have a 5% recovery rate vs. 35% for under $500. Consider limiting retries for high-value transactions to reduce latency."
+</Accordion>
+
+<Accordion title="Example: Cost optimization opportunity">
+"Provider A and Provider B have equivalent approval rates for US card transactions, but Provider B costs 0.3% less per transaction. Shifting 50% of US traffic to Provider B could save $X/month."
+</Accordion>
+
+## Filtering
+
+| Filter | Options |
+|--------|---------|
+| **Time Period** | Last 24h, 7d, 30d, 90d, custom range |
+| **Country** | Filter by transaction country |
+| **Payment Method** | Cards, PIX, Bank Transfer, etc. |
+| **Provider** | Specific provider connection |
+| **Card Brand** | Visa, Mastercard, Amex, etc. |
+
+## Exporting Data
+
+Export AI performance data for reporting:
+
+<Steps>
+  <Step title="Set filters">
+    Configure the desired time period and dimension filters.
+  </Step>
+  <Step title="Click Export">
+    Select format: CSV, XLSX, or PDF.
+  </Step>
+  <Step title="Download report">
+    The export includes all visible metrics and breakdown tables.
+  </Step>
+</Steps>
+
+<Note>
+AI Dashboard data is refreshed every 15 minutes. For real-time transaction monitoring, use the main Payments section in the Dashboard.
+</Note>
+
+## A/B Testing
+
+Aida supports controlled A/B testing to validate optimization impact:
+
+1. Configure a test in **AI > Experiments**
+2. Define control group (manual routing) vs. test group (Aida)
+3. Set traffic split percentage
+4. Monitor results in the AI Dashboard
+5. Promote the winner to 100% traffic

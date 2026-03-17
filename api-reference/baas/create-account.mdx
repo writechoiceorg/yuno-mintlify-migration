@@ -1,0 +1,115 @@
+---
+title: "Create Account"
+description: "Create a bank account for an onboarded entity"
+api: "POST https://api-sandbox.y.uno/v1/baas/accounts"
+---
+
+<Info>
+An entity must have a `SUCCEEDED` onboarding status before you can create a bank account.
+</Info>
+
+## Headers
+
+<ParamField header="x-idempotency-key" type="string" required>
+  Unique UUID to ensure the request is processed only once.
+</ParamField>
+
+## Body
+
+<ParamField body="account_id" type="string" required>
+  Merchant's Yuno account ID (UUID).
+</ParamField>
+
+<ParamField body="entity_id" type="string" required>
+  The entity identifier from [Create Entity](/api-reference/baas/create-entity).
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  ISO 4217 currency code (e.g., `USD`, `GBP`, `AUD`, `EUR`).
+</ParamField>
+
+<ParamField body="country" type="string" required>
+  ISO 3166-1 alpha-2 country code.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">
+  Account identifier.
+</ResponseField>
+
+<ResponseField name="entity_id" type="string">
+  Associated entity.
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  Account currency.
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  Account country.
+</ResponseField>
+
+<ResponseField name="account_details" type="object">
+  Region-specific account identifiers. See [Account identifiers by region](/features/baas/overview#account-identifiers-by-region).
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Account status.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp.
+</ResponseField>
+
+<RequestExample>
+```json
+{
+  "account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "currency": "USD",
+  "country": "US"
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201 Created (US)
+{
+  "id": "acc_770e8400-e29b-41d4-a716-446655440000",
+  "entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "currency": "USD",
+  "country": "US",
+  "account_details": {
+    "account_number": "1234567890",
+    "routing_number": "021000021"
+  },
+  "status": "ACTIVE",
+  "created_at": "2026-02-01T15:00:00Z"
+}
+```
+
+```json 201 Created (UK)
+{
+  "id": "acc_770e8400-e29b-41d4-a716-446655440001",
+  "entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "currency": "GBP",
+  "country": "GB",
+  "account_details": {
+    "account_number": "12345678",
+    "sort_code": "123456",
+    "iban": "GB29NWBK60161331926819"
+  },
+  "status": "ACTIVE",
+  "created_at": "2026-02-01T15:00:00Z"
+}
+```
+
+```json 400 Bad Request
+{
+  "code": "ONBOARDING_NOT_COMPLETED",
+  "messages": ["Entity onboarding must be SUCCEEDED before creating an account"],
+  "http_code": 400
+}
+```
+</ResponseExample>

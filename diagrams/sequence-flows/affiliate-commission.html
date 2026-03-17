@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Affiliate Commission</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  .lane-label {
+    position: absolute;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0a0a0a;
+    line-height: 1.43;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  .step {
+    position: absolute;
+    width: 104px;
+    height: 98px;
+    background: #ffffff;
+    border: 1px solid #3e4fe0;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #0a0a0a;
+    text-align: center;
+    line-height: 1.35;
+  }
+
+  .step.self {
+    border-style: dashed;
+    border-color: #ca8a04;
+    background: #fefce8;
+  }
+
+  .step-badge {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #3e4fe0;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fafafa;
+    line-height: 1;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     4 swim lanes (Buyer / Platform / Yuno / Affiliates):
+       Lane 0 (Buyer)      : y=48  → y=242  cy=145  box_top=96
+       Lane 1 (Platform)   : y=242 → y=436  cy=339  box_top=290
+       Lane 2 (Yuno)       : y=436 → y=630  cy=533  box_top=484
+       Lane 3 (Affiliates) : y=630 → y=826  cy=728  box_top=679
+
+     6 columns, 195px spacing, starting at left=220:
+       Col1=220  Col2=415  Col3=610  Col4=805  Col5=1000  Col6=1195
+       cx: 272  467  662  857  1052  1247
+═══════════════════════════════════════════════════════════════ -->
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.07)"/>
+    </filter>
+    <marker id="arr-dn" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#64748b"/>
+    </marker>
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background card ───────────────────────────────────────── -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.55"/>
+
+  <!-- ── Lane tints (alternating) ──────────────────────────────── -->
+  <rect x="40" y="242" width="1460" height="194" fill="#fafafa" opacity="1"/>
+  <rect x="40" y="630" width="1460" height="196" fill="#fafafa" opacity="1"/>
+
+  <!-- ── Lane dividers ─────────────────────────────────────────── -->
+  <line x1="40" y1="242" x2="1500" y2="242" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+  <line x1="40" y1="436" x2="1500" y2="436" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+  <line x1="40" y1="630" x2="1500" y2="630" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ── Left label panel divider ──────────────────────────────── -->
+  <line x1="181" y1="48" x2="181" y2="826" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CONNECTOR PATHS
+  ════════════════════════════════════════════════════════════════ -->
+
+  <!-- v1: Col1 Buyer→Platform  "Purchase via Referral" (solid down) -->
+  <path id="v1" d="M 272,194 L 272,290"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v2: Col2 Platform→Yuno  "Payment with Split Rules" (solid down) -->
+  <path id="v2" d="M 467,388 L 467,484"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v3: Col3 Yuno self-action  "Calculate Commission" (no connector) -->
+
+  <!-- v4: Col4 Yuno→Platform  "Payment Confirmed" (dashed up) -->
+  <path id="v4" d="M 857,484 L 857,388"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v5: Col5 Yuno→Affiliates  "Scheduled Payout L1" (solid down) -->
+  <path id="v5" d="M 1052,582 L 1052,679"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v6: Col6 Yuno→Affiliates  "Scheduled Payout L2" (solid down) -->
+  <path id="v6" d="M 1247,582 L 1247,679"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ANIMATED SPARKS
+  ════════════════════════════════════════════════════════════════ -->
+  <g clip-path="url(#diagram-clip)">
+
+    <!-- v1: Purchase via Referral (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.4s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v1"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v2: Payment with Split Rules (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.4s" begin="0.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v2"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v4: Payment Confirmed (orange, up) -->
+    <circle r="3" fill="#f97316" filter="url(#spark-glow)" opacity="0.8">
+      <animateMotion dur="1.4s" begin="1.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v4"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v5: Scheduled Payout L1 (green, down) -->
+    <circle r="3.5" fill="#15803d" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.4s" begin="2.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v5"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v6: Scheduled Payout L2 (green, down) -->
+    <circle r="3.5" fill="#15803d" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.4s" begin="3.0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v6"/>
+      </animateMotion>
+    </circle>
+
+  </g>
+</svg>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SWIM LANE LABELS
+═══════════════════════════════════════════════════════════════ -->
+<div class="lane-label" style="left:109px; top:124px;">Buyer</div>
+<div class="lane-label" style="left:109px; top:318px;">Platform</div>
+<div class="lane-label" style="left:109px; top:512px;">Yuno</div>
+<div class="lane-label" style="left:109px; top:706px;">Affiliates</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STEP BADGES
+═══════════════════════════════════════════════════════════════ -->
+<div class="step-badge" style="left:220px; top:86px;">1</div>
+<div class="step-badge" style="left:415px; top:280px;">2</div>
+<div class="step-badge" style="left:610px; top:474px;">3</div>
+<div class="step-badge" style="left:805px; top:474px;">4</div>
+<div class="step-badge" style="left:1000px; top:474px;">5</div>
+<div class="step-badge" style="left:1195px; top:474px;">6</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STEP BOXES
+     Lane0 top=96  · Lane1 top=290  · Lane2 top=484  · Lane3 top=679
+═══════════════════════════════════════════════════════════════ -->
+
+<!-- Col 1: Buyer→Platform "Purchase via Referral" -->
+<div class="step" style="left:220px; top:96px;">Purchase<br>via Referral</div>
+<div class="step" style="left:220px; top:290px;">Receives<br>referral<br>order</div>
+
+<!-- Col 2: Platform→Yuno "Payment with Split Rules" -->
+<div class="step" style="left:415px; top:290px;">Payment<br>with Split<br>Rules</div>
+<div class="step" style="left:415px; top:484px;">Receives<br>split<br>config</div>
+
+<!-- Col 3: Yuno self-action "Calculate Commission" -->
+<div class="step self" style="left:610px; top:484px;">Calculate<br>Commission<br>(L1=10%,<br>L2=3%)</div>
+
+<!-- Col 4: Yuno→Platform "Payment Confirmed" -->
+<div class="step" style="left:805px; top:484px;">Payment<br>Confirmed</div>
+<div class="step" style="left:805px; top:290px;">Receives<br>confirmation</div>
+
+<!-- Col 5: Yuno→Affiliates "Scheduled Payout L1" -->
+<div class="step" style="left:1000px; top:484px;">Scheduled<br>Payout L1</div>
+<div class="step" style="left:1000px; top:679px;">L1 affiliate<br>receives<br>10%</div>
+
+<!-- Col 6: Yuno→Affiliates "Scheduled Payout L2" -->
+<div class="step" style="left:1195px; top:484px;">Scheduled<br>Payout L2</div>
+<div class="step" style="left:1195px; top:679px;">L2 affiliate<br>receives<br>3%</div>
+
+</div><!-- /diagram -->
+</div><!-- /scroll-wrapper -->
+</body>
+</html>

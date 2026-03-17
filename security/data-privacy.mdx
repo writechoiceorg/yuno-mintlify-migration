@@ -1,0 +1,123 @@
+---
+title: "Data Privacy & Compliance"
+description: "GDPR compliance, data residency, and retention policies for payment data processed through Yuno."
+---
+
+
+## Overview
+
+Yuno is committed to protecting the privacy and security of personal and financial data. This page outlines how Yuno handles data privacy, complies with major regulations (including GDPR and LGPD), and provides tools for you to manage your customers' data rights.
+
+## Regulatory Compliance
+
+| Regulation | Region | Status |
+|-----------|--------|--------|
+| **GDPR** | European Union / EEA | Compliant |
+| **LGPD** | Brazil | Compliant |
+| **PCI DSS** | Global | Level 1 Certified |
+| **SOC 2 Type II** | Global | Certified |
+
+<Info>
+  Yuno acts as a **data processor** under GDPR and LGPD. You, the merchant, are the **data controller**. This means you determine the purposes and means of processing personal data, while Yuno processes it on your behalf according to your instructions and applicable regulations.
+</Info>
+
+## Data Processing
+
+### What Data Yuno Processes
+
+| Data Category | Examples | Purpose | Retention |
+|--------------|---------|---------|-----------|
+| **Payment data** | Card tokens, transaction amounts | Payment processing | Per retention policy |
+| **Customer identifiers** | Email, name, document number | Transaction association | Per retention policy |
+| **Device data** | IP address, browser info, device ID | Fraud prevention, 3DS | 90 days |
+| **Transaction records** | Payment IDs, status, timestamps | Reconciliation, compliance | 7 years (regulatory) |
+
+### What Yuno Does NOT Store
+
+- Raw card numbers (PANs) are encrypted in the PCI-compliant vault
+- CVV/CVC codes are never stored (used only for real-time authorization)
+- Passwords or authentication credentials
+
+## Data Residency
+
+Yuno processes and stores data in secure data centers with regional presence:
+
+| Region | Data Center Location | Applicable Data |
+|--------|---------------------|-----------------|
+| Americas | US, Brazil | LATAM merchant data |
+| Europe | EU (Frankfurt) | EU merchant data |
+
+<Warning>
+  If your business is subject to data residency requirements (e.g., EU data must stay within the EU), contact Yuno support to confirm your data processing region before going live.
+</Warning>
+
+## Data Retention Policies
+
+| Data Type | Default Retention | Configurable | Regulatory Minimum |
+|-----------|------------------|--------------|-------------------|
+| Transaction records | 7 years | No | Required by financial regulations |
+| Customer PII | 3 years after last transaction | Yes | Varies by jurisdiction |
+| Device/session data | 90 days | No | N/A |
+| Audit logs | 5 years | No | Required for compliance |
+| Vaulted card tokens | Until customer deletion | Yes | N/A |
+
+## Customer Data Rights
+
+Yuno provides API endpoints to help you fulfill customer data rights under GDPR and LGPD:
+
+### Right to Access (Data Export)
+
+```bash
+curl --request GET \
+  --url https://api.y.uno/v1/customers/{customer_id}/data-export \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+### Right to Deletion (Data Erasure)
+
+```bash
+curl --request DELETE \
+  --url https://api.y.uno/v1/customers/{customer_id} \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+<Warning>
+  Customer deletion removes personal data but retains anonymized transaction records as required by financial regulations. Vaulted payment methods are permanently deleted and cannot be recovered.
+</Warning>
+
+### Right to Rectification
+
+```bash
+curl --request PATCH \
+  --url https://api.y.uno/v1/customers/{customer_id} \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --data '{
+    "email": "updated-email@example.com",
+    "name": "Updated Name"
+  }'
+```
+
+## Data Processing Agreement (DPA)
+
+A Data Processing Agreement is required under GDPR when Yuno processes personal data on your behalf. Yuno provides a standard DPA that covers:
+
+- Scope and purpose of data processing
+- Data security measures
+- Sub-processor management
+- Breach notification procedures
+- Data subject rights assistance
+
+<Note>
+  Request a copy of Yuno's Data Processing Agreement through your account manager or via the Yuno Dashboard under **Settings > Legal > Data Processing Agreement**.
+</Note>
+
+## Best Practices
+
+- **Minimize data collection**: Only send personal data to Yuno that is necessary for payment processing.
+- **Implement data deletion workflows**: Build customer-facing tools to handle deletion requests promptly.
+- **Review sub-processors**: Regularly review Yuno's sub-processor list (available in the DPA) for compliance.
+- **Use tokenization**: Leverage Yuno's tokenization to avoid storing sensitive data on your servers.
+- **Document your data flows**: Maintain a record of processing activities (ROPA) that includes Yuno as a data processor.

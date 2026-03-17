@@ -1,0 +1,164 @@
+---
+title: "VTEX Headless Integration"
+description: "Integrate Yuno SDK Web for VTEX Headless to manage payments with custom frontends."
+---
+
+## Overview
+
+This guide covers integrating Yuno with VTEX Headless for merchants using custom frontends instead of VTEX IO's standard checkout. The VTEX Headless flow lets you control the UI while the Yuno VTEX connector handles payment processing.
+
+<Note>
+  For standard VTEX IO integration, see the [VTEX Plugin](/platform/plugins/vtex) page.
+</Note>
+
+## VTEX IO Applications
+
+Two VTEX IO applications are required:
+
+| Application | Purpose |
+|-------------|---------|
+| `yunopartnerbr.yuno` | PPF connector facilitating integration between VTEX and Yuno's payment infrastructure |
+| `yunopartnerbr.yuno-app` | Frontend payment app for Card or Click to Pay payments (not required for PIX, Boleto, or redirect-based methods) |
+
+The payment app:
+- Runs Yuno Web SDK to collect browser data
+- Executes third-party fraud detection SDKs
+- Processes payments directly within Yuno
+- Supports two credit card payments
+
+## Installation
+
+### Install the Connector (`yunopartnerbr.yuno`)
+
+1. Log into your VTEX store account.
+2. Navigate to **Store Settings > Providers** in VTEX Admin.
+3. Click **New Provider**.
+4. Search for and select **Yuno**.
+5. Click **Install** and follow setup instructions.
+
+### Install the Payment App (`yunopartnerbr.yuno-app`)
+
+Required for card-based payments:
+
+1. Go to **Apps > App Management** in VTEX Admin.
+2. Search for **Yuno**.
+3. Select **Yuno Payment App** (second option).
+4. Click **Install**.
+
+### Install SDK Web VTEX (npm)
+
+For headless projects, install the SDK via npm:
+
+```bash
+npm install @yuno-payments/sdk-web-vtex
+```
+
+```javascript
+import { loadScript } from '@yuno-payments/sdk-web-vtex'
+
+const yunoVTEX = await loadScript()
+yunoVTEX.mount({ /* ... */ })
+```
+
+## Headless Payment Flow
+
+The headless flow works as follows:
+
+1. User clicks pay button in your custom frontend.
+2. VTEX backend sends payment information to the Yuno connector.
+3. Connector sends credit card information to Yuno API.
+4. API returns a one-time token.
+5. Connector informs VTEX to open payment app with token.
+6. Your frontend opens Yuno SDK Web VTEX with provided data.
+7. Payment details, browser information, and fraud data are sent to the connector.
+8. Connector processes payment via `{{merchant's domain}}/_v/yunopartnerbr.yuno/v4/payments/yuno`.
+9. User receives payment status confirmation.
+
+## SDK Web VTEX Configuration
+
+Include the script in your HTML:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://sdk-web-vtex.y.uno/v1/main.js"></script>
+</head>
+<body>
+  <div id="root-container"></div>
+  <script>
+    window.YunoVTEX.mount({
+      elementRoot: "root-container",
+      payload: '{}',
+      language: 'pt',
+      domainVTEX: 'https://myvtex.yunopartnerbr.com',
+      onPaymentDone: (paymentData) => {
+        console.log(paymentData);
+      },
+      onError: (message, error) => {
+        console.log(message, error);
+      },
+      onLoading: (loading) => {
+        console.log(loading);
+      }
+    });
+  </script>
+</body>
+</html>
+```
+
+### SDK Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `elementRoot` | String | Yes | HTML element ID to mount the SDK |
+| `payload` | String | Yes | Connector response data (JSON string) |
+| `language` | String | Yes | ISO 639-1 language code (e.g., `"pt"`) |
+| `domainVTEX` | String | No | Your VTEX domain |
+| `onPaymentDone` | Function | No | Called when payment completes |
+| `onError` | Function | No | Called on errors |
+| `onLoading` | Function | No | Called during payment processing |
+
+### Payload Structure
+
+The `payload` parameter receives a JSON string from the connector response:
+
+```json
+{
+  "isVTEXCard": true,
+  "checkoutSessions": ["session-id"],
+  "paymentIds": ["payment-id"],
+  "orderId": "order-id"
+}
+```
+
+## PIX Flow (Headless)
+
+For PIX and other alternative payment methods, the flow differs:
+
+1. User clicks pay button.
+2. VTEX backend sends payment information to the connector.
+3. Connector creates payment in Yuno.
+4. Yuno generates QR code and payment details, returns to VTEX.
+5. Your frontend displays the PIX QR code or redirects the user to complete payment.
+
+## Seller ID / Affiliate Code
+
+The VTEX connector captures `sellerId` (Affiliate Code) from VTEX orders and includes it in checkout session and payment metadata:
+
+```json
+{
+  "metadata": [
+    {
+      "key": "sellerId",
+      "value": "affiliate_code_from_vtex_order"
+    }
+  ]
+}
+```
+
+This supports VTEX's Affiliate mode for marketplace participation and attribution tracking.
+
+<Warning>
+  The connector automatically generates and formats payloads — you don't need to modify them manually. Payload structure adapts based on the selected payment method.
+</Warning>

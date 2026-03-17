@@ -1,0 +1,228 @@
+---
+title: "Create Entity"
+description: "Register an individual or business entity for BaaS operations"
+api: "POST https://api-sandbox.y.uno/v1/baas/entities"
+---
+
+## Headers
+
+<ParamField header="x-idempotency-key" type="string" required>
+  Unique UUID to ensure the request is processed only once.
+</ParamField>
+
+## Body
+
+<ParamField body="account_id" type="string" required>
+  The unique identifier of the merchant's Yuno account (UUID, 36 characters).
+</ParamField>
+
+<ParamField body="merchant_entity_id" type="string" required>
+  The merchant's own identifier for this entity, used for reconciliation.
+</ParamField>
+
+<ParamField body="national_entity" type="string" required>
+  Type of entity. Values: `INDIVIDUAL`, `ENTITY`.
+</ParamField>
+
+<ParamField body="phone" type="object" required>
+  <Expandable title="phone">
+    <ParamField body="country_code" type="string" required>
+      Country dialing code (e.g., `+1`).
+    </ParamField>
+    <ParamField body="number" type="string" required>
+      Phone number.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="address" type="object" required>
+  <Expandable title="address">
+    <ParamField body="address_line_1" type="string" required>
+      Street address.
+    </ParamField>
+    <ParamField body="address_line_2" type="string">
+      Additional address information.
+    </ParamField>
+    <ParamField body="city" type="string" required>
+      City name.
+    </ParamField>
+    <ParamField body="state" type="string" required>
+      State or province code.
+    </ParamField>
+    <ParamField body="zip_code" type="string" required>
+      Postal code.
+    </ParamField>
+    <ParamField body="country" type="string" required>
+      ISO 3166-1 alpha-2 country code.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="entity_detail" type="object" required>
+  Contains either `individual` or `entity` details based on `national_entity` type.
+  <Expandable title="entity_detail — Individual">
+    <ParamField body="individual.first_name" type="string" required>
+      First name.
+    </ParamField>
+    <ParamField body="individual.last_name" type="string" required>
+      Last name.
+    </ParamField>
+    <ParamField body="individual.email" type="string" required>
+      Email address.
+    </ParamField>
+    <ParamField body="individual.date_of_birth" type="string" required>
+      Date of birth in `YYYY-MM-DD` format.
+    </ParamField>
+    <ParamField body="individual.gender" type="string">
+      `M` or `F`.
+    </ParamField>
+    <ParamField body="individual.country_of_residence" type="string">
+      ISO 3166-1 alpha-2 country code.
+    </ParamField>
+    <ParamField body="individual.tax_information" type="array">
+      Array of tax identifiers. Each item includes `country`, `tax_id`, `tax_id_type` (SSN, EIN, ITIN, VAT, ABN, NIF, TIN, OTHER), and `is_primary`.
+    </ParamField>
+  </Expandable>
+  <Expandable title="entity_detail — Business">
+    <ParamField body="entity.name" type="string" required>
+      Business name.
+    </ParamField>
+    <ParamField body="entity.country" type="string" required>
+      Country of incorporation.
+    </ParamField>
+    <ParamField body="entity.entity_type" type="string" required>
+      Business type (e.g., `CORPORATION`).
+    </ParamField>
+    <ParamField body="entity.tax_information" type="array">
+      Array of tax identifiers.
+    </ParamField>
+    <ParamField body="entity.beneficial_owners" type="array">
+      Array of beneficial owners with personal details, `ownership_percentage`, and `title`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">
+  Entity identifier.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Associated Yuno account.
+</ResponseField>
+
+<ResponseField name="merchant_entity_id" type="string">
+  Merchant's reconciliation identifier.
+</ResponseField>
+
+<ResponseField name="national_entity" type="string">
+  `INDIVIDUAL` or `ENTITY`.
+</ResponseField>
+
+<ResponseField name="phone" type="object">
+  Phone details.
+</ResponseField>
+
+<ResponseField name="address" type="object">
+  Address details.
+</ResponseField>
+
+<ResponseField name="entity_detail" type="object">
+  Individual or business details.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 timestamp.
+</ResponseField>
+
+<RequestExample>
+```json Individual
+{
+  "account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "merchant_entity_id": "merchant_user_12345",
+  "national_entity": "INDIVIDUAL",
+  "phone": {
+    "country_code": "+1",
+    "number": "2025551234"
+  },
+  "address": {
+    "address_line_1": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zip_code": "94102",
+    "country": "US"
+  },
+  "entity_detail": {
+    "individual": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com",
+      "date_of_birth": "1990-01-15",
+      "gender": "M",
+      "country_of_residence": "US",
+      "tax_information": [
+        {
+          "country": "US",
+          "tax_id": "123456789",
+          "tax_id_type": "SSN",
+          "is_primary": true
+        }
+      ]
+    }
+  }
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "merchant_entity_id": "merchant_user_12345",
+  "national_entity": "INDIVIDUAL",
+  "phone": {
+    "country_code": "+1",
+    "number": "2025551234"
+  },
+  "address": {
+    "address_line_1": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zip_code": "94102",
+    "country": "US"
+  },
+  "entity_detail": {
+    "individual": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com",
+      "date_of_birth": "1990-01-15"
+    }
+  },
+  "created_at": "2026-02-01T10:00:00Z",
+  "updated_at": "2026-02-01T10:00:00Z"
+}
+```
+
+```json 400 Bad Request
+{
+  "code": "VALIDATION_ERROR",
+  "messages": ["national_entity is required"],
+  "http_code": 400
+}
+```
+
+```json 409 Conflict
+{
+  "code": "DUPLICATE_ENTITY",
+  "messages": ["Entity with merchant_entity_id already exists"],
+  "http_code": 409
+}
+```
+</ResponseExample>

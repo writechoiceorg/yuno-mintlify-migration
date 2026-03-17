@@ -1,0 +1,170 @@
+---
+title: "Transaction Retries"
+description: "Configure automatic retry logic for failed payment transactions"
+---
+
+## Overview
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/refund-with-retry-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/refund-with-retry-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+Transaction retries allow you to automatically or manually reattempt failed payments. Not all declines are permanent -- soft declines (temporary issues) can often succeed on retry, while hard declines (permanent issues) should not be retried.
+
+Understanding the difference between soft and hard declines and configuring appropriate retry logic can significantly improve your payment success rate.
+
+## Soft Decline vs. Hard Decline
+
+### Soft Declines (Retryable)
+
+Soft declines are temporary failures that may succeed on a subsequent attempt. Common causes include:
+
+- Insufficient funds (customer may add money)
+- Issuer temporarily unavailable
+- Rate limiting or throttling
+- Temporary processing errors
+- 3DS authentication timeout
+
+### Hard Declines (Do Not Retry)
+
+Hard declines are permanent failures that will not succeed on retry. Retrying hard declines wastes resources and may trigger penalties:
+
+- Card stolen or lost
+- Card expired
+- Invalid card number
+- Fraud-related decline
+- Account closed
+
+<Warning>
+Card networks penalize merchants who excessively retry hard declines. Visa and Mastercard monitor retry rates and may impose fines or restrict processing for merchants with high retry-to-decline ratios.
+</Warning>
+
+## Retryable Decline Codes
+
+| Code | Description | Retryable | Recommended Action |
+|------|-------------|-----------|-------------------|
+| `INSUFFICIENT_FUNDS` | Not enough balance | Yes | Retry after 24 hours |
+| `ISSUER_UNAVAILABLE` | Issuer system down | Yes | Retry after 1 hour |
+| `PROCESSING_ERROR` | Temporary processing issue | Yes | Retry after 15 minutes |
+| `AUTHENTICATION_REQUIRED` | 3DS needed but not completed | Yes | Retry with 3DS flow |
+| `RATE_LIMIT` | Too many attempts | Yes | Retry with exponential backoff |
+| `DO_NOT_HONOR` | Generic issuer decline | Maybe | Retry once; if declined again, treat as hard |
+| `STOLEN_CARD` | Card reported stolen | No | Do not retry; block card |
+| `EXPIRED_CARD` | Card is expired | No | Request updated card from customer |
+| `INVALID_CARD` | Card number is invalid | No | Request correct card details |
+| `FRAUD_DECLINE` | Suspected fraud | No | Do not retry; review transaction |
+| `ACCOUNT_CLOSED` | Cardholder account closed | No | Do not retry; request alternative payment |
+
+## Network Retry Limits
+
+Card networks impose strict limits on retry attempts:
+
+### Visa
+
+| Rule | Limit |
+|------|-------|
+| Maximum retries | 15 attempts |
+| Time window | 30 days from initial decline |
+| Applies to | Same card, same merchant |
+
+### Mastercard
+
+| Rule | Limit |
+|------|-------|
+| Maximum retries (same amount) | 10 attempts within 24 hours |
+| Maximum retries (30-day window) | 35 attempts |
+| Time window | 30 days from initial decline |
+| Applies to | Same card, same amount, same merchant |
+
+<Note>
+These limits apply to the combination of card number and merchant. Exceeding these limits may result in network fines. Yuno tracks retry counts automatically when using the retry features.
+</Note>
+
+## Cascade Retry vs. Same-Provider Retry
+
+### Same-Provider Retry
+
+Retry the transaction with the same payment provider. Useful when the decline is due to a temporary issue (issuer unavailable, rate limiting).
+
+### Cascade Retry
+
+Route the transaction to a different payment provider. Useful when:
+- The provider is experiencing an outage
+- The decline is provider-specific
+- A different acquirer may have better authorization rates for the card brand or region
+
+Configure cascade routing in **Dashboard > Routing > Cascade Rules** to define fallback providers.
+
+## Configuring Retry Rules
+
+Set up automatic retry rules in the Yuno Dashboard:
+
+1. Navigate to **Dashboard > Settings > Retry Rules**
+2. Define which decline codes should trigger automatic retries
+3. Set the maximum number of retry attempts
+4. Configure the delay between retries
+5. Optionally enable cascade routing for retries
+
+### Example Configuration
+
+| Setting | Value |
+|---------|-------|
+| Retryable codes | `INSUFFICIENT_FUNDS`, `ISSUER_UNAVAILABLE`, `PROCESSING_ERROR` |
+| Max retries | 3 |
+| Initial delay | 15 minutes |
+| Backoff multiplier | 2x |
+| Cascade enabled | Yes (fallback to secondary provider) |
+
+## Exponential Backoff
+
+When implementing retry logic, use exponential backoff to avoid overwhelming providers and issuers:
+
+```
+Attempt 1: Immediate
+Attempt 2: Wait 15 minutes
+Attempt 3: Wait 30 minutes
+Attempt 4: Wait 60 minutes
+```
+
+For API-level retries (429 rate limit responses), use shorter intervals:
+
+```
+Attempt 1: Wait 1 second
+Attempt 2: Wait 2 seconds
+Attempt 3: Wait 4 seconds
+Attempt 4: Wait 8 seconds
+```
+
+<Note>
+Add random jitter (0-1 second) to backoff intervals to avoid thundering herd problems when multiple retries fire simultaneously.
+</Note>
+
+## Monitoring Retry Performance
+
+Track retry effectiveness in **Dashboard > Analytics > Retries**:
+
+| Metric | Description |
+|--------|-------------|
+| Retry success rate | Percentage of retries that result in approval |
+| Average retries to success | Mean number of attempts before approval |
+| Retry-to-decline ratio | Retries vs. total declines (monitor for network compliance) |
+| Cascade success rate | Success rate when routing to fallback providers |
+
+<Warning>
+If your retry success rate is below 10%, review your retry rules. You may be retrying hard declines unnecessarily, which increases costs and network penalty risk.
+</Warning>
+
+## Common Issues
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| Retries always fail | Retrying hard declines | Review decline codes; only retry soft declines |
+| Network penalty warning | Exceeding retry limits | Reduce max retries; respect Visa/Mastercard limits |
+| Cascade not triggering | No fallback provider configured | Add a secondary provider in **Dashboard > Routing** |
+| Duplicate charges | Retry succeeded but original also processed | Use idempotency keys to prevent double-charging |

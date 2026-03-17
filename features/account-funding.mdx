@@ -1,0 +1,86 @@
+---
+title: "Account Funding Transactions"
+description: "Process account funding transactions for wallet loading and prepaid cards"
+---
+
+## Overview
+
+Account Funding Transactions (AFTs) are a specific transaction type used to transfer funds from a payment card to a non-card account, such as a digital wallet, prepaid card, or money transfer service. AFTs have distinct processing rules and compliance requirements compared to standard purchase transactions.
+
+## Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| Wallet loading | Customer funds a digital wallet from a debit or credit card |
+| Prepaid card funding | Loading funds onto a prepaid card |
+| Money transfer | Person-to-person transfers via card-funded services |
+| Account top-up | Adding funds to a stored-value account |
+
+## API Parameters
+
+To create an Account Funding Transaction, set the `transaction_type` field to `ACCOUNT_FUNDING`:
+
+```json
+{
+  "checkout_session": "session-id",
+  "payment_method": {
+    "type": "CARD",
+    "token": "one-time-token"
+  },
+  "amount": { "currency": "USD", "value": 100.00 },
+  "country": "US",
+  "transaction_type": "ACCOUNT_FUNDING",
+  "customer": {
+    "email": "customer@example.com",
+    "first_name": "John",
+    "last_name": "Doe"
+  },
+  "description": "Wallet top-up"
+}
+```
+
+| Field | Value | Description |
+|-------|-------|-------------|
+| `transaction_type` | `ACCOUNT_FUNDING` | Identifies this as an AFT |
+
+<Note>
+All other payment fields (amount, customer, payment_method) follow the same schema as standard card payments. See [Card Payments](/guides/payment-methods/cards) for details.
+</Note>
+
+## Card Network Requirements
+
+Card networks classify AFTs differently from standard purchases:
+
+### Visa
+
+- AFTs use the Original Credit Transaction (OCT) framework
+- Visa requires the merchant to register for AFT processing
+- Transaction limits may apply based on merchant category and risk profile
+
+### Mastercard
+
+- AFTs are classified under the Payment Transaction category
+- Mastercard requires specific MCC (Merchant Category Code) registration
+- Enhanced due diligence may be required for high-value transfers
+
+## Compliance and Regulatory Considerations
+
+AFTs are subject to additional regulatory requirements due to their money-movement nature:
+
+1. **KYC (Know Your Customer)**: Verify the identity of both sender and recipient where applicable
+2. **AML (Anti-Money Laundering)**: Monitor AFT patterns for suspicious activity
+3. **Transaction limits**: Card networks and regulators impose limits on AFT amounts and frequency
+4. **Cross-border restrictions**: Some jurisdictions restrict cross-border AFTs; verify country-specific rules
+5. **Reporting**: Maintain records of AFTs for regulatory reporting requirements
+
+<Warning>
+AFT compliance requirements vary significantly by jurisdiction. Consult with your compliance team and Yuno account manager before implementing AFTs to ensure you meet all applicable regulations.
+</Warning>
+
+## Common Issues
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| 400: `invalid transaction_type` | Typo or unsupported value | Use exactly `ACCOUNT_FUNDING` |
+| 403: `AFT not enabled` | Merchant not registered for AFTs | Contact Yuno support to enable AFT processing |
+| Decline: `transaction not permitted` | Card issuer blocks AFTs on the card | Customer should contact their issuer or use a different card |

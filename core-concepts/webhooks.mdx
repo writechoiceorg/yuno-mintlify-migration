@@ -1,0 +1,130 @@
+---
+title: "Webhooks"
+description: "Receive real-time event notifications for payment status changes"
+---
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/webhook-lifecycle-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/webhook-lifecycle-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## What are Webhooks?
+
+Webhooks are HTTP POST requests that Yuno sends to your server when events occur -- such as a payment succeeding, being declined, or a refund being processed. They are essential for asynchronous payment methods (PIX, Boleto, OXXO) where the customer completes payment after the initial API call.
+
+## Setting Up Webhooks
+
+Configure your webhook endpoint in **Dashboard > Settings > Webhooks**:
+
+<Steps>
+  <Step title="Add endpoint URL">
+    Enter the HTTPS URL where Yuno should send event notifications. This must be a publicly accessible endpoint.
+  </Step>
+  <Step title="Select events">
+    Choose which event types you want to receive (e.g., `payment.succeeded`, `payment.failed`, `payment.declined`).
+  </Step>
+  <Step title="Save and test">
+    Use the Dashboard's test feature to send a sample event to your endpoint and verify it responds with HTTP 200.
+  </Step>
+</Steps>
+
+## Event Types
+
+| Event | Description | When It Fires |
+|-------|-------------|---------------|
+| `payment.created` | A new payment was created | After `POST /v1/payments` |
+| `payment.succeeded` | Payment was captured successfully | After successful capture |
+| `payment.failed` | Payment processing failed (timeout, provider error) | After a processing error |
+| `payment.declined` | Payment was declined by issuer or provider | After provider/issuer decline |
+| `payment.cancelled` | Payment was cancelled or voided | After cancellation request |
+| `payment.expired` | Payment authorization expired without capture | After authorization window closes |
+| `payment.refunded` | Full refund was processed | After successful full refund |
+| `payment.partially_refunded` | Partial refund was processed | After successful partial refund |
+
+## Payload Structure
+
+Every webhook delivery includes a JSON payload with the event type, timestamp, and the full resource object:
+
+```json
+{
+  "event_type": "payment.succeeded",
+  "timestamp": "2026-02-28T14:30:00Z",
+  "data": {
+    "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "status": "SUCCEEDED",
+    "amount": {
+      "currency": "USD",
+      "value": 100.00
+    },
+    "payment_method": {
+      "type": "CARD"
+    },
+    "country": "US",
+    "merchant_order_id": "order-9876",
+    "provider": "provider_a",
+    "created_at": "2026-02-28T14:29:55Z"
+  }
+}
+```
+
+<Note>
+The `data.id` field uses UUID format (e.g., `f47ac10b-58cc-...`), matching the `id` field in [Payment API responses](/api-reference/payments/get). Use this ID to correlate webhook events with your API calls.
+</Note>
+
+## Delivery and Retry Policy
+
+Yuno expects your endpoint to respond with HTTP **200** within **30 seconds**. If your endpoint fails to respond or returns a non-2xx status, Yuno retries with exponential backoff:
+
+| Attempt | Delay After Failure |
+|---------|-------------------|
+| 1st retry | 1 minute |
+| 2nd retry | 5 minutes |
+| 3rd retry | 30 minutes |
+| 4th retry | 2 hours |
+| 5th retry | 12 hours |
+
+<Warning>
+  After all retry attempts are exhausted, the event is marked as failed. You can manually re-trigger delivery from the Dashboard or use the API to retrieve missed events.
+</Warning>
+
+## Signature Verification
+
+Yuno signs every webhook payload so you can verify it was sent by Yuno and was not tampered with. The signature is included in the `X-Yuno-Signature` header.
+
+To verify:
+
+1. Extract the `X-Yuno-Signature` header from the request
+2. Compute an HMAC-SHA256 of the raw request body using your webhook secret (found in Dashboard)
+3. Compare the computed signature with the received header value
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhookSignature(body, signature, secret) {
+  const computed = crypto
+    .createHmac('sha256', secret)
+    .update(body, 'utf8')
+    .digest('hex');
+  return crypto.timingSafeEqual(
+    Buffer.from(computed),
+    Buffer.from(signature)
+  );
+}
+```
+
+<Warning>
+  Always verify webhook signatures in production. Without verification, attackers could send fake events to your endpoint and trigger unauthorized actions (e.g., marking orders as paid).
+</Warning>
+
+## Best Practices
+
+- **Respond quickly**: Return HTTP 200 immediately, then process the event asynchronously
+- **Handle duplicates**: Yuno may deliver the same event more than once; use `payment_id` as an idempotency key
+- **Verify signatures**: Always validate the `X-Yuno-Signature` header in production
+- **Log everything**: Store raw webhook payloads for debugging and audit trails
+- **Use HTTPS**: Webhook endpoints must use HTTPS for security

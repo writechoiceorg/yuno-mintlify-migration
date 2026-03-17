@@ -1,0 +1,170 @@
+---
+title: "Payment Links"
+description: "Create shareable payment links to collect payments without building a frontend checkout experience."
+---
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/payment-link-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/payment-link-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## Overview
+
+Payment Links allow you to create shareable URLs that direct customers to a hosted payment page. This is ideal for scenarios where you need to collect payments without building or maintaining a checkout frontend -- such as invoice payments, social commerce, email campaigns, or phone orders.
+
+Each payment link generates a unique URL that can be shared via email, SMS, messaging apps, or embedded in a website.
+
+## Creating a Payment Link
+
+Use the Payment Links API to generate a shareable payment URL.
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/payment-links \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "amount": {
+      "value": 150.00,
+      "currency": "USD"
+    },
+    "country": "US",
+    "description": "Invoice #1042 - Premium Plan",
+    "customer": {
+      "email": "customer@example.com",
+      "name": "Jane Smith"
+    },
+    "expiration_date": "2026-03-15T23:59:59Z",
+    "allowed_payment_methods": ["CARD"],
+    "redirect_url": "https://yourstore.com/thank-you",
+    "metadata": {
+      "invoice_id": "INV-1042",
+      "order_id": "ORD-5678"
+    }
+  }'
+```
+
+```json Response
+{
+  "id": "pl_abc123def456",
+  "url": "https://pay.y.uno/pl_abc123def456",
+  "status": "ACTIVE",
+  "amount": {
+    "value": 150.00,
+    "currency": "USD"
+  },
+  "description": "Invoice #1042 - Premium Plan",
+  "expiration_date": "2026-03-15T23:59:59Z",
+  "created_at": "2026-02-28T12:00:00Z"
+}
+```
+</CodeGroup>
+
+## Payment Link Configuration
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `amount` | Yes | Payment amount and currency |
+| `country` | Yes | ISO 3166-1 alpha-2 country code |
+| `description` | No | Description shown to customer on payment page |
+| `customer` | No | Pre-fill customer information |
+| `expiration_date` | No | ISO 8601 expiration timestamp |
+| `allowed_payment_methods` | No | Restrict available payment methods |
+| `redirect_url` | No | URL to redirect after successful payment |
+| `metadata` | No | Key-value pairs for your internal reference |
+
+## Payment Link Lifecycle
+
+| Status | Description |
+|--------|-------------|
+| `ACTIVE` | Link is available for payment |
+| `COMPLETED` | Payment has been successfully collected |
+| `EXPIRED` | Link passed its expiration date |
+| `CANCELLED` | Link was manually cancelled |
+
+<Info>
+  A payment link can only be used once. After a successful payment, the link status changes to `COMPLETED` and cannot be reused.
+</Info>
+
+## Managing Payment Links
+
+### List Payment Links
+
+```bash
+curl --request GET \
+  --url https://api.y.uno/v1/payment-links \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+### Cancel a Payment Link
+
+```bash
+curl --request POST \
+  --url https://api.y.uno/v1/payment-links/pl_abc123def456/cancel \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+## Webhook Events
+
+| Event | Trigger |
+|-------|---------|
+| `payment_link.created` | New payment link generated |
+| `payment_link.paid` | Customer completed payment |
+| `payment_link.expired` | Link reached expiration date |
+| `payment_link.cancelled` | Link was manually cancelled |
+
+<Warning>
+  Always set an `expiration_date` for payment links to prevent stale links from being used unexpectedly. A common practice is 7-30 days depending on the use case.
+</Warning>
+
+## Use Cases
+
+- **Invoice payments**: Send payment links in invoices for easy collection.
+- **Social commerce**: Share links on social media or messaging apps.
+- **Phone orders**: Generate links during phone calls for customers to pay.
+- **Email campaigns**: Embed payment links in marketing emails.
+- **Donations**: Create one-time donation collection links.
+
+<Note>
+  Payment links use Yuno's hosted checkout page, which is fully PCI-compliant and handles all payment method rendering and processing. No frontend development is required on your side.
+</Note>
+
+## Enroll Cards with Payment Links
+
+Payment links can also be used to update expired or declined card details and automatically enroll the new card. This is particularly useful for merchants running their own subscription engines who need a new `vaulted_token` when a customer's card expires or is blocked.
+
+### How It Works
+
+<Steps>
+  <Step title="Send the Payment Link">
+    Create a payment link with `vault_on_success` set to `true` and `one_time_use` set to `true`. The customer receives a secure link to complete a pending payment with a new credit or debit card.
+
+    Required fields:
+    - `customer_payer.id` — Previously generated customer identifier
+    - `one_time_use` — Set to `true` for single-use links
+    - `vault_on_success` — Set to `true` to enroll the card after successful payment
+  </Step>
+
+  <Step title="Automatic Enrollment">
+    Upon successful payment through the link, Yuno automatically generates a new `vaulted_token` for the customer's updated card.
+  </Step>
+
+  <Step title="Continue Charging">
+    Use the [Get Payment Methods](/api-reference/payment-methods/list) endpoint to retrieve the customer's updated stored payment methods. Continue your subscription schedule with the new `vaulted_token`.
+  </Step>
+</Steps>
+
+### Benefits
+
+- **Speed**: Customers resolve payment issues instantly without account login.
+- **Seamless update**: New cards are automatically saved when previous cards expire or are blocked.
+- **Security**: All transactions use Yuno's PCI-compliant hosted checkout with encryption.

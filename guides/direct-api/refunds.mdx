@@ -1,0 +1,199 @@
+---
+title: "Refunds"
+description: "Process full and partial refunds through the Yuno API"
+---
+
+## Overview
+
+Refunds return funds to the customer after a payment has been captured. Yuno supports both full refunds (entire amount) and partial refunds (a portion of the original amount).
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/refund-with-retry-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/refund-with-retry-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+<Note>
+Refunds can only be issued for payments with status `SUCCEEDED`. For authorized but uncaptured payments, use [Cancel](/guides/direct-api/capture-and-cancel) instead (no processing fees).
+</Note>
+
+## Create a Full Refund
+
+<CodeGroup>
+```javascript Node.js
+const refund = await fetch(
+  `https://api-sandbox.y.uno/v1/payments/${paymentId}/refund`,
+  {
+    method: 'POST',
+    headers: {
+      'public-api-key': process.env.YUNO_PUBLIC_KEY,
+      'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+      'account-code': process.env.YUNO_ACCOUNT_CODE,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      reason: 'Customer requested refund',
+    }),
+  }
+);
+const refundResult = await refund.json();
+```
+
+```python Python
+import requests
+
+refund = requests.post(
+    f'https://api-sandbox.y.uno/v1/payments/{payment_id}/refund',
+    headers={
+        'public-api-key': YUNO_PUBLIC_KEY,
+        'private-secret-key': YUNO_PRIVATE_KEY,
+        'account-code': YUNO_ACCOUNT_CODE,
+        'Content-Type': 'application/json',
+    },
+    json={
+        'reason': 'Customer requested refund',
+    },
+)
+refund_result = refund.json()
+```
+
+```go Go
+payload := map[string]interface{}{
+    "reason": "Customer requested refund",
+}
+
+body, _ := json.Marshal(payload)
+req, _ := http.NewRequest("POST",
+    fmt.Sprintf("https://api-sandbox.y.uno/v1/payments/%s/refund", paymentID),
+    bytes.NewBuffer(body),
+)
+
+req.Header.Set("public-api-key", os.Getenv("YUNO_PUBLIC_KEY"))
+req.Header.Set("private-secret-key", os.Getenv("YUNO_PRIVATE_KEY"))
+req.Header.Set("account-code", os.Getenv("YUNO_ACCOUNT_CODE"))
+req.Header.Set("Content-Type", "application/json")
+
+resp, err := http.DefaultClient.Do(req)
+```
+</CodeGroup>
+
+## Create a Partial Refund
+
+Specify the amount to refund:
+
+<CodeGroup>
+```javascript Node.js
+const partialRefund = await fetch(
+  `https://api-sandbox.y.uno/v1/payments/${paymentId}/refund`,
+  {
+    method: 'POST',
+    headers: {
+      'public-api-key': process.env.YUNO_PUBLIC_KEY,
+      'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+      'account-code': process.env.YUNO_ACCOUNT_CODE,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      amount: { currency: 'USD', value: 25.00 },
+      reason: 'Partial refund - item returned',
+    }),
+  }
+);
+```
+
+```python Python
+import requests
+
+partial_refund = requests.post(
+    f'https://api-sandbox.y.uno/v1/payments/{payment_id}/refund',
+    headers={
+        'public-api-key': YUNO_PUBLIC_KEY,
+        'private-secret-key': YUNO_PRIVATE_KEY,
+        'account-code': YUNO_ACCOUNT_CODE,
+        'Content-Type': 'application/json',
+    },
+    json={
+        'amount': {'currency': 'USD', 'value': 25.00},
+        'reason': 'Partial refund - item returned',
+    },
+)
+```
+
+```go Go
+payload := map[string]interface{}{
+    "amount": map[string]interface{}{"currency": "USD", "value": 25.00},
+    "reason": "Partial refund - item returned",
+}
+
+body, _ := json.Marshal(payload)
+req, _ := http.NewRequest("POST",
+    fmt.Sprintf("https://api-sandbox.y.uno/v1/payments/%s/refund", paymentID),
+    bytes.NewBuffer(body),
+)
+
+req.Header.Set("public-api-key", os.Getenv("YUNO_PUBLIC_KEY"))
+req.Header.Set("private-secret-key", os.Getenv("YUNO_PRIVATE_KEY"))
+req.Header.Set("account-code", os.Getenv("YUNO_ACCOUNT_CODE"))
+req.Header.Set("Content-Type", "application/json")
+
+resp, err := http.DefaultClient.Do(req)
+```
+</CodeGroup>
+
+## Refund Response
+
+```json
+{
+  "id": "ref_xyz789",
+  "payment_id": "pay_abc123",
+  "status": "SUCCEEDED",
+  "amount": { "currency": "USD", "value": 25.00 },
+  "reason": "Partial refund - item returned",
+  "created_at": "2026-02-28T14:30:00Z"
+}
+```
+
+## Refund Statuses
+
+| Status | Description |
+|--------|-------------|
+| `SUCCEEDED` | Refund processed and funds returned |
+| `PENDING` | Refund submitted, awaiting provider confirmation |
+| `FAILED` | Refund could not be processed |
+
+## Multiple Partial Refunds
+
+You can issue multiple partial refunds against a single payment, as long as the total refunded amount does not exceed the original captured amount:
+
+```
+Original payment: $100.00
+First partial refund:  -$30.00 (remaining: $70.00)
+Second partial refund: -$20.00 (remaining: $50.00)
+```
+
+<Warning>
+Attempting to refund more than the remaining capturable amount will result in an error. Track cumulative refunds on your side for accurate reconciliation.
+</Warning>
+
+## Refund Timelines
+
+Refund processing time depends on the payment method and provider:
+
+| Payment Method | Typical Timeline |
+|---------------|------------------|
+| Credit Card | 5-10 business days |
+| Debit Card | 3-5 business days |
+| PIX | Instant to 1 business day |
+| Bank Transfer | 3-7 business days |
+
+## Best Practices
+
+- Always include a descriptive `reason` for audit and reconciliation purposes
+- Use webhooks to track refund status changes asynchronously
+- Implement idempotency keys to prevent duplicate refund requests
+- Prefer cancel/void over refund for same-day reversals to minimize fees
+- Keep a log mapping refund IDs to order/item-level details

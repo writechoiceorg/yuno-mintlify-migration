@@ -1,0 +1,641 @@
+---
+title: "Android SDK Integration"
+description: "Integrate Yuno payments into your Android app with Kotlin using Full Checkout or Seamless Checkout"
+---
+
+## Overview
+
+The Yuno Android SDK provides a pre-built payment UI that handles payment method rendering, card tokenization, and 3DS authentication. It supports both View-based (Activity/Fragment) and Jetpack Compose integrations.
+
+<Note>
+The Android SDK maintains SAQ-A PCI compliance (the simplest compliance level — card data never touches your servers).
+</Note>
+
+## Prerequisites
+
+- Android Studio Hedgehog (2023.1) or later
+- Minimum SDK: API 21 (Android 5.0)
+- Target SDK: API 34+
+- Kotlin 1.9+
+- Gradle 8.0+
+- Yuno API keys ([Authentication](/getting-started/authentication))
+- At least one payment method enabled in your [Dashboard](/platform/dashboard/connections)
+
+## Installation
+
+<Steps>
+  <Step title="Add the Yuno Maven repository">
+    In your project-level `settings.gradle.kts`:
+
+    ```kotlin
+    dependencyResolutionManagement {
+        repositories {
+            google()
+            mavenCentral()
+            maven { url = uri("https://yunopayments.jfrog.io/artifactory/snapshots") }
+        }
+    }
+    ```
+  </Step>
+
+  <Step title="Add the SDK dependency">
+    In your app-level `build.gradle.kts`:
+
+    ```kotlin
+    dependencies {
+        implementation("com.yuno.payments:android-sdk:1.5.0")
+    }
+    ```
+  </Step>
+
+  <Step title="Sync Gradle">
+    Click **Sync Now** in Android Studio or run:
+
+    ```bash
+    ./gradlew build
+    ```
+  </Step>
+</Steps>
+
+## SDK Initialization
+
+Initialize the SDK in your `Application` class:
+
+```kotlin
+import android.app.Application
+import com.yuno.payments.core.Yuno
+import com.yuno.payments.core.YunoConfig
+
+class YourApplication : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+
+        Yuno.initialize(
+            application = this,
+            config = YunoConfig(
+                publicApiKey = "your-public-api-key",
+                environment = YunoConfig.Environment.SANDBOX // Use PRODUCTION for live
+            )
+        )
+    }
+}
+```
+
+Register the Application class in `AndroidManifest.xml`:
+
+```xml
+<application
+    android:name=".YourApplication"
+    ...>
+</application>
+```
+
+### Configuration options
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `publicApiKey` | `String` | Yes | Your Yuno public API key |
+| `environment` | `Environment` | Yes | `SANDBOX` or `PRODUCTION` |
+| `language` | `YunoLanguage` | No | UI language. Defaults to device locale |
+| `cardFlow` | `CardFlow` | No | `ONE_STEP` (default) or `MULTI_STEP` |
+
+<Snippet file="no-secret-key-client.mdx" />
+
+## Full Checkout
+
+Full Checkout renders all enabled payment methods with a single call.
+
+### Activity / Fragment
+
+<Steps>
+  <Step title="Create a checkout session (server-side)">
+    Create a session from your backend:
+
+    ```json
+    // POST https://api-sandbox.y.uno/v1/checkout/sessions
+    {
+      "amount": { "currency": "USD", "value": 50.00 },
+      "country": "CO",
+      "merchant_order_id": "order-123",
+      "workflow": "SDK_CHECKOUT"
+    }
+    ```
+
+    Pass the `checkout_session` token to your Android app.
+  </Step>
+
+  <Step title="Register the checkout launcher">
+    ```kotlin
+    import com.yuno.payments.features.checkout.FullCheckoutLauncher
+    import com.yuno.payments.features.checkout.FullCheckoutResult
+
+    class CheckoutActivity : AppCompatActivity() {
+
+        private val checkoutLauncher = registerForActivityResult(
+            FullCheckoutLauncher()
+        ) { result: FullCheckoutResult ->
+            handleResult(result)
+        }
+
+        private fun handleResult(result: FullCheckoutResult) {
+            when (result.status) {
+                PaymentStatus.SUCCEEDED -> navigateToConfirmation(result.paymentId)
+                PaymentStatus.FAILED -> showError(result.errorMessage)
+                PaymentStatus.PROCESSING -> showProcessingState()
+                PaymentStatus.CANCELLED -> showCancelledState()
+            }
+        }
+    }
+    ```
+  </Step>
+
+  <Step title="Launch Full Checkout">
+    ```kotlin
+    fun startCheckout(sessionToken: String) {
+        checkoutLauncher.launch(
+            FullCheckoutParams(
+                checkoutSession = sessionToken,
+                countryCode = "CO"
+            )
+        )
+    }
+    ```
+  </Step>
+
+  <Step title="Verify payment (server-side)">
+    Always confirm the payment status from your backend:
+
+    ```kotlin
+    // Server-side verification
+    // GET https://api-sandbox.y.uno/v1/payments/{payment_id}
+    ```
+
+    <Snippet file="verify-server-side.mdx" />
+  </Step>
+</Steps>
+
+### Jetpack Compose
+
+```kotlin
+import com.yuno.payments.features.checkout.YunoFullCheckout
+import com.yuno.payments.features.checkout.rememberCheckoutState
+
+@Composable
+fun CheckoutScreen(checkoutSession: String) {
+    val checkoutState = rememberCheckoutState()
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(
+            onClick = {
+                checkoutState.startFullCheckout(
+                    checkoutSession = checkoutSession,
+                    countryCode = "CO"
+                )
+            }
+        ) {
+            Text("Pay Now")
+        }
+    }
+
+    YunoFullCheckout(
+        state = checkoutState,
+        onResult = { result ->
+            when (result.status) {
+                PaymentStatus.SUCCEEDED -> { /* Navigate to confirmation */ }
+                PaymentStatus.FAILED -> { /* Show error */ }
+                PaymentStatus.PROCESSING -> { /* Show processing */ }
+                PaymentStatus.CANCELLED -> { /* Handle cancellation */ }
+            }
+        }
+    )
+}
+```
+
+## Seamless Checkout
+
+Seamless Checkout gives you control over payment method selection while Yuno handles the payment form.
+
+<Steps>
+  <Step title="Retrieve available payment methods">
+    ```kotlin
+    Yuno.getPaymentMethods(
+        checkoutSession = sessionToken,
+        countryCode = "CO"
+    ) { methods ->
+        // Display methods in your custom UI
+        updatePaymentMethodList(methods)
+    }
+    ```
+  </Step>
+
+  <Step title="Register the seamless checkout launcher">
+    ```kotlin
+    private val seamlessLauncher = registerForActivityResult(
+        SeamlessCheckoutLauncher()
+    ) { result: SeamlessCheckoutResult ->
+        handleResult(result)
+    }
+    ```
+  </Step>
+
+  <Step title="Launch for selected method">
+    ```kotlin
+    fun onPaymentMethodSelected(method: YunoPaymentMethod) {
+        seamlessLauncher.launch(
+            SeamlessCheckoutParams(
+                checkoutSession = sessionToken,
+                paymentMethodType = method.type,
+                countryCode = "CO"
+            )
+        )
+    }
+    ```
+  </Step>
+
+  <Step title="Handle payment creation callback">
+    ```kotlin
+    class CheckoutActivity : AppCompatActivity(), YunoSeamlessListener {
+
+        override fun yunoCreatePayment(
+            oneTimeToken: String,
+            tokenWithInformation: YunoTokenData
+        ) {
+            // Create payment on your server
+            PaymentApi.createPayment(oneTimeToken) { success ->
+                if (success) {
+                    Yuno.continuePayment()
+                }
+            }
+        }
+
+        override fun yunoPaymentResult(result: PaymentResult) {
+            handleResult(result)
+        }
+    }
+    ```
+  </Step>
+</Steps>
+
+## 3DS Handling
+
+The SDK handles 3D Secure authentication automatically. When a payment requires 3DS, the SDK presents the authentication challenge within the checkout flow.
+
+No additional code is required. The payment result callback receives the final outcome after 3DS completes.
+
+<Tip>
+Test 3DS flows in sandbox using Yuno's test card numbers. Check the [Testing guide](/guides/testing) for available test credentials.
+</Tip>
+
+## Google Pay
+
+To enable Google Pay in the Yuno Android SDK:
+
+<Steps>
+  <Step title="Enable Google Pay in Yuno Dashboard">
+    Navigate to **Dashboard > Settings > Payment Methods** and enable Google Pay.
+  </Step>
+
+  <Step title="Add Google Pay metadata to manifest">
+    ```xml
+    <application>
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
+    </application>
+    ```
+  </Step>
+
+  <Step title="Pass Google Pay configuration">
+    ```kotlin
+    checkoutLauncher.launch(
+        FullCheckoutParams(
+            checkoutSession = sessionToken,
+            countryCode = "US",
+            googlePay = YunoGooglePayConfig(
+                merchantName = "Your Store Name",
+                countryCode = "US"
+            )
+        )
+    )
+    ```
+  </Step>
+</Steps>
+
+## ProGuard Rules
+
+If you use code shrinking (R8/ProGuard), add these rules to your `proguard-rules.pro`:
+
+```
+# Yuno SDK
+-keep class com.yuno.payments.** { *; }
+-keepclassmembers class com.yuno.payments.** { *; }
+-dontwarn com.yuno.payments.**
+
+# Required for payment processing
+-keep class com.google.android.gms.wallet.** { *; }
+```
+
+<Note>
+The SDK ships with consumer ProGuard rules. These additional rules are only needed if you encounter obfuscation issues.
+</Note>
+
+## Customization
+
+Customize the checkout appearance to match your app's design:
+
+```kotlin
+val appearance = YunoAppearance(
+    primaryColor = Color.parseColor("#6200EE"),
+    backgroundColor = Color.WHITE,
+    textColor = Color.BLACK,
+    cornerRadiusDp = 12,
+    fontFamily = "sans-serif-medium",
+    buttonStyle = ButtonStyle.ROUNDED
+)
+
+Yuno.initialize(
+    application = this,
+    config = YunoConfig(
+        publicApiKey = "your-public-api-key",
+        environment = YunoConfig.Environment.SANDBOX,
+        appearance = appearance
+    )
+)
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `primaryColor` | `Int` (Color) | Primary accent color for buttons and highlights |
+| `backgroundColor` | `Int` (Color) | Background color of the checkout sheet |
+| `textColor` | `Int` (Color) | Primary text color |
+| `cornerRadiusDp` | `Int` | Corner radius in dp for cards and buttons |
+| `fontFamily` | `String` | Font family name |
+| `buttonStyle` | `ButtonStyle` | `ROUNDED` or `RECTANGULAR` |
+
+### Localization
+
+The SDK supports automatic localization based on the device locale. Override with:
+
+```kotlin
+Yuno.initialize(
+    application = this,
+    config = YunoConfig(
+        publicApiKey = "your-public-api-key",
+        environment = YunoConfig.Environment.SANDBOX,
+        language = YunoLanguage.SPANISH
+    )
+)
+```
+
+Supported languages: English, Spanish, Portuguese, Indonesian, Malay, Thai.
+
+### Dark mode
+
+The SDK respects the system dark mode setting by default. Colors adapt automatically unless you provide explicit `appearance` overrides.
+
+## Error Handling
+
+Handle SDK errors through the result callback:
+
+```kotlin
+private fun handleResult(result: FullCheckoutResult) {
+    result.error?.let { error ->
+        when (error.code) {
+            YunoErrorCode.NETWORK_ERROR ->
+                showRetryAlert("Check your internet connection")
+            YunoErrorCode.AUTHENTICATION_FAILED ->
+                showError("Invalid API key. Verify your configuration.")
+            YunoErrorCode.SESSION_EXPIRED ->
+                refreshSessionAndRetry()
+            YunoErrorCode.CANCELLED ->
+                { /* User cancelled — no action needed */ }
+            else ->
+                showError(error.message ?: "An unexpected error occurred")
+        }
+    }
+}
+```
+
+### Common error codes
+
+<Snippet file="error-codes-mobile.mdx" />
+
+## Testing in Sandbox
+
+<Steps>
+  <Step title="Use sandbox environment">
+    Set `environment = YunoConfig.Environment.SANDBOX` during initialization.
+  </Step>
+
+  <Step title="Use test credentials">
+    Use sandbox API keys from **Dashboard > API Keys > Sandbox**.
+  </Step>
+
+  <Step title="Test with Yuno test cards">
+    Use Yuno-provided test card numbers to simulate different outcomes. See [Testing](/guides/testing).
+  </Step>
+</Steps>
+
+<Note>
+Sandbox transactions use simulated providers. Some payment methods may have limited availability in sandbox compared to production.
+</Note>
+
+## Troubleshooting
+
+### SDK not initializing
+
+- Verify `Yuno.initialize()` is called in `Application.onCreate()` before any Activity launches
+- Confirm the public API key is correct and matches your environment
+- Check that `minSdk` is set to 21 or higher in `build.gradle.kts`
+
+### Checkout not appearing
+
+- Ensure the checkout session token is valid and not expired
+- Verify the Activity is not finishing when launching checkout
+- Check that at least one payment method is enabled in Dashboard for the specified country
+- Confirm the `FullCheckoutLauncher` is registered before `onCreate()` completes
+
+### Build errors
+
+- **Duplicate classes**: Add `exclude` rules for conflicting dependencies
+- **Desugaring issues**: Enable core library desugaring in `build.gradle.kts`:
+
+```kotlin
+android {
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+}
+```
+
+### Payment failing silently
+
+- Implement the result callback to capture all outcomes
+- Enable verbose logging for debugging:
+
+```kotlin
+Yuno.initialize(
+    application = this,
+    config = YunoConfig(
+        publicApiKey = "your-public-api-key",
+        environment = YunoConfig.Environment.SANDBOX,
+        enableLogging = true
+    )
+)
+```
+
+- Check Logcat with tag filter `YunoSDK` for SDK output
+
+### Fragment lifecycle conflicts
+
+If using Fragments, register the launcher in `onCreate()` (not `onViewCreated()`):
+
+```kotlin
+class CheckoutFragment : Fragment() {
+    // Register in class body or onCreate — NOT in onViewCreated
+    private val checkoutLauncher = registerForActivityResult(
+        FullCheckoutLauncher()
+    ) { result -> handleResult(result) }
+}
+```
+
+## API Reference
+
+<Accordion title="Full parameter reference, callback interfaces, enrollment, and ProGuard rules">
+
+### YunoConfig Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `publicApiKey` | `String` | Yes | — | Your Yuno public API key |
+| `environment` | `YunoConfig.Environment` | Yes | — | `SANDBOX` or `PRODUCTION` |
+| `language` | `YunoLanguage` | No | Device locale | UI language (`ENGLISH`, `SPANISH`, `PORTUGUESE`, `INDONESIAN`, `MALAY`, `THAI`) |
+| `cardFlow` | `CardFlow` | No | `ONE_STEP` | `ONE_STEP` (single form) or `MULTI_STEP` (step-by-step card entry) |
+| `enableLogging` | `Boolean` | No | `false` | Enable verbose SDK logging to Logcat (tag: `YunoSDK`) |
+| `appearance` | `YunoAppearance` | No | Default theme | Visual customization |
+
+### FullCheckoutParams
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `checkoutSession` | `String` | Yes | Checkout session ID from your server |
+| `countryCode` | `String` | Yes | ISO 3166-1 alpha-2 country code |
+| `googlePay` | `YunoGooglePayConfig` | No | Google Pay configuration |
+
+### SeamlessCheckoutParams
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `checkoutSession` | `String` | Yes | Checkout session ID |
+| `paymentMethodType` | `String` | Yes | Payment method type (e.g., `"CARD"`, `"PIX"`, `"PSE"`) |
+| `countryCode` | `String` | Yes | ISO 3166-1 alpha-2 country code |
+| `vaultedToken` | `String` | No | Vaulted token for saved payment methods |
+
+### Callback Interfaces
+
+**OnPaymentListener:**
+
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `onPaymentStateChange(state)` | `PaymentState` | Called when the payment lifecycle state changes |
+| `onTokenGenerated(token)` | `String` | Called when a one-time token is generated for payment creation |
+
+**YunoSeamlessListener:**
+
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `yunoCreatePayment(oneTimeToken, tokenWithInformation)` | `String`, `YunoTokenData` | Called when a token is generated. Create payment server-side, then call `Yuno.continuePayment()` |
+| `yunoPaymentResult(result)` | `PaymentResult` | Called with the final payment outcome |
+
+### Enrollment
+
+Register the enrollment launcher and start enrollment for returning customers:
+
+```kotlin
+private val enrollmentLauncher = registerForActivityResult(
+    EnrollmentLauncher()
+) { result: EnrollmentResult ->
+    handleEnrollmentResult(result)
+}
+
+fun startEnrollment(sessionId: String) {
+    enrollmentLauncher.launch(
+        EnrollmentParams(
+            enrollmentSession = sessionId,
+            countryCode = "CO",
+            customerId = "customer-001"
+        )
+    )
+}
+```
+
+**Enrollment Statuses:** `CREATED`, `READY_TO_ENROLL`, `ENROLLED`, `ENROLL_FAILED`, `EXPIRED`, `REJECTED`, `DECLINED`, `UNENROLLED`
+
+### Activity Result Handling
+
+Register launchers at class level or in `onCreate()` — never in `onViewCreated()`:
+
+```kotlin
+class CheckoutActivity : AppCompatActivity() {
+    private val fullCheckoutLauncher = registerForActivityResult(
+        FullCheckoutLauncher()
+    ) { result -> handlePaymentResult(result) }
+
+    private val seamlessLauncher = registerForActivityResult(
+        SeamlessCheckoutLauncher()
+    ) { result -> handlePaymentResult(result) }
+}
+```
+
+### Extended Customization
+
+Additional appearance properties beyond the basics:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `errorColor` | `Int` (Color) | Color for error messages and invalid field states |
+| `borderColor` | `Int` (Color) | Border color for input fields |
+| `elevation` | `Float` | Elevation in dp for the checkout sheet |
+| `fontSizeSp` | `Int` | Base font size in sp |
+
+**Dark Mode:** The SDK respects the system dark mode setting by default. Use `forceDarkMode = true` in `YunoAppearance` to override.
+
+### Payment Method Types
+
+| Constant | Description |
+|----------|-------------|
+| `"CARD"` | Credit and debit cards |
+| `"PIX"` | PIX instant payments (Brazil) |
+| `"PSE"` | PSE bank transfers (Colombia) |
+| `"OXXO"` | OXXO cash vouchers (Mexico) |
+| `"NEQUI"` | Nequi mobile wallet (Colombia) |
+| `"APPLE_PAY"` | Apple Pay |
+| `"GOOGLE_PAY"` | Google Pay |
+
+</Accordion>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Mobile SDK Overview" icon="mobile" href="/guides/sdk/mobile-overview">
+    Compare all mobile SDK options.
+  </Card>
+  <Card title="iOS SDK" icon="apple" href="/guides/sdk/ios-checkout">
+    Building for iOS? Start here.
+  </Card>
+  <Card title="Customization" icon="palette" href="/guides/sdk/customization">
+    Theme and style your checkout.
+  </Card>
+  <Card title="Testing" icon="vial" href="/guides/testing">
+    Test card numbers and sandbox setup.
+  </Card>
+</CardGroup>

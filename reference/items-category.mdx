@@ -1,0 +1,67 @@
+---
+title: "Items Category"
+description: "Enum values for item categories used in order line items."
+---
+
+Use these category codes when sending order item details in the `additional_data.order.items[].category` field of a payment request.
+
+| Category | Description |
+|----------|-------------|
+| `ART` | Collectibles & Art |
+| `BABY` | Toys for Baby, Stroller, Stroller Accessories, Car Safety Seats |
+| `COUPONS` | Coupons |
+| `BEAUTY&_PERSONAL_CARE` | Makeup, Skin Care Products, Hair Care Products, Perfumes & Fragrances |
+| `DONATIONS` | Donations |
+| `COMPUTING` | Computers & Tablets |
+| `BOOKS` | Books |
+| `GROCERY_&_GOURMET_FOOD` | Alcoholic Beverages, Baby Foods, Frozen Foods, Fresh Produce |
+| `CAMERAS` | Cameras & Photography |
+| `VIDEO_GAMES` | Video Games & Consoles |
+| `TELEVISION` | LCD, LED, Smart TV, Plasmas, TVs |
+| `CAR_ELECTRONICS` | Car Audio, Car Alarm Systems & Security, Car DVRs, Car Video Players, Car PC |
+| `ELECTRONICS` | Audio & Surveillance, Video & GPS, Others |
+| `AUTOMOTIVE` | Parts & Accessories |
+| `TOYS_&_GAMES` | Board Games & Toys |
+| `MUSICAL_INSTRUMENTS` | Guitars, Ukuleles, Drums & Percussion, Musical Instrument Keyboards |
+| `HANDMADE` | Accessories, Jewelry, Decorations |
+| `GARDEN_&_OUTDOOR` | Outdoor Décor, Patio Furniture & Accessories, Outdoor Lighting, Pest Control |
+| `ENTERTAINMENT` | Music, Movies & Series, Magazines & Comics |
+| `INDUSTRIAL&_SCIENTIFIC` | Scales & Balances, Industrial Magnets |
+| `FASHION` | Men's, Women's, Kids & Baby, Handbags & Accessories, Shoes, Jewelry & Watches |
+| `GAMES` | Online Games & Credits |
+| `PET_SUPPLIES` | Dogs and Cats Food, Toys, Furniture |
+| `HOME` | Home Appliances and Garden Items |
+| `MUSICAL` | Instruments & Gear |
+| `PHONES` | Cell Phones & Accessories |
+| `SERVICES` | General Services |
+| `LEARNINGS` | Trainings, Conferences, Workshops |
+| `TICKETS` | Concerts, Sports, Arts, Theater, Family, Excursions, Events |
+| `TRAVELS` | Plane Tickets, Hotel Vouchers, Travel Vouchers |
+| `VIRTUAL_GOODS` | E-books, Music Files, Software, Digital Images, PDFs, Mobile Recharge, DTH Recharge |
+| `OTHERS` | Other categories |
+
+## Usage Example
+
+```json
+{
+  "additional_data": {
+    "order": {
+      "items": [
+        {
+          "id": "item-001",
+          "name": "Wireless Headphones",
+          "quantity": 1,
+          "unit_amount": 89.99,
+          "category": "ELECTRONICS",
+          "brand": "SoundMax"
+        }
+      ]
+    }
+  }
+}
+```
+
+## Related Pages
+
+- [Payment Object](/api-reference/payments/object) — Where item categories are used
+- [Industry Categories](/reference/industry-categories) — Merchant industry classification

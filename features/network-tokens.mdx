@@ -1,0 +1,98 @@
+---
+title: "Network Tokens"
+description: "Improve approval rates and reduce declines with Visa and Mastercard network tokenization."
+---
+
+
+## Overview
+
+Network Tokens replace raw card numbers (PANs) with network-issued tokens provided by Visa and Mastercard. These tokens are automatically updated when a card is renewed, reissued, or replaced, ensuring that recurring and stored-credential transactions continue to process without customer intervention. Network tokenization typically improves authorization rates by 2-5% and reduces fraud-related declines.
+
+## How Network Tokens Work
+
+1. When a customer saves their card through Yuno, a network token request is sent to Visa or Mastercard.
+2. The card network issues a unique token that maps to the customer's PAN.
+3. Subsequent transactions use the network token instead of the raw PAN.
+4. If the card is renewed or reissued, the network automatically updates the token mapping.
+5. Each transaction generates a unique cryptogram, preventing replay attacks.
+
+## Benefits
+
+| Benefit | Description |
+|---------|-------------|
+| **Higher approval rates** | Issuers trust network tokens more than raw PANs (+2-5% approval lift) |
+| **Automatic card updates** | Token stays valid when card is renewed or replaced |
+| **Reduced fraud** | Dynamic cryptograms prevent card-not-present fraud |
+| **Lower interchange** | Some networks offer reduced interchange for tokenized transactions |
+| **Improved compliance** | Tokens reduce PCI scope since raw PANs are not stored |
+
+<Info>
+  Network tokens are distinct from Yuno vault tokens. A Yuno vault token references a stored card in Yuno's PCI-compliant vault. A network token is issued by Visa/Mastercard and is used at the acquirer/issuer level for transaction processing.
+</Info>
+
+## Enabling Network Tokens
+
+Network tokenization is enabled at the merchant account level. Contact Yuno support or enable it in your Dashboard under **Settings > Card Processing > Network Tokens**.
+
+### Supported Networks
+
+| Network | Token Service | Status |
+|---------|--------------|--------|
+| Visa | Visa Token Service (VTS) | Supported |
+| Mastercard | Mastercard Digital Enablement Service (MDES) | Supported |
+
+## Integration
+
+Network tokenization is transparent to your integration. Once enabled, Yuno automatically provisions network tokens for eligible cards and uses them for transactions.
+
+### Automatic Provisioning
+
+When a customer stores a card:
+
+```json
+POST /v1/customers/{customer_id}/payment-methods
+{
+  "type": "CARD",
+  "vaulted_token": "tok_card_abc123",
+  "country": "BR"
+}
+```
+
+Yuno automatically requests a network token from the card network. No additional API calls are needed.
+
+### Token Lifecycle Events
+
+| Event | Description |
+|-------|-------------|
+| `network_token.provisioned` | Network token created for a stored card |
+| `network_token.updated` | Token mapping updated (card renewal) |
+| `network_token.suspended` | Token temporarily suspended by issuer |
+| `network_token.deactivated` | Token permanently deactivated |
+
+## Impact on Authorization
+
+```
+Without Network Tokens:
+  PAN 4242...4242 ──> Acquirer ──> Issuer ──> Approve/Decline
+
+With Network Tokens:
+  Token + Cryptogram ──> Acquirer ──> Network ──> Issuer ──> Approve/Decline
+                                        │
+                                   Token mapped
+                                   to current PAN
+```
+
+<Warning>
+  Not all cards are eligible for network tokenization. Eligibility depends on the issuing bank's participation in the token service. Ineligible cards continue to process normally using the vaulted PAN.
+</Warning>
+
+## Best Practices
+
+- **Enable for all stored cards**: Network tokens benefit any transaction using stored credentials.
+- **Monitor approval rate changes**: Track the impact of network tokenization on your authorization rates in the Dashboard.
+- **Use with recurring payments**: Network tokens are particularly valuable for subscriptions where cards may expire between billing cycles.
+- **Combine with 3D Secure**: Network tokens and 3DS together provide the highest approval rates and strongest fraud protection.
+
+<Note>
+  Network token provisioning is asynchronous. The first transaction after card storage may use the raw PAN while the network token is being provisioned. Subsequent transactions will use the network token.
+</Note>

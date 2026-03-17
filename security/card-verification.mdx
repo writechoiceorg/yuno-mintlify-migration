@@ -1,0 +1,130 @@
+---
+title: "Card Verification"
+description: "Verify a card's validity without charging the customer using zero-amount authorization."
+---
+
+
+## Overview
+
+Card verification allows you to confirm that a card is valid, active, and belongs to the customer without processing an actual charge. This is done through a **zero-amount authorization** (also called a $0 auth or account verification), where the issuer validates the card details and returns an approval or decline without reserving or capturing any funds.
+
+## Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| **Card enrollment** | Verify a card before saving it for future use |
+| **Subscription signup** | Confirm card validity before starting a free trial |
+| **Wallet top-up** | Validate a card before linking it to a digital wallet |
+| **Pre-authorization check** | Ensure a card is active before a high-value transaction |
+| **Fraud prevention** | Detect stolen or invalid cards early in the flow |
+
+## How It Works
+
+1. Submit a verification request with the card details (or a vaulted token).
+2. Yuno sends a zero-amount authorization to the card issuer.
+3. The issuer validates the card number, expiration, CVV, and account status.
+4. A verification result is returned: `VERIFIED` or `FAILED` with a reason code.
+5. No charge appears on the customer's statement (some issuers may show a temporary $0 hold).
+
+## API Example
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/card-verifications \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "payment_method": {
+      "type": "CARD",
+      "token": "tok_card_abc123"
+    },
+    "country": "BR",
+    "currency": "BRL",
+    "customer": {
+      "email": "customer@example.com"
+    }
+  }'
+```
+
+```json Response - Verified
+{
+  "id": "cv_abc123",
+  "status": "VERIFIED",
+  "payment_method": {
+    "type": "CARD",
+    "card": {
+      "last_four": "4242",
+      "brand": "VISA"
+    }
+  },
+  "verification_details": {
+    "avs_result": "MATCH",
+    "cvv_result": "MATCH"
+  },
+  "created_at": "2026-02-28T14:00:00Z"
+}
+```
+
+```json Response - Failed
+{
+  "id": "cv_def456",
+  "status": "FAILED",
+  "reason": "CARD_EXPIRED",
+  "payment_method": {
+    "type": "CARD",
+    "card": {
+      "last_four": "1234",
+      "brand": "MASTERCARD"
+    }
+  },
+  "created_at": "2026-02-28T14:01:00Z"
+}
+```
+</CodeGroup>
+
+## Verification Results
+
+| Status | Description | Next Step |
+|--------|-------------|-----------|
+| `VERIFIED` | Card is valid and active | Safe to save or use for payments |
+| `FAILED` | Card is invalid, expired, or declined | Prompt customer for another card |
+
+## Failure Reasons
+
+| Reason Code | Description |
+|------------|-------------|
+| `CARD_EXPIRED` | Card has passed its expiration date |
+| `CARD_DECLINED` | Issuer declined the verification |
+| `INVALID_CARD_NUMBER` | Card number fails Luhn check or is not recognized |
+| `CVV_MISMATCH` | CVV does not match issuer records |
+| `INSUFFICIENT_FUNDS` | Not applicable for $0 auth (rare) |
+| `LOST_OR_STOLEN` | Card reported as lost or stolen |
+
+<Warning>
+  Some issuers do not support zero-amount authorizations and will decline the request. In these cases, consider using a small-amount authorization (e.g., $1.00) followed by an immediate void. Check with your provider for issuer support.
+</Warning>
+
+## AVS and CVV Results
+
+Card verification responses include Address Verification System (AVS) and CVV check results when available:
+
+| Result | Meaning |
+|--------|---------|
+| `MATCH` | Data matches issuer records |
+| `NO_MATCH` | Data does not match |
+| `NOT_CHECKED` | Issuer did not perform the check |
+| `UNAVAILABLE` | Issuer does not support this check |
+
+<Info>
+  AVS results require the customer's billing address to be included in the verification request. Without address data, AVS will return `NOT_CHECKED`.
+</Info>
+
+## Best Practices
+
+- **Verify before vaulting**: Always verify a card before saving it for recurring use.
+- **Handle failures gracefully**: Provide clear error messages when verification fails.
+- **Use with 3DS**: Combine card verification with 3D Secure for subscription enrollments.
+- **Do not over-verify**: Excessive verification requests on the same card may trigger issuer fraud alerts.
+- **Inform customers**: Some issuers show a temporary $0 pending charge. Consider informing customers that this is a verification, not a charge.

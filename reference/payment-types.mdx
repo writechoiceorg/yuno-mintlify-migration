@@ -1,0 +1,104 @@
+---
+title: "Payment Type"
+description: "Enum values for all payment method types supported by Yuno."
+---
+
+Use these values in the `payment_method.type` field when creating payments. Available payment types vary by country, provider, and merchant configuration.
+
+<Info>
+  This list is updated regularly as Yuno adds new payment methods. Check your [Dashboard > Payment Methods](https://dashboard.y.uno) for the methods enabled on your account.
+</Info>
+
+## Cards
+
+| Type | Description |
+|------|-------------|
+| `CARD` | Credit, debit, or prepaid card payment |
+
+## Bank Transfers
+
+| Type | Description |
+|------|-------------|
+| `PIX` | Instant payment (Brazil) |
+| `PIX_BIOMETRICO` | PIX with biometric verification (Brazil) |
+| `SMART_PIX` | Optimized PIX flow (Brazil) |
+| `SPEI` | Interbank electronic transfer (Mexico) |
+| `PSE` | Bank transfer via PSE (Colombia) |
+| `KHIPU` | Bank transfer (Chile) |
+| `TRANSFERENCIA_3.0` | Bank transfer (Argentina/Chile) |
+| `ACH` | Automated Clearing House transfer |
+| `ACH_PLAID` | ACH via Plaid integration |
+| `EU_BANK_TRANSFER` | European bank transfer |
+| `IDEAL` | iDEAL bank transfer (Netherlands) |
+| `PRZELEWY24` | Przelewy24 transfer (Poland) |
+| `TRUSTLY` | Trustly bank transfer (Europe) |
+| `FPX` | Financial Process Exchange (Malaysia) |
+| `FINTOC` | Fintoc bank transfer (Chile/Mexico) |
+| `SAFETYPAY_BANK_TRANSFER` | SafetyPay bank transfer |
+| `CODI` | CoDi mobile payment (Mexico) |
+| `SBP` | Faster Payments System (Russia) |
+| `VIRTUAL_ACCOUNT_IDN` | Virtual account (Indonesia) |
+| `BREB_QR` | QR code bank transfer (Brazil) |
+| `PAY_BY_BANK_(EUROPE)` | Open banking payment (Europe) |
+
+## Cash & Vouchers
+
+| Type | Description |
+|------|-------------|
+| `OXXO` | OXXO cash voucher (Mexico) |
+| `BOLETO` | Boleto bancário (Brazil) |
+| `EFECTY` | Efecty cash payment (Colombia) |
+| `BALOTO` | Baloto cash payment (Colombia) |
+| `PAGO_EFECTIVO` | PagoEfectivo cash payment (Peru) |
+| `RAPIPAGO` | Rapipago cash payment (Argentina) |
+| `PAGOFACIL` | PagoFácil cash payment (Argentina) |
+
+## Digital Wallets
+
+| Type | Description |
+|------|-------------|
+| `APPLE_PAY` | Apple Pay |
+| `GOOGLE_PAY` | Google Pay |
+| `CLICK_TO_PAY` | Click to Pay (Visa/Mastercard) |
+| `NUPAY` | NuPay wallet (Brazil) |
+| `MERCADO_PAGO_WALLET` | Mercado Pago wallet |
+| `DAVIPLATA` | Daviplata wallet (Colombia) |
+| `NEQUI` | Nequi wallet (Colombia) |
+| `ASTROPAY_WALLET` | AstroPay wallet |
+
+## Buy Now, Pay Later
+
+| Type | Description |
+|------|-------------|
+| `KLARNA_PAY_NOW` | Klarna Pay Now |
+| `KLARNA_PAY_LATER` | Klarna Pay Later |
+| `CUOTEALO_BCP` | Cuotealo BCP installments (Peru) |
+
+## Enrollment-Specific
+
+| Type | Description |
+|------|-------------|
+| `EU_BANK_TRANSFER_ENROLLMENT` | EU bank transfer enrollment |
+| `IDEAL_ENROLLMENT` | iDEAL enrollment |
+| `KLARNA_PAY_NOW_ENROLLMENT` | Klarna Pay Now enrollment |
+| `DAVIPLATA_ENROLLMENT` | Daviplata enrollment |
+
+## Fraud & Security
+
+| Type | Description |
+|------|-------------|
+| `3DS` | 3D Secure authentication |
+| `FRAUD` | Fraud screening transaction |
+
+## Payouts
+
+| Type | Description |
+|------|-------------|
+| `AFIRME_PAYOUT` | Afirme payout (Mexico) |
+| `ASTROPAY_PAYOUT` | AstroPay payout |
+
+## Related Pages
+
+- [Payment Methods by Region](/guides/payment-methods/by-region) — Country-specific availability
+- [Payment Method Object](/api-reference/payment-methods/object) — The payment method resource
+- [Coverage](/reference/coverage) — Provider and method coverage matrix

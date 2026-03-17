@@ -1,0 +1,68 @@
+---
+title: "Installments"
+description: "Split payments into multiple charges over time to increase conversion and average order value."
+---
+
+
+## Overview
+
+Installments allow your customers to split a single purchase into multiple smaller payments over time. This feature is particularly popular in Latin American markets where installment-based purchasing is a standard consumer expectation.
+
+By offering installments through Yuno, you can increase conversion rates and boost average order values while providing flexible payment options to your customers.
+
+## How Installments Work
+
+When a customer selects an installment plan at checkout, the total purchase amount is divided into equal payments collected over a defined period. Depending on the plan type, interest may or may not be applied to the total.
+
+<CardGroup cols={2}>
+  <Card title="Merchant Installments" icon="store" href="/features/installments/merchant-installments">
+    Interest-free plans where the merchant absorbs the financing cost. The customer pays the original price split across installments.
+  </Card>
+  <Card title="Provider Installments" icon="building-columns" href="/features/installments/provider-installments">
+    Bank or provider-funded plans where a financial institution finances the split. Interest is typically charged to the customer.
+  </Card>
+</CardGroup>
+
+## Installment Plan Types
+
+| Type | Interest Bearer | Customer Experience | Merchant Settlement |
+|------|----------------|---------------------|---------------------|
+| Merchant-funded | Merchant | No interest charged | Receives discounted upfront amount |
+| Provider-funded | Customer | Interest added to total | Receives full amount from provider |
+
+## Supported Markets
+
+Installments are widely supported across Latin America and select markets worldwide. Availability depends on your payment provider and the card issuer's policies.
+
+<Info>
+  Installment availability varies by country, payment provider, and card issuer. Check your Yuno Dashboard under **Settings > Payment Methods** to see which installment options are enabled for your account.
+</Info>
+
+## Integration Flow
+
+1. **Create an installment plan** (merchant-funded) or query available plans from the provider.
+2. **Present installment options** to the customer at checkout.
+3. **Submit the payment** with the selected installment configuration.
+4. **Track installment status** via webhooks or the Payments API.
+
+<Note>
+  When using Yuno's Full Checkout SDK, installment options are automatically presented to the customer based on your configuration. For Lite Checkout or Direct API, you must handle the installment selection UI yourself.
+</Note>
+
+## Key Considerations
+
+- **Minimum amounts**: Some providers enforce minimum transaction amounts for installment eligibility.
+- **Maximum installments**: The number of available installments depends on the provider and card issuer (commonly 2-12 for merchant-funded, up to 48 for provider-funded).
+- **Refunds**: Refunding an installment payment may cancel remaining installments or trigger a partial refund depending on the provider.
+- **Currency**: Installments are processed in the local currency of the transaction.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Set Up Merchant Installments" icon="gear" href="/features/installments/merchant-installments">
+    Create interest-free plans via the API.
+  </Card>
+  <Card title="Use Provider Installments" icon="bank" href="/features/installments/provider-installments">
+    Leverage bank-funded installment plans.
+  </Card>
+</CardGroup>

@@ -1,0 +1,62 @@
+---
+title: "Request a Transfer"
+description: "Request a fund transfer or reversal for a split marketplace payment."
+api: "POST https://api-sandbox.y.uno/v1/payments/{payment_id}/transactions/{transaction_id}/split-marketplace/transfer-reversal"
+---
+
+Requests a fund transfer or reversal associated with a split marketplace payment. Use this to reverse a transfer that was previously made to a recipient as part of a marketplace split.
+
+## Path Parameters
+
+<ParamField path="payment_id" type="string" required>
+  The unique identifier of the payment.
+</ParamField>
+
+<ParamField path="transaction_id" type="string" required>
+  The unique identifier of the transaction within the payment.
+</ParamField>
+
+## Request Body
+
+<ParamField body="recipient_id" type="string" required>
+  The unique identifier of the recipient whose transfer should be reversed.
+
+  Example: `3aaa4d82-11e8-48ce-8ef5-04eee3a10802`
+</ParamField>
+
+<ParamField body="amount" type="number">
+  Transfer amount to reverse.
+
+  Example: `1000.00`
+</ParamField>
+
+<ParamField body="currency" type="string">
+  ISO 4217 currency code.
+
+  Example: `USD`
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Reason for the transfer reversal.
+
+  Example: `Refund request`
+</ParamField>
+
+<RequestExample>
+```json Request
+{
+  "recipient_id": "3aaa4d82-11e8-48ce-8ef5-04eee3a10802",
+  "amount": 1000.00,
+  "currency": "USD",
+  "reason": "Refund request"
+}
+```
+</RequestExample>
+
+## Related Pages
+
+- [Transfer Onboarding](/api-reference/recipients/transfer-onboarding) — Initiate a fund transfer
+- [Reverse Transfer](/api-reference/recipients/reverse-transfer) — Reverse a completed transfer
+- [Get Transfer](/api-reference/recipients/get-transfer) — Retrieve transfer details
+- [List Transfers](/api-reference/recipients/list-transfers) — List all transfers for a recipient
+- [Split & Marketplace](/features/split-marketplace) — Overview of marketplace split payments

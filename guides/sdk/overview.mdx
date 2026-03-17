@@ -1,0 +1,119 @@
+---
+title: "SDK Overview"
+description: "Choose the right Yuno SDK integration for your checkout experience"
+---
+
+## Which integration should I use?
+
+Our single SDK is very flexible and supports different patterns based on the level of control you need. More advanced use cases require a larger integration effort, so make sure your requirements justify the investment.
+
+> **Not sure what to do? Go with Full Checkout.** It covers the most common scenarios with the least integration effort.
+
+## Full Checkout (Recommended)
+
+Full Checkout is the fastest path to accepting payments. Mount it with a single call and Yuno renders the entire checkout UI — payment method selection, card forms, alternative methods, and 3DS handling — all included.
+
+- **Fastest time-to-value** — one mount call, ~10 lines of code
+- **All payment methods** render automatically based on your configuration
+- **SAQ-A compliance** (simplest PCI level — card data never touches your servers)
+- **Production-ready** — responsive, accessible, localized out of the box
+
+Get started with the [Full Checkout integration guide](/guides/sdk/full-checkout).
+
+<Accordion title="Need more control? Compare all integration patterns">
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/sdk-decision-tree.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/sdk-decision-tree.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+**Comparison**
+
+| | Full | Seamless | Lite | Secure Fields | Headless |
+|---|---|---|---|---|---|
+| **Best for** | Most integrations | Custom method selection | Custom checkout pages | Individual field styling | Full UI control |
+| **Effort** | ~10 lines | Low | Medium | Medium-High | High |
+| **UI control** | Theme & branding | Payment method list | Layout + styling | Per-field styling | Complete |
+| **PCI scope** | SAQ-A | SAQ-A | SAQ-A | SAQ-A | SAQ-A |
+| **Payment methods** | All, automatic | All, you select | All, you select | Cards only | Cards only |
+| **Auto payment methods** | Yes | Yes | No | No | No |
+| **Dashboard conditions** | Yes | Yes | Yes | Yes | No |
+
+**Seamless Checkout**
+
+Seamless Checkout combines SDK convenience with control over payment method selection. Yuno handles the payment form and creates payments in a single flow — you control which methods to show and when.
+
+- **Single-flow payment creation** — the only integration that handles token-to-payment seamlessly
+- **Payment method control** — you decide which methods to display
+- **External buttons** — mount Apple Pay and Google Pay buttons anywhere in your UI
+- **Low development effort** — similar to Full Checkout with more flexibility
+
+Get started with the [Seamless Checkout integration guide](/guides/sdk/seamless-checkout).
+
+**Lite Checkout**
+
+Embed a payment form directly in your page with full layout control. Yuno supplies available payment methods; you decide which to display and manage the UI.
+
+See the [Lite Checkout guide](/guides/sdk/lite-checkout).
+
+**Secure Fields**
+
+Individual, tokenized input fields (card number, expiry, CVV) that you place and style independently. Web only.
+
+See the [Secure Fields guide](/guides/sdk/secure-fields).
+
+**Headless**
+
+Build your own checkout UI from scratch. You collect card data, Yuno handles tokenization and 3DS. Maximum flexibility, highest integration effort.
+
+See the [Headless guide](/guides/sdk/headless).
+
+</Accordion>
+
+## Installation
+
+Install the Yuno Web SDK via npm or CDN:
+
+<CodeGroup>
+```bash npm
+npm install @yuno-payments/sdk-web
+```
+
+```html CDN
+<script src="https://sdk-web.y.uno/v1/static/js/main.min.js"></script>
+```
+</CodeGroup>
+
+## SDK Versions
+
+When integrating, always check the latest version of `@yuno-payments/sdk-web` on [npm](https://www.npmjs.com/package/@yuno-payments/sdk-web) to ensure compatibility.
+
+<Warning>
+If you are upgrading from a previous SDK version, review the [migration notes](https://github.com/yuno-payments) for breaking changes in the initialization API.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Full Checkout" icon="credit-card" href="/guides/sdk/full-checkout">
+    Recommended — get live in minutes.
+  </Card>
+  <Card title="Customization" icon="palette" href="/guides/sdk/customization">
+    Theme, branding, and styling options.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<Tip>
+**Recommended progression:**
+1. **[Full Checkout](/guides/sdk/full-checkout)** — Start here. Pre-built UI with all payment methods.
+2. **[Customize the UI](/guides/sdk/customization)** — Match the checkout to your brand.
+3. **[Add card enrollment](/guides/sdk/enrollment)** — Let customers save cards for future payments.
+4. **[Explore advanced modes](/guides/sdk/seamless-checkout)** — Seamless, Lite, Secure Fields, and Headless for more control.
+</Tip>

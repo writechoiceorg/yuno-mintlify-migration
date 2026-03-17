@@ -1,0 +1,143 @@
+---
+title: "Secure Fields"
+description: "Embed individual card input fields for full UI control while maintaining PCI compliance"
+---
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/secure-fields-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/secure-fields-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## Overview
+
+Secure Fields lets you embed individual, PCI-compliant card input fields (card number, expiry date, CVV) directly into your custom checkout UI. Each field is rendered in a secure iframe managed by Yuno, so sensitive card data never touches your servers.
+
+<Note>
+Secure Fields gives you complete design freedom while keeping your PCI scope at **SAQ-A** level (the simplest compliance level — card data never touches your servers).
+</Note>
+
+<Tip>
+**Using React or Vue?** Check out the [React Components](/guides/sdk/react-components) or [Vue Components](/guides/sdk/vue-components) for framework-specific wrappers.
+</Tip>
+
+## Prerequisites
+
+- Yuno API keys ([Authentication](/getting-started/authentication))
+- `@yuno-payments/sdk-web` installed ([SDK Overview](/guides/sdk/overview))
+- A custom checkout page where you control the form layout
+
+## Integration Flow
+
+<Steps>
+  <Step title="Create a checkout session (server-side)">
+    ```javascript
+    const session = await createCheckoutSession({
+      amount: { currency: 'USD', value: 75.00 },
+      country: 'US',
+      merchant_order_id: 'order-456',
+      workflow: 'SDK_SECURE_FIELDS',
+    });
+    ```
+  </Step>
+
+  <Step title="Initialize the SDK">
+    ```javascript
+    const yuno = await Yuno.initialize({
+      publicApiKey: 'your-public-api-key',
+      checkoutSession: session.checkout_session,
+      country: 'US',
+    });
+    ```
+  </Step>
+
+  <Step title="Mount individual Secure Fields">
+    Create container elements for each field and mount them:
+
+    ```html
+    <form id="payment-form">
+      <label>Card Number</label>
+      <div id="yuno-card-number"></div>
+
+      <label>Expiry Date</label>
+      <div id="yuno-expiry"></div>
+
+      <label>CVV</label>
+      <div id="yuno-cvv"></div>
+
+      <button type="submit">Pay</button>
+    </form>
+    ```
+
+    ```javascript
+    const secureFields = yuno.mountSecureFields({
+      cardNumber: { elementSelector: '#yuno-card-number' },
+      expiryDate: { elementSelector: '#yuno-expiry' },
+      cvv: { elementSelector: '#yuno-cvv' },
+      onReady: () => console.log('Secure Fields ready'),
+      onFieldChange: (field, event) => {
+        if (event.error) {
+          showFieldError(field, event.error.message);
+        } else {
+          clearFieldError(field);
+        }
+      },
+    });
+    ```
+  </Step>
+
+  <Step title="Generate a one-time token">
+    When the user submits the form, generate a token from the secure fields:
+
+    ```javascript
+    document.getElementById('payment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const { token } = await secureFields.generateToken({
+          cardHolderName: 'John Doe',
+        });
+        // Send token to your server to create the payment
+        await createPayment(token);
+      } catch (error) {
+        console.error('Tokenization failed:', error);
+      }
+    });
+    ```
+
+    <Warning>
+    The one-time token expires after a single use. Generate a new token for each payment attempt.
+    </Warning>
+  </Step>
+
+  <Step title="Create payment and handle 3DS">
+    Use the token server-side to create the payment, then call `continuePayment()` client-side for 3DS:
+
+    ```javascript
+    yuno.continuePayment();
+    ```
+  </Step>
+</Steps>
+
+## Styling Secure Fields
+
+You can style the iframe inputs to match your design system:
+
+```javascript
+const secureFields = yuno.mountSecureFields({
+  styles: {
+    base: {
+      fontSize: '16px',
+      color: '#333',
+      fontFamily: 'Inter, sans-serif',
+    },
+    focus: { borderColor: '#0066FF' },
+    error: { color: '#E53E3E' },
+  },
+});
+```
+
+See [Customization](/guides/sdk/customization) for the full list of style properties.

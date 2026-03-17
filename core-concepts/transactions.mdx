@@ -1,0 +1,158 @@
+---
+title: "Transactions"
+description: "Understand the relationship between payments and individual processing attempts"
+---
+
+## Payments vs Transactions
+
+A **payment** represents the merchant's intent to collect funds. A **transaction** represents a single processing attempt against a provider. One payment can have multiple transactions when Yuno retries or cascades across providers.
+
+```
+Payment (1)  ──>  Transaction 1: Provider A (DECLINED)
+             ──>  Transaction 2: Provider B (SUCCEEDED)  <-- final result
+```
+
+## Why Multiple Transactions?
+
+Yuno creates additional transactions in these scenarios:
+
+| Scenario | Description |
+|----------|-------------|
+| **Provider decline** | Primary provider declines; Yuno retries with a fallback provider |
+| **Provider timeout** | Primary provider does not respond within the configured window |
+| **Cascading rules** | Your routing configuration specifies retry behavior across providers |
+| **Capture** | A separate transaction records the capture of an authorized payment |
+| **Refund** | Each refund (full or partial) creates its own transaction |
+
+## Transaction Types
+
+| Type | Description |
+|------|-------------|
+| `AUTHORIZATION` | Reserves funds on the customer's payment instrument |
+| `CAPTURE` | Transfers previously authorized funds to the merchant |
+| `SALE` | Combined authorization and capture in a single step (auto-capture) |
+| `REFUND` | Returns captured funds to the customer |
+| `VOID` | Releases an authorization without capturing funds |
+| `CANCELLATION` | Cancels a pending or authorized payment |
+| `VERIFY` | Zero-amount card verification without charging |
+| `3DS` | 3D Secure authentication challenge transaction |
+
+## Transaction Statuses
+
+| Status | Meaning |
+|--------|---------|
+| `CREATED` | Transaction initiated, not yet sent to provider |
+| `PENDING` | Transaction submitted, awaiting provider response |
+| `SUCCEEDED` | Provider confirmed successful processing |
+| `DECLINED` | Provider or issuer declined the transaction |
+| `REJECTED` | Transaction blocked by validation or fraud rules |
+| `FAILED` | Processing error (network issue, provider error) |
+| `CANCELLED` | Transaction cancelled before completion |
+| `EXPIRED` | Transaction timed out without resolution |
+| `ERROR` | Unexpected system or provider error |
+
+## Transaction Status Flows by Type
+
+Each transaction type can reach specific statuses. The table below shows every valid outcome per type.
+
+| Transaction Type | Possible Statuses |
+|---|---|
+| **PURCHASE** | `CREATED` · `SUCCEEDED` · `PENDING` · `CANCELLED` · `EXPIRED` · `DECLINED` · `REJECTED` · `ERROR` |
+| **AUTHORIZE** | `CREATED` · `SUCCEEDED` · `DECLINED` · `ERROR` |
+| **VERIFY** | `CREATED` · `SUCCEEDED` · `DECLINED` · `ERROR` |
+| **CAPTURE** | `PENDING` · `DECLINED` · `ERROR` |
+| **CANCEL** | `SUCCEEDED` |
+| **REFUND** | `CREATED` · `SUCCEEDED` · `PENDING` · `DECLINED` · `ERROR` |
+| **3DS** | `DECLINED` · `ERROR` |
+| **CHARGEBACK** | `CREATED` · `WON` · `PENDING` · `LOST` · `ERROR` |
+| **FRAUD SCREENING** | `CREATED` · `SUCCEEDED` · `PENDING` · `CANCELLED` · `DECLINED` · `ERROR` |
+
+### How a Purchase Flows
+
+The most common transaction type. This shows every path a purchase can take:
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/purchase-transaction-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/purchase-transaction-flow.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+### How Authorize + Capture Flows
+
+Two-step payment: authorize reserves funds, capture transfers them.
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/authorize-capture-transaction.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/authorize-capture-transaction.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+### How Chargebacks Flow
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/chargeback-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/chargeback-flow.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+## Viewing Transactions
+
+Retrieve all transactions for a payment:
+
+```bash
+curl -X GET https://api-sandbox.y.uno/v1/payments/{payment_id}/transactions \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code"
+```
+
+Each transaction includes the provider used, the provider's raw response code, and timing information:
+
+```json
+{
+  "transactions": [
+    {
+      "transaction_id": "txn_001",
+      "type": "SALE",
+      "status": "DECLINED",
+      "provider": "provider_a",
+      "provider_response_code": "51",
+      "provider_response_message": "Insufficient funds",
+      "created_at": "2026-02-28T10:00:00Z"
+    },
+    {
+      "transaction_id": "txn_002",
+      "type": "SALE",
+      "status": "SUCCEEDED",
+      "provider": "provider_b",
+      "provider_response_code": "00",
+      "provider_response_message": "Approved",
+      "created_at": "2026-02-28T10:00:02Z"
+    }
+  ]
+}
+```
+
+<Note>
+  The `provider_response_code` and `provider_response_message` contain the raw response from the acquirer or issuer. These are useful for debugging declines but vary across providers.
+</Note>
+
+## Transaction vs Payment Status
+
+The payment status reflects the **final outcome** across all transactions. If the first transaction is declined but a cascade succeeds, the payment status is `SUCCEEDED` even though one transaction was `DECLINED`.
+
+<Warning>
+  Always use the **payment status** for business logic (order fulfillment, notifications to customers). Use transaction-level data only for debugging and analytics.
+</Warning>

@@ -1,0 +1,45 @@
+---
+title: "Cancel Transfer"
+description: "Cancel a pending BaaS transfer"
+api: "POST https://api-sandbox.y.uno/v1/baas/transfers/{transfer_id}/cancel"
+---
+
+## Path parameters
+
+<ParamField path="transfer_id" type="string" required>
+  The transfer identifier to cancel.
+</ParamField>
+
+## Response
+
+Returns the transfer object with status `CANCELLED`.
+
+<Info>
+Only transfers in `PENDING` status can be cancelled. Transfers that are already `PROCESSING` or in a terminal state cannot be cancelled.
+</Info>
+
+<ResponseExample>
+```json 200 OK
+{
+  "id": "xfer_880e8400-e29b-41d4-a716-446655440000",
+  "account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "source_entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "destination_entity_id": "ent_770e8400-e29b-41d4-a716-446655440001",
+  "amount": 250.00,
+  "currency": "USD",
+  "status": "CANCELLED",
+  "payment_rail": "ACH_SAME_DAY",
+  "reference": "invoice_2026_001",
+  "created_at": "2026-02-01T16:00:00Z",
+  "updated_at": "2026-02-01T16:05:00Z"
+}
+```
+
+```json 400 Bad Request
+{
+  "code": "INVALID_STATUS",
+  "messages": ["Cannot cancel transfer with status PROCESSING"],
+  "http_code": 400
+}
+```
+</ResponseExample>

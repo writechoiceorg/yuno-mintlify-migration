@@ -1,0 +1,35 @@
+---
+title: "Close Account"
+description: "Close a BaaS bank account"
+api: "DELETE https://api-sandbox.y.uno/v1/baas/accounts/{account_id}"
+---
+
+## Path parameters
+
+<ParamField path="account_id" type="string" required>
+  The BaaS account identifier to close.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "id": "acc_770e8400-e29b-41d4-a716-446655440000",
+  "entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "currency": "USD",
+  "country": "US",
+  "status": "CLOSED",
+  "created_at": "2026-02-01T15:00:00Z",
+  "updated_at": "2026-02-03T10:00:00Z"
+}
+```
+
+```json 400 Bad Request
+{
+  "code": "ACCOUNT_HAS_BALANCE",
+  "messages": ["Cannot close account with remaining balance"],
+  "http_code": 400
+}
+```
+</ResponseExample>

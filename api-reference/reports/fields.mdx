@@ -1,0 +1,354 @@
+---
+title: "Reports Fields"
+description: "Complete field reference for all Yuno report types, detailing the columns included in each report."
+---
+
+In this section, you can find all report types and related fields available when generating your reports. Take into account the description of the fields, where you can find the origin of the data and its availability.
+
+Yuno provides several report types:
+
+- [Payment](#payment)
+- [Transaction](#transaction)
+- [Transaction Reconciliation](#transaction-reconciliation)
+- [Settlement](#settlement)
+- [Communications](#communications)
+- [Fraud Transactions](#fraud-transactions)
+- [Payouts](#payouts)
+- [Fees](#fees)
+- [Agenda](#agenda)
+- [Sales Conciliation](#sales-conciliation)
+- [Advancements](#advancements)
+
+<Info>
+  The report fields are subject to modifications, and new fields can be added to the end of the current structure.
+</Info>
+
+---
+
+## Payment
+
+The Payment report includes all payment-level data including customer, card, checkout, and airline information.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `account_id` | string | The unique identifier of the account |
+| `amount_value` | number | The payment amount |
+| `captured` | number | The captured amount |
+| `currency` | enum | The currency used to make the payment (ISO 4217) |
+| `country` | enum | The country where the transaction was processed (ISO 3166-1) |
+| `created_at` | timestamp | The payment creation date |
+| `checkout_session` | string | The checkout session identifier |
+| `card_brand` | string | Brand of card used (e.g., VISA, MASTERCARD) |
+| `card_holder_name` | string | Name of the cardholder |
+| `card_iin` | string | Issuer Identification Number (first 6-8 digits) |
+| `card_lfd` | string | Last four digits of the card |
+| `card_type` | string | Card type (CREDIT, DEBIT, PREPAID) |
+| `card_category` | string | Card category (e.g., Gold, Platinum) |
+| `card_issuer_name` | string | Name of the issuing bank |
+| `card_issuer_code` | string | Code of the issuing bank |
+| `bank_name` | string | Bank name for bank transfer payments |
+| `beneficiary_name` | string | Beneficiary name |
+| `bnpl_installments` | integer | Number of BNPL installments |
+| `browser_info_accept_header` | string | Browser accept header |
+| `browser_info_color_depth` | string | Browser color depth |
+| `browser_info_javascript_enabled` | boolean | Whether JavaScript is enabled |
+| `browser_info_language` | string | Browser language |
+| `browser_info_screen_height` | integer | Browser screen height |
+| `browser_info_screen_width` | integer | Browser screen width |
+| `browser_info_user_agent` | string | Browser user agent string |
+| `airline_leg_arrival_airport` | string | IATA arrival airport code |
+| `airline_leg_base_fare` | number | Base fare amount (excluding taxes) |
+| `airline_leg_base_fare_currency` | string | Base fare currency (ISO 4217) |
+| `airline_leg_carrier_code` | string | IATA carrier code |
+| `airline_leg_departure_airport` | string | IATA departure airport code |
+| `airline_leg_departure_datetime` | timestamp | Local departure date and time |
+| `airline_leg_fare_basis_code` | string | Fare basis code |
+| `airline_leg_fare_class_code` | string | Fare class code |
+| `airline_leg_flight_number` | string | Flight number |
+| `airline_leg_stopover_code` | string | Stopover code |
+| `airline_passenger_country` | string | Passenger country |
+| `airline_passenger_date_of_birth` | string | Passenger date of birth |
+| `airline_passenger_document_number` | string | Passenger document number |
+| `airline_passenger_document_type` | string | Passenger document type |
+| `airline_passenger_email` | string | Passenger email |
+| `airline_passenger_first_name` | string | Passenger first name |
+| `airline_passenger_last_name` | string | Passenger last name |
+| `airline_passenger_loyalty_number` | string | Passenger loyalty program number |
+| `airline_passenger_loyalty_tier` | string | Passenger loyalty tier |
+| `airline_passenger_middle_name` | string | Passenger middle name |
+| `airline_passenger_nationality` | string | Passenger nationality |
+| `airline_passenger_phone_country_code` | string | Passenger phone country code |
+| `airline_passenger_phone_number` | string | Passenger phone number |
+| `airline_passenger_type` | string | Passenger type |
+| `airline_ticket_e_ticket` | boolean | Whether it is an e-ticket |
+| `airline_ticket_issue_address` | string | Ticket issue address |
+| `airline_ticket_issue_carrier_prefix_code` | string | Carrier prefix code |
+| `airline_ticket_issue_city` | string | Ticket issue city |
+| `airline_ticket_issue_country` | string | Ticket issue country |
+| `airline_ticket_issue_date` | string | Ticket issue date |
+| `airline_ticket_issue_travel_agent_code` | string | Travel agent code |
+| `airline_ticket_issue_travel_agent_name` | string | Travel agent name |
+| `airline_ticket_issue_zip_code` | string | Ticket issue ZIP code |
+| `airline_ticket_restricted` | boolean | Whether the ticket is restricted |
+| `airline_ticket_ticket_number` | string | Ticket number |
+| `airline_ticket_total_fare_amount` | number | Total fare amount |
+| `airline_ticket_total_fee_amount` | number | Total fee amount |
+| `airline_ticket_total_tax_amount` | number | Total tax amount |
+
+---
+
+## Transaction
+
+The Transaction report contains individual transaction-level data for each processing attempt within a payment.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `transaction_id` | string | Unique transaction identifier |
+| `payment_id` | string | Parent payment identifier |
+| `account_id` | string | Account identifier |
+| `type` | string | Transaction type (PURCHASE, AUTHORIZE, CAPTURE, REFUND, CANCEL, CHARGEBACK) |
+| `status` | string | Transaction status |
+| `amount` | number | Transaction amount |
+| `currency` | string | Currency code (ISO 4217) |
+| `country` | string | Processing country (ISO 3166-1) |
+| `provider_id` | string | Provider that processed the transaction |
+| `provider_transaction_id` | string | Provider's transaction identifier |
+| `response_code` | string | Provider response code |
+| `response_message` | string | Provider response message |
+| `merchant_order_id` | string | Merchant order reference |
+| `payment_method_type` | string | Payment method type (CARD, PIX, BOLETO, etc.) |
+| `card_brand` | string | Card brand |
+| `card_iin` | string | First 6-8 digits of the card |
+| `card_lfd` | string | Last four digits |
+| `card_type` | string | Card type (CREDIT, DEBIT) |
+| `card_issuer_name` | string | Issuing bank name |
+| `three_ds_version` | string | 3DS version used |
+| `three_ds_eci` | string | Electronic Commerce Indicator |
+| `three_ds_status` | string | 3DS authentication status |
+| `created_at` | timestamp | Transaction creation date |
+| `updated_at` | timestamp | Last update date |
+
+---
+
+## Transaction Reconciliation
+
+The Transaction Reconciliation report combines transaction data with provider settlement references for reconciliation purposes.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `transaction_id` | string | Unique transaction identifier |
+| `payment_id` | string | Parent payment identifier |
+| `account_id` | string | Account identifier |
+| `merchant_order_id` | string | Merchant order reference |
+| `type` | string | Transaction type |
+| `status` | string | Transaction status |
+| `amount` | number | Transaction amount |
+| `currency` | string | Currency code (ISO 4217) |
+| `country` | string | Processing country |
+| `provider_id` | string | Provider identifier |
+| `provider_transaction_id` | string | Provider's transaction ID |
+| `provider_settlement_id` | string | Provider's settlement reference |
+| `response_code` | string | Provider response code |
+| `response_message` | string | Provider response message |
+| `payment_method_type` | string | Payment method type |
+| `card_brand` | string | Card brand |
+| `card_iin` | string | First 6-8 digits |
+| `card_lfd` | string | Last four digits |
+| `created_at` | timestamp | Transaction creation date |
+| `settled_at` | timestamp | Settlement date |
+
+---
+
+## Settlement
+
+The Settlement report provides settlement-level data showing when funds were transferred from providers.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `settlement_id` | string | Unique settlement identifier |
+| `account_id` | string | Account identifier |
+| `provider_id` | string | Provider identifier |
+| `provider_settlement_id` | string | Provider's settlement reference |
+| `status` | string | Settlement status |
+| `gross_amount` | number | Gross settlement amount |
+| `net_amount` | number | Net settlement amount (after fees) |
+| `fee_amount` | number | Total fees deducted |
+| `currency` | string | Currency code (ISO 4217) |
+| `country` | string | Processing country |
+| `transaction_count` | integer | Number of transactions in settlement |
+| `settlement_date` | timestamp | Date funds were settled |
+| `created_at` | timestamp | Record creation date |
+
+---
+
+## Communications
+
+The Communications report tracks notifications and webhook deliveries.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `communication_id` | string | Unique communication identifier |
+| `account_id` | string | Account identifier |
+| `type` | string | Communication type (WEBHOOK, EMAIL, SMS) |
+| `status` | string | Delivery status |
+| `event_type` | string | Event that triggered the communication |
+| `payment_id` | string | Associated payment identifier |
+| `transaction_id` | string | Associated transaction identifier |
+| `destination` | string | Delivery destination (URL, email, phone) |
+| `response_code` | string | HTTP response code (for webhooks) |
+| `attempts` | integer | Number of delivery attempts |
+| `created_at` | timestamp | Communication creation date |
+| `delivered_at` | timestamp | Successful delivery date |
+
+---
+
+## Fraud Transactions
+
+The Fraud Transactions report contains fraud screening results and risk assessment data.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `transaction_id` | string | Fraud screening transaction identifier |
+| `payment_id` | string | Associated payment identifier |
+| `account_id` | string | Account identifier |
+| `status` | string | Fraud screening status |
+| `risk_score` | number | Risk score assigned by fraud provider |
+| `risk_level` | string | Risk level (LOW, MEDIUM, HIGH) |
+| `decision` | string | Screening decision (APPROVE, DECLINE, REVIEW) |
+| `provider_id` | string | Fraud provider identifier |
+| `provider_transaction_id` | string | Fraud provider's transaction reference |
+| `reason` | string | Reason for the decision |
+| `payment_method_type` | string | Payment method type |
+| `card_brand` | string | Card brand |
+| `card_iin` | string | First 6-8 digits |
+| `card_lfd` | string | Last four digits |
+| `country` | string | Processing country |
+| `amount` | number | Payment amount |
+| `currency` | string | Currency code |
+| `created_at` | timestamp | Screening date |
+
+---
+
+## Payouts
+
+The Payouts report includes all payout transaction data.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `payout_id` | string | Unique payout identifier |
+| `account_id` | string | Account identifier |
+| `status` | string | Payout status |
+| `amount` | number | Payout amount |
+| `currency` | string | Currency code (ISO 4217) |
+| `country` | string | Processing country |
+| `merchant_reference` | string | Merchant's payout reference |
+| `description` | string | Payout description |
+| `purpose` | string | Payout purpose |
+| `provider_id` | string | Provider identifier |
+| `provider_transaction_id` | string | Provider's transaction reference |
+| `beneficiary_name` | string | Beneficiary name |
+| `beneficiary_document_type` | string | Beneficiary document type |
+| `beneficiary_document_number` | string | Beneficiary document number |
+| `withdrawal_method_type` | string | Withdrawal method type |
+| `bank_code` | string | Bank code |
+| `bank_account_number` | string | Bank account number |
+| `bank_account_type` | string | Account type (CHECKINGS, SAVINGS) |
+| `created_at` | timestamp | Payout creation date |
+| `updated_at` | timestamp | Last update date |
+
+---
+
+## Fees
+
+The Fees report details processing fees charged per transaction.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `fee_id` | string | Unique fee identifier |
+| `account_id` | string | Account identifier |
+| `transaction_id` | string | Associated transaction identifier |
+| `payment_id` | string | Associated payment identifier |
+| `fee_type` | string | Type of fee |
+| `amount` | number | Fee amount |
+| `currency` | string | Currency code (ISO 4217) |
+| `provider_id` | string | Provider identifier |
+| `country` | string | Processing country |
+| `payment_method_type` | string | Payment method type |
+| `created_at` | timestamp | Fee record date |
+
+---
+
+## Agenda
+
+The Agenda report provides a schedule of expected future settlements and receivables.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `account_id` | string | Account identifier |
+| `transaction_id` | string | Transaction identifier |
+| `payment_id` | string | Payment identifier |
+| `provider_id` | string | Provider identifier |
+| `expected_settlement_date` | timestamp | Expected date of settlement |
+| `gross_amount` | number | Gross expected amount |
+| `net_amount` | number | Net expected amount (after fees) |
+| `fee_amount` | number | Expected fee amount |
+| `currency` | string | Currency code (ISO 4217) |
+| `country` | string | Processing country |
+| `status` | string | Agenda entry status |
+| `installment_number` | integer | Installment number (if applicable) |
+| `total_installments` | integer | Total installments |
+| `created_at` | timestamp | Record creation date |
+
+---
+
+## Sales Conciliation
+
+The Sales Conciliation report matches sales records with provider confirmations for reconciliation.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `account_id` | string | Account identifier |
+| `transaction_id` | string | Transaction identifier |
+| `payment_id` | string | Payment identifier |
+| `merchant_order_id` | string | Merchant order reference |
+| `provider_id` | string | Provider identifier |
+| `provider_transaction_id` | string | Provider's transaction reference |
+| `sale_amount` | number | Original sale amount |
+| `confirmed_amount` | number | Provider-confirmed amount |
+| `currency` | string | Currency code (ISO 4217) |
+| `country` | string | Processing country |
+| `status` | string | Conciliation status |
+| `payment_method_type` | string | Payment method type |
+| `conciliation_date` | timestamp | Date of conciliation |
+| `created_at` | timestamp | Sale creation date |
+
+---
+
+## Advancements
+
+The Advancements report tracks early receipt of future receivables (advance payments from providers).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `advancement_id` | string | Unique advancement identifier |
+| `account_id` | string | Account identifier |
+| `provider_id` | string | Provider identifier |
+| `original_settlement_date` | timestamp | Original expected settlement date |
+| `advanced_date` | timestamp | Date the advancement was received |
+| `gross_amount` | number | Gross advanced amount |
+| `net_amount` | number | Net amount received (after advancement fees) |
+| `fee_amount` | number | Advancement fee |
+| `currency` | string | Currency code (ISO 4217) |
+| `status` | string | Advancement status |
+| `transaction_count` | integer | Number of transactions advanced |
+| `created_at` | timestamp | Record creation date |
+
+---
+
+## Related Pages
+
+- [Report Object](/api-reference/reports/object) — The report resource
+- [Report Status](/api-reference/reports/report-status) — Report generation status lifecycle
+- [Create Report](/api-reference/reports/create) — Generate a new report
+- [Download Report](/api-reference/reports/download) — Download a generated report
+- [Reports Feature](/features/reports) — Overview of Yuno's reporting capabilities

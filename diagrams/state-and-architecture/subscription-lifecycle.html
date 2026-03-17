@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Subscription Lifecycle</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  .node {
+    position: absolute;
+    border: 1px solid;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    padding: 12px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a0a0a;
+    text-align: center;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+  }
+
+  .node.blue   { border-color: #2563eb; background: #eff6ff; }
+  .node.green  { border-color: #16a34a; background: #f0fdf4; }
+  .node.orange { border-color: #f97316; background: #fff7ed; }
+  .node.slate  { border-color: #64748b; background: #f8fafc; }
+  .node.red    { border-color: #dc2626; background: #fff1f2; }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<!--
+  COORDINATE SYSTEM (Base 1)
+  bg_diagram  : left=40, top=48, width=1460, height=778
+
+  Center column (cx=770): Start dot, CREATED, ACTIVE, PAST_DUE, CANCELLED
+  PAUSED     : cx=330,  top=440  bottom=484
+  EXPIRED    : cx=1180, top=440  bottom=484
+
+  Connectors:
+    Main flow (downward): Start→CREATED→ACTIVE→PAST_DUE→CANCELLED
+    ACTIVE ↔ PAUSED (bidirectional)
+    ACTIVE ↔ PAST_DUE (bidirectional)
+    ACTIVE  → EXPIRED
+    ACTIVE  → CANCELLED (wide right arc, outside EXPIRED)
+-->
+
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.08)"/>
+    </filter>
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#94a3b8"/>
+    </marker>
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background card ──────────────────────────────────────── -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.6"/>
+
+  <!-- ── Dashed grid — vertical ─────────────────────────────── -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="190"  y1="48" x2="190"  y2="826"/>
+    <line x1="340"  y1="48" x2="340"  y2="826"/>
+    <line x1="490"  y1="48" x2="490"  y2="826"/>
+    <line x1="640"  y1="48" x2="640"  y2="826"/>
+    <line x1="790"  y1="48" x2="790"  y2="826"/>
+    <line x1="940"  y1="48" x2="940"  y2="826"/>
+    <line x1="1090" y1="48" x2="1090" y2="826"/>
+    <line x1="1240" y1="48" x2="1240" y2="826"/>
+    <line x1="1390" y1="48" x2="1390" y2="826"/>
+  </g>
+
+  <!-- ── Dashed grid — horizontal ──────────────────────────── -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="40" y1="135" x2="1500" y2="135"/>
+    <line x1="40" y1="285" x2="1500" y2="285"/>
+    <line x1="40" y1="435" x2="1500" y2="435"/>
+    <line x1="40" y1="585" x2="1500" y2="585"/>
+    <line x1="40" y1="735" x2="1500" y2="735"/>
+  </g>
+
+  <!-- ── Initial state dot ──────────────────────────────────── -->
+  <circle cx="770" cy="108" r="9" fill="#0a0a0a"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CONNECTOR PATHS
+  ════════════════════════════════════════════════════════════════ -->
+
+  <!-- p0: Start → CREATED (straight vertical) -->
+  <path id="p0" d="M 770,117 L 770,130"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p1: CREATED → ACTIVE (straight vertical) -->
+  <path id="p1" d="M 770,174 L 770,268"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p2: ACTIVE → PAUSED (diagonal left-down) -->
+  <path id="p2" d="M 706,312 C 590,378 450,378 330,440"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p3: ACTIVE → PAST_DUE (vertical, left lane) -->
+  <path id="p3" d="M 755,312 L 755,440"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p4: ACTIVE → EXPIRED (diagonal right-down) -->
+  <path id="p4" d="M 834,312 C 960,378 1090,378 1180,440"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p5: PAUSED → ACTIVE (back arc curving upward) -->
+  <path id="p5" d="M 362,440 C 362,356 692,352 720,312"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p6: PAST_DUE → ACTIVE (back arc, right lane) -->
+  <path id="p6" d="M 785,440 C 816,378 808,348 796,312"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p8: PAST_DUE → CANCELLED (center to center, straight vertical) -->
+  <path id="p8" d="M 770,484 L 770,628"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p10: ACTIVE → CANCELLED (wide right arc, right-center to right-center) -->
+  <path id="p10" d="M 812,290 C 1430,290 1430,650 822,650"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ANIMATED SPARKS
+  ════════════════════════════════════════════════════════════════ -->
+  <g clip-path="url(#diagram-clip)">
+
+    <!-- p0: → CREATED (blue) -->
+    <circle r="3.5" fill="#2563eb" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="0.8s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p0"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p1: → ACTIVE (green) -->
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.4s" begin="0.3s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p1"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p2: → PAUSED (orange) -->
+    <circle r="3.5" fill="#f97316" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="2s" begin="0.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p2"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p3: → PAST_DUE (orange) -->
+    <circle r="3.5" fill="#f97316" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="1s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p4: → EXPIRED (slate) -->
+    <circle r="3.5" fill="#64748b" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2s" begin="0.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p4"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p5: PAUSED → ACTIVE (green) -->
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2.2s" begin="1.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p5"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p6: PAST_DUE → ACTIVE (green) -->
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="1.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p6"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p8: PAST_DUE → CANCELLED (red) -->
+    <circle r="3.5" fill="#dc2626" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="1.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p8"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p10: ACTIVE → CANCELLED wide arc (red) -->
+    <circle r="3.5" fill="#dc2626" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="3.8s" begin="2.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p10"/>
+      </animateMotion>
+    </circle>
+
+  </g>
+</svg>
+
+<!-- ════════════════════════════════════════════════════════════════
+     HTML NODES  (left = center x, transform:translateX(-50%))
+════════════════════════════════════════════════════════════════ -->
+
+<!-- CREATED: cx=770, top=130 -->
+<div class="node blue" style="left:770px; top:130px;">CREATED</div>
+
+<!-- ACTIVE: cx=770, top=268 -->
+<div class="node green" style="left:770px; top:268px;">ACTIVE</div>
+
+<!-- PAUSED: cx=330, top=440 -->
+<div class="node orange" style="left:330px; top:440px;">PAUSED</div>
+
+<!-- PAST_DUE: cx=770, top=440 -->
+<div class="node orange" style="left:770px; top:440px;">PAST_DUE</div>
+
+<!-- EXPIRED: cx=1180, top=440 -->
+<div class="node slate" style="left:1180px; top:440px;">EXPIRED</div>
+
+<!-- CANCELLED: cx=770, top=628 -->
+<div class="node red" style="left:770px; top:628px;">CANCELLED</div>
+
+</div><!-- /diagram -->
+</div><!-- /scroll-wrapper -->
+</body>
+</html>

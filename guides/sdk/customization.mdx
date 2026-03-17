@@ -1,0 +1,140 @@
+---
+title: "Customization"
+description: "Customize the Yuno SDK appearance with themes, colors, fonts, and layout options"
+---
+
+## Overview
+
+Yuno SDK provides extensive customization options so the checkout experience matches your brand. You can configure themes, colors, typography, and layout through the SDK initialization or the [Checkout Builder](/platform/dashboard/checkout-builder) in the Dashboard.
+
+## Theme Configuration
+
+Pass a `theme` object during SDK initialization to customize the appearance:
+
+```javascript
+const yuno = Yuno.initialize('your-public-api-key');
+
+// Pass theme options when configuring checkout via startCheckout() or startSeamlessCheckout()
+yuno.startCheckout({
+  checkoutSession: 'checkout-session-id',
+  countryCode: 'BR',
+  language: 'en',
+  elementSelector: '#yuno-checkout',
+  yunoCreatePayment: async (oneTimeToken) => {
+    // Create payment server-side
+  },
+});
+```
+
+Theme properties can be configured via the [Checkout Builder](/platform/dashboard/checkout-builder) in the Dashboard or through CSS variables (see below).
+
+## Available Theme Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `primary` | `string` | `#0066FF` | Primary action color (buttons, links) |
+| `secondary` | `string` | `#6B7280` | Secondary elements color |
+| `background` | `string` | `#FFFFFF` | Form background color |
+| `text` | `string` | `#1F2937` | Primary text color |
+| `error` | `string` | `#EF4444` | Error state color for fields and messages |
+| `success` | `string` | `#10B981` | Success state color |
+| `borderRadius` | `string` | `4px` | Border radius for inputs and buttons |
+| `fontFamily` | `string` | System default | Font family for all text elements |
+| `fontSize` | `string` | `14px` | Base font size |
+
+## Dark Mode
+
+Enable dark mode by setting the `mode` property:
+
+```javascript
+theme: {
+  mode: 'dark',
+  primary: '#60A5FA',
+  background: '#1F2937',
+  text: '#F9FAFB',
+}
+```
+
+<Note>
+When `mode: 'dark'` is set, the SDK automatically adjusts contrast ratios for accessibility compliance. You can still override individual colors.
+</Note>
+
+## Layout Options
+
+Control the checkout layout for Full Checkout and Lite Checkout:
+
+```javascript
+yuno.startCheckout({
+  checkoutSession: 'checkout-session-id',
+  countryCode: 'BR',
+  language: 'en',
+  elementSelector: '#yuno-checkout',
+  yunoCreatePayment: async (oneTimeToken) => {
+    // Create payment server-side
+  },
+});
+yuno.mountCheckout();
+```
+
+## Secure Fields Styling
+
+For Secure Fields, use the `styles` object to match your form design:
+
+```javascript
+const secureFields = yuno.mountSecureFields({
+  styles: {
+    base: {
+      fontSize: '16px',
+      color: '#333',
+      fontFamily: 'Inter, sans-serif',
+      padding: '12px',
+      '::placeholder': { color: '#9CA3AF' },
+    },
+    focus: {
+      borderColor: '#0066FF',
+      boxShadow: '0 0 0 2px rgba(0, 102, 255, 0.2)',
+    },
+    error: {
+      color: '#EF4444',
+      borderColor: '#EF4444',
+    },
+    valid: {
+      borderColor: '#10B981',
+    },
+  },
+});
+```
+
+## Checkout Builder (No-Code)
+
+For non-technical customization, use the Checkout Builder in the Dashboard:
+
+<Steps>
+  <Step title="Navigate to Dashboard > Checkout Builder" />
+  <Step title="Select colors, fonts, and layout preferences visually" />
+  <Step title="Preview changes in real time" />
+  <Step title="Publish to apply changes across all SDK integrations" />
+</Steps>
+
+<Warning>
+SDK-level theme configurations override Checkout Builder settings. If you set themes programmatically, Dashboard changes will not take effect.
+</Warning>
+
+## Localization
+
+The SDK automatically detects the user's locale. Override it explicitly:
+
+```javascript
+const yuno = Yuno.initialize('your-public-api-key');
+
+yuno.startCheckout({
+  checkoutSession: 'session-id',
+  countryCode: 'BR',
+  language: 'pt',   // 'en' | 'es' | 'pt'
+  elementSelector: '#yuno-checkout',
+  yunoCreatePayment: async (oneTimeToken) => {
+    // Create payment server-side
+  },
+});
+yuno.mountCheckout();
+```

@@ -1,0 +1,104 @@
+---
+title: "Merchant Installments"
+description: "Offer interest-free installments where the merchant absorbs the financing cost, increasing conversion without extra charges to the customer."
+---
+
+
+## Overview
+
+Merchant installments are interest-free payment plans where you, the merchant, absorb the cost of financing. The customer pays the original purchase price split across multiple installments with no additional interest or fees. This model is highly effective for increasing conversion rates and average order values, especially in markets like Brazil, Mexico, and Colombia.
+
+## How It Works
+
+1. You create an **Installment Plan** defining the number of installments, applicable amount ranges, and associated fees.
+2. At checkout, Yuno presents the available installment options to the customer based on your plans.
+3. The customer selects their preferred installment count.
+4. Yuno processes the payment and manages the installment schedule with the provider.
+5. You receive the settlement amount minus the installment financing fee.
+
+<Info>
+  With merchant-funded installments, the customer always sees the original price. The financing cost is deducted from your settlement.
+</Info>
+
+## Creating an Installment Plan
+
+Use the Installment Plans API to define your installment configurations.
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/installment-plans \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "name": "Standard 3x Plan",
+    "description": "3 interest-free installments",
+    "installments": 3,
+    "min_amount": 50.00,
+    "max_amount": 10000.00,
+    "currency": "BRL",
+    "country": "BR",
+    "enabled": true
+  }'
+```
+
+```json Response
+{
+  "id": "ip_abc123def456",
+  "name": "Standard 3x Plan",
+  "installments": 3,
+  "min_amount": 50.00,
+  "max_amount": 10000.00,
+  "currency": "BRL",
+  "country": "BR",
+  "enabled": true,
+  "created_at": "2026-02-28T12:00:00Z"
+}
+```
+</CodeGroup>
+
+## Including Installments in a Payment
+
+When creating a payment, specify the installment count in the request body.
+
+```json
+{
+  "amount": {
+    "value": 300.00,
+    "currency": "BRL"
+  },
+  "country": "BR",
+  "payment_method": {
+    "type": "CARD",
+    "installments": 3
+  },
+  "customer": {
+    "email": "customer@example.com"
+  }
+}
+```
+
+## Settlement Impact
+
+| Installments | Customer Pays | Merchant Receives | Financing Cost |
+|-------------|---------------|-------------------|----------------|
+| 1x | $300.00 | $300.00 | None |
+| 3x | $300.00 | ~$291.00 | ~3% |
+| 6x | $300.00 | ~$282.00 | ~6% |
+| 12x | $300.00 | ~$264.00 | ~12% |
+
+<Warning>
+  Financing costs vary by provider and negotiated rates. The table above shows approximate values. Check your provider agreement for exact rates.
+</Warning>
+
+<Note>
+  For the complete Installment Plans API specification, refer to the [Installment Plans API Reference](https://docs.y.uno/reference/installment-plans).
+</Note>
+
+## Best Practices
+
+- **Set minimum amounts** to avoid unprofitable small-value installment transactions.
+- **Limit maximum installments** based on your margin tolerance and provider capabilities.
+- **A/B test installment options** to find the optimal configuration for your market.
+- **Display installment pricing** prominently at checkout to drive conversion.

@@ -1,0 +1,41 @@
+---
+title: "Cancel Onboarding"
+description: "Cancel an in-progress entity onboarding"
+api: "POST https://api-sandbox.y.uno/v1/baas/entities/{entity_id}/onboardings/{onboarding_id}/cancel"
+---
+
+## Path parameters
+
+<ParamField path="entity_id" type="string" required>
+  The entity identifier.
+</ParamField>
+
+<ParamField path="onboarding_id" type="string" required>
+  The onboarding identifier to cancel.
+</ParamField>
+
+## Response
+
+Returns the onboarding object with status `CANCELLED`.
+
+<ResponseExample>
+```json 200 OK
+{
+  "id": "onb_990e8400-e29b-41d4-a716-446655440000",
+  "entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "yuno_account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "onboarding_type": "ONE_STEP",
+  "status": "CANCELLED",
+  "created_at": "2026-02-01T10:00:00Z",
+  "updated_at": "2026-02-01T15:00:00Z"
+}
+```
+
+```json 400 Bad Request
+{
+  "code": "INVALID_STATUS",
+  "messages": ["Cannot cancel onboarding with terminal status"],
+  "http_code": 400
+}
+```
+</ResponseExample>

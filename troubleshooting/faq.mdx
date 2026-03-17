@@ -1,0 +1,106 @@
+---
+title: "FAQ"
+description: "Frequently asked questions about Yuno payment integration"
+---
+
+## General
+
+<Accordion title="What is Yuno?">
+Yuno is a payment orchestration platform that connects merchants to multiple payment providers through a single API. Instead of integrating each provider individually, you integrate once with Yuno and gain access to cards, PIX, bank transfers, and other payment methods across Latin America and beyond.
+</Accordion>
+
+<Accordion title="Which countries and payment methods does Yuno support?">
+Yuno supports payment processing in multiple Latin American countries including Brazil, Colombia, Mexico, Chile, Peru, and Argentina, among others. Supported payment methods include credit/debit cards, PIX, bank transfers, OXXO, PSE, and more. See the [Coverage Matrix](/reference/coverage) for the complete list.
+</Accordion>
+
+<Accordion title="What is the difference between sandbox and production?">
+**Sandbox** is an isolated testing environment where no real money is transferred. Use it with [test cards](/guides/testing/test-cards) and sandbox API keys to validate your integration. **Production** processes real payments with real funds. Each environment has separate API keys, provider connections, and configurations.
+</Accordion>
+
+## Integration
+
+<Accordion title="Which integration should I choose?">
+It depends on your requirements:
+- **Full Checkout** -- Fastest setup, Yuno manages the entire UI
+- **Lite Checkout** -- Embed a payment form in your page, balance of control and speed
+- **Secure Fields** -- Full UI control for card payments, PCI SAQ-A compliant
+- **Direct API** -- Complete server-side control, requires PCI DSS Level 1
+
+See [Choose Your Integration](/guides/integration-overview) for a detailed comparison.
+</Accordion>
+
+<Accordion title="Do I need PCI compliance?">
+Yes, but the level depends on your integration:
+- **SDK integrations** (Full Checkout, Lite, Secure Fields): SAQ-A (simplest self-assessment)
+- **Direct API**: SAQ-D Level 1 (most stringent, requires handling raw card data)
+
+If you are unsure about your PCI requirements, use an SDK integration to minimize compliance scope.
+</Accordion>
+
+<Accordion title="How do I handle 3DS authentication?">
+For SDK integrations, call `yuno.continuePayment()` after creating the payment server-side. The SDK handles the 3DS challenge UI automatically. For Direct API, you must implement the 3DS redirect flow manually based on the `action_url` in the payment response.
+</Accordion>
+
+<Accordion title="Can I use multiple payment providers simultaneously?">
+Yes. Configure multiple [Connections](/platform/dashboard/connections) and use [Routing Rules](/platform/dashboard/routing) to distribute transactions across providers based on country, payment method, amount, or other criteria.
+</Accordion>
+
+## Payments
+
+<Accordion title="Why is my payment stuck in PENDING status?">
+Pending status indicates the payment is awaiting asynchronous confirmation. This is normal for:
+- PIX (waiting for customer to scan QR code)
+- Bank transfers (waiting for bank confirmation)
+- OXXO (waiting for customer to pay at store)
+
+Set up [webhooks](/guides/webhooks/setup) to receive real-time notifications when the payment status changes.
+</Accordion>
+
+<Accordion title="What is the difference between cancel (void) and refund?">
+- **Cancel/Void**: Releases an authorization hold before capture. No funds were transferred, so no processing fees.
+- **Refund**: Returns funds after a payment was captured. Processing fees may apply.
+
+Always prefer cancel over refund for uncaptured authorizations. See [Capture and Cancel](/guides/direct-api/capture-and-cancel).
+</Accordion>
+
+<Accordion title="How long do refunds take?">
+Refund timelines depend on the payment method:
+- Credit cards: 5-10 business days
+- Debit cards: 3-5 business days
+- PIX: Instant to 1 business day
+- Bank transfers: 3-7 business days
+</Accordion>
+
+## Troubleshooting
+
+<Accordion title="I am getting a 400 error. What should I check?">
+400 errors indicate invalid request payloads. Common causes:
+1. Missing required fields (check [Error Codes](/troubleshooting/error-codes))
+2. Wrong data types (string vs. number, especially for amounts)
+3. Invalid formats (currency must be ISO 4217, country must be ISO 3166-1)
+4. Malformed JSON syntax
+
+Include the full error response body in your debugging -- the `error.code` and `error.details` fields specify exactly which field failed validation.
+</Accordion>
+
+<Accordion title="Why do webhooks return 404 in sandbox?">
+Some webhook event types are not available in the sandbox environment. This is a known limitation. Test with the events that are available and verify full webhook coverage when switching to production.
+</Accordion>
+
+<Accordion title="My SDK is not loading. What should I check?">
+1. Verify the SDK package is installed correctly (`npm list @yuno-payments/sdk-web`)
+2. Check browser console for JavaScript errors
+3. Verify your domain is in the allowed origins list (Dashboard > Settings)
+4. Ensure you are not blocking third-party scripts with CSP or ad blockers
+5. See [SDK Errors](/troubleshooting/sdk-errors) for specific error messages
+</Accordion>
+
+## Account
+
+<Accordion title="How do I rotate my API keys?">
+Go to **Dashboard > Settings > API Keys** and click **Rotate Keys**. New keys are generated immediately, and old keys remain active for 24 hours to allow zero-downtime migration. See [Settings](/platform/dashboard/settings) for details.
+</Accordion>
+
+<Accordion title="How do I add team members?">
+Navigate to **Dashboard > Settings > Team > Invite Member**. Enter the email address and select a role (Admin, Developer, Viewer, or Finance). See [Settings](/platform/dashboard/settings) for role permissions.
+</Accordion>

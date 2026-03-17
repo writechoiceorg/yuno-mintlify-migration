@@ -1,0 +1,236 @@
+---
+title: "Testing Webhooks Locally"
+description: "Set up local webhook testing with tunneling tools, debug failed deliveries, and implement idempotent event handling"
+---
+
+## Overview
+
+During development, your local server is not accessible from the internet. To receive Yuno webhook events locally, you need a tunneling tool that exposes your local server to a public URL. This guide covers setup, debugging, and best practices for local webhook testing.
+
+## Setting Up ngrok
+
+[ngrok](https://ngrok.com) creates a secure tunnel from a public URL to your local machine. Other alternatives include [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) and [localtunnel](https://theboringproxy.io/localtunnel).
+
+### Install and configure ngrok
+
+```bash
+# Install via Homebrew (macOS)
+brew install ngrok
+
+# Or download from https://ngrok.com/download
+
+# Authenticate with your ngrok account
+ngrok config add-authtoken your-ngrok-auth-token
+```
+
+### Start the tunnel
+
+Point ngrok at the port your local server runs on:
+
+```bash
+# If your server runs on port 3000
+ngrok http 3000
+```
+
+ngrok outputs a public URL like `https://abc123.ngrok-free.app`. This is your webhook endpoint URL.
+
+### Register the tunnel URL in Yuno Dashboard
+
+1. Go to **Dashboard > Settings > Webhooks**
+2. Click **Add Endpoint** (or edit an existing endpoint)
+3. Set the URL to your ngrok URL plus your webhook path:
+   ```
+   https://abc123.ngrok-free.app/webhooks/yuno
+   ```
+4. Select the events you want to receive (e.g., `payment.succeeded`, `refund.created`)
+5. Click **Save**
+
+<Warning>
+ngrok URLs change every time you restart the tunnel (on the free plan). Update your Dashboard webhook URL each time you restart ngrok, or use a paid plan for stable subdomains.
+</Warning>
+
+## Sending Test Events from the Dashboard
+
+Yuno Dashboard allows you to send test webhook events without creating real transactions:
+
+1. Navigate to **Dashboard > Settings > Webhooks**
+2. Click on your configured endpoint
+3. Click **Send Test Event**
+4. Select the event type (e.g., `payment.succeeded`)
+5. Click **Send**
+
+Your local server should receive the event within seconds. Check your server logs and the ngrok web inspector at `http://localhost:4040` for details.
+
+## Debugging Failed Webhook Deliveries
+
+### Check the ngrok inspector
+
+ngrok provides a web inspector at `http://localhost:4040` that shows:
+
+- All incoming HTTP requests
+- Request headers and body
+- Response status codes and body
+- Timing information
+
+This is invaluable for debugging signature verification issues, since you can see the exact raw body Yuno sent.
+
+### Common delivery failures
+
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| No requests in ngrok | Wrong URL in Dashboard | Verify the ngrok URL matches Dashboard config |
+| 401 response | Signature verification failing | Check that you are using the correct webhook secret for sandbox |
+| 500 response | Unhandled error in your handler | Check server logs for stack traces |
+| Timeout | Handler takes too long | Respond with 200 immediately, process asynchronously |
+| Connection refused | Local server not running | Start your server before the tunnel |
+
+### Enable verbose logging
+
+Add request logging to your webhook handler during development:
+
+<CodeGroup>
+```javascript Node.js
+app.post('/webhooks/yuno', express.json(), (req, res) => {
+  console.log('Webhook received:', {
+    headers: {
+      'x-yuno-signature': req.headers['x-yuno-signature'],
+      'x-yuno-timestamp': req.headers['x-yuno-timestamp'],
+    },
+    body: req.body,
+  });
+
+  // Verify signature and process event...
+  res.status(200).send('OK');
+});
+```
+
+```python Python
+@app.route('/webhooks/yuno', methods=['POST'])
+def webhook_handler():
+    print('Webhook received:', {
+        'signature': request.headers.get('x-yuno-signature'),
+        'timestamp': request.headers.get('x-yuno-timestamp'),
+        'body': request.get_json(),
+    })
+
+    # Verify signature and process event...
+    return 'OK', 200
+```
+</CodeGroup>
+
+### Yuno retry behavior
+
+When your endpoint returns a non-2xx status code or times out, Yuno retries the delivery:
+
+| Attempt | Delay |
+|---------|-------|
+| 1st retry | 5 minutes |
+| 2nd retry | 30 minutes |
+| 3rd retry | 2 hours |
+| 4th retry | 8 hours |
+| 5th retry | 24 hours |
+
+After 5 failed retries, the event is marked as failed. You can manually retry failed events from **Dashboard > Settings > Webhooks > Failed Deliveries**.
+
+<Note>
+Your endpoint must respond within 15 seconds. If your processing takes longer, return 200 immediately and handle the event asynchronously using a message queue or background job.
+</Note>
+
+## Idempotent Event Handling
+
+Yuno may deliver the same event more than once (due to retries or at-least-once delivery). Your handler must be idempotent to prevent duplicate processing.
+
+### Pattern: Track processed event IDs
+
+<CodeGroup>
+```javascript Node.js
+const processedEvents = new Set(); // Use a database in production
+
+async function handleEvent(event) {
+  // Check if already processed
+  if (processedEvents.has(event.id)) {
+    console.log(`Event ${event.id} already processed, skipping`);
+    return;
+  }
+
+  // Process the event
+  switch (event.type) {
+    case 'payment.succeeded':
+      await fulfillOrder(event.data.payment_id);
+      break;
+    case 'refund.created':
+      await processRefund(event.data.refund_id);
+      break;
+  }
+
+  // Mark as processed
+  processedEvents.add(event.id);
+}
+```
+
+```python Python
+# Use a database in production
+processed_events = set()
+
+def handle_event(event):
+    # Check if already processed
+    if event['id'] in processed_events:
+        print(f"Event {event['id']} already processed, skipping")
+        return
+
+    # Process the event
+    if event['type'] == 'payment.succeeded':
+        fulfill_order(event['data']['payment_id'])
+    elif event['type'] == 'refund.created':
+        process_refund(event['data']['refund_id'])
+
+    # Mark as processed
+    processed_events.add(event['id'])
+```
+</CodeGroup>
+
+### Production recommendations
+
+- Store processed event IDs in a persistent store (Redis, database) with a TTL of 7 days
+- Use database transactions to ensure event processing and ID recording are atomic
+- Design your event handlers to be safe to run multiple times (e.g., use upserts instead of inserts)
+
+## Monitoring Webhooks
+
+### Health check endpoint
+
+Add a health check endpoint alongside your webhook handler to verify your server is reachable:
+
+```javascript
+app.get('/webhooks/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+```
+
+### Structured logging for production
+
+Log webhook events in a structured format for easier debugging and monitoring:
+
+```javascript
+function logWebhookEvent(event, status) {
+  console.log(JSON.stringify({
+    type: 'webhook',
+    event_id: event.id,
+    event_type: event.type,
+    status: status,
+    timestamp: new Date().toISOString(),
+  }));
+}
+```
+
+## Local Testing Checklist
+
+- [ ] Tunneling tool (ngrok) installed and running
+- [ ] Webhook URL registered in Yuno Dashboard with correct path
+- [ ] Webhook signing secret stored as environment variable
+- [ ] Signature verification implemented and tested
+- [ ] Timestamp validation implemented (5-minute tolerance)
+- [ ] Idempotent event handling in place
+- [ ] Handler responds within 15 seconds
+- [ ] Test events sent successfully from Dashboard
+- [ ] Error cases handled (invalid signature, unknown event types)

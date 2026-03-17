@@ -1,0 +1,130 @@
+---
+title: "Audit Logs"
+description: "Track all actions performed in the Yuno Dashboard"
+---
+
+## Overview
+
+Audit Logs provide a complete record of actions performed in the Yuno Dashboard. Every configuration change, login event, and API key operation is recorded with details about who performed the action, when, and from where. Access audit logs at **Dashboard > Settings > Audit Logs**.
+
+## What Audit Logs Capture
+
+| Category | Tracked Actions |
+|----------|----------------|
+| **Authentication** | Login, logout, failed login attempts, SSO events, 2FA changes |
+| **API Keys** | Key creation, rotation, revocation, key access |
+| **Team Management** | Member invitations, role changes, member removal |
+| **Configuration** | Routing rule changes, risk condition updates, provider connection edits |
+| **Payment Operations** | Manual refunds, payment cancellations, void operations |
+| **Settings** | Notification changes, webhook configuration, account preference updates |
+| **Checkout** | Checkout builder changes, custom branding updates |
+
+## Viewing Audit Logs
+
+Navigate to **Dashboard > Settings > Audit Logs** to view the log stream. Logs are displayed in reverse chronological order, with the most recent actions at the top.
+
+### Filtering
+
+Use the filter bar to narrow the log view:
+
+| Filter | Options | Description |
+|--------|---------|-------------|
+| **Action Type** | Login, Configuration Change, Key Rotation, etc. | Filter by the type of action performed |
+| **User** | Select team member(s) | Filter by the user who performed the action |
+| **Date Range** | Custom date picker | Filter to a specific time period |
+| **Resource Type** | Routing Rule, Connection, API Key, Team Member, etc. | Filter by the type of resource affected |
+| **Environment** | Sandbox, Production | Filter by the environment where the action occurred |
+
+### Search
+
+Use the search bar to find specific log entries by:
+
+- User email
+- Resource identifier (e.g., routing rule name, connection ID)
+- Action description keywords
+
+## Log Entry Structure
+
+Each audit log entry contains the following fields:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **Timestamp** | ISO 8601 timestamp of the action | `2026-01-15T14:32:00Z` |
+| **User** | Email of the team member who performed the action | `engineer@example.com` |
+| **Action** | Type of action performed | `routing_rule.updated` |
+| **Resource** | Type and identifier of the affected resource | `Routing Rule: Brazil Cards` |
+| **Environment** | Sandbox or Production | `Production` |
+| **IP Address** | IP address from which the action was performed | `203.0.113.42` |
+| **Details** | Structured description of what changed | `Priority changed from 2 to 1` |
+
+### Example Log Entry
+
+```json
+{
+  "timestamp": "2026-01-15T14:32:00Z",
+  "user": "engineer@example.com",
+  "action": "routing_rule.updated",
+  "resource": {
+    "type": "routing_rule",
+    "id": "rule_abc123",
+    "name": "Brazil Cards"
+  },
+  "environment": "production",
+  "ip_address": "203.0.113.42",
+  "details": {
+    "field": "priority",
+    "old_value": 2,
+    "new_value": 1
+  }
+}
+```
+
+## Exporting Logs
+
+Export audit logs for external analysis or compliance records:
+
+1. Apply desired filters to narrow the log view
+2. Click **Export** in the top-right corner
+3. Select the export format:
+
+| Format | Use Case |
+|--------|----------|
+| **CSV** | Import into spreadsheets, SIEM tools, or databases |
+| **JSON** | Programmatic analysis, integration with log aggregation platforms |
+
+<Note>
+Exports include all log entries matching the current filters. For large date ranges, the export is processed asynchronously and delivered via email when ready.
+</Note>
+
+## Retention Policy
+
+| Setting | Value |
+|---------|-------|
+| **Default retention** | 12 months |
+| **Extended retention** | Available on Enterprise plans (up to 7 years) |
+| **Export before expiry** | Recommended for long-term compliance needs |
+
+Audit log entries older than the retention period are permanently deleted. Export logs before they expire if you need to retain them beyond the retention window.
+
+## Compliance Use Cases
+
+Audit logs support requirements across multiple compliance frameworks:
+
+| Framework | Requirement | How Audit Logs Help |
+|-----------|-------------|---------------------|
+| **PCI DSS Requirement 10** | Track all access to network resources and cardholder data | Logs capture all Dashboard actions with user identity, timestamp, and IP |
+| **SOC 2 (CC6.1)** | Logical access security | Role changes, login events, and access control modifications are recorded |
+| **SOC 2 (CC7.2)** | System operations monitoring | Configuration changes and operational actions are tracked |
+| **GDPR Article 30** | Records of processing activities | Payment operation logs provide processing records |
+
+<Warning>
+Audit logs record Dashboard actions only. API-level request logs are available separately through your server-side logging infrastructure. Ensure both are captured for complete compliance coverage.
+</Warning>
+
+## Best Practices
+
+- **Review audit logs regularly.** Schedule weekly reviews of production configuration changes to catch unintended modifications.
+- **Export logs before retention expiry.** Set up a quarterly export process to archive logs for long-term compliance.
+- **Monitor login anomalies.** Watch for failed login attempts, logins from unusual IP addresses, or access outside business hours.
+- **Use filters effectively.** When investigating an incident, filter by date range and resource type to quickly find relevant entries.
+- **Correlate with API logs.** Cross-reference Dashboard audit logs with your server-side API request logs for a complete picture of system activity.

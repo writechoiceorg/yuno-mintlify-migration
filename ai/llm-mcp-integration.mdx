@@ -1,0 +1,115 @@
+---
+title: "LLM & MCP Integration"
+description: "Connect AI coding tools to Yuno's payment APIs using Model Context Protocol (MCP)"
+---
+
+<Info>
+**Public Beta** — MCP integration uses the open [Model Context Protocol](https://modelcontextprotocol.io) standard. Connect any MCP-compatible AI tool to Yuno's API. Available for all plan tiers in sandbox; production access requires account approval.
+</Info>
+
+## Overview
+
+Yuno supports the Model Context Protocol (MCP) to enable AI-powered development tools (like Claude Code, Cursor, and Windsurf) to interact directly with Yuno's payment APIs. This integration allows AI assistants to query payment data, create test transactions, and debug integration issues using natural language.
+
+<Note>
+MCP integration is designed for development and debugging workflows. It should not be used for production payment processing.
+</Note>
+
+## What is MCP?
+
+Model Context Protocol (MCP) is an open standard that allows AI applications to connect to external data sources and tools. Yuno's MCP server exposes payment API capabilities as MCP tools that AI assistants can invoke.
+
+## Available MCP Tools
+
+| Tool | Description | Use Case |
+|------|-------------|----------|
+| `create_checkout_session` | Create a new checkout session | Start a payment flow |
+| `create_payment` | Create a payment | Test payment creation |
+| `get_payment` | Retrieve payment details | Debug payment status |
+| `list_payments` | List recent payments | Review transaction history |
+| `create_refund` | Process a refund | Test refund flows |
+| `get_payment_methods` | List available methods | Check method availability |
+| `validate_payload` | Validate a payment payload | Pre-flight validation |
+
+## Setting Up MCP Integration
+
+<Steps>
+  <Step title="Install the Yuno MCP server">
+    Install the Yuno MCP server package:
+
+    ```bash
+    npm install -g @yuno-payments/mcp-server
+    ```
+
+    Or use npx for a one-time run:
+    ```bash
+    npx @yuno-payments/mcp-server
+    ```
+  </Step>
+
+  <Step title="Configure credentials">
+    Set your Yuno sandbox credentials as environment variables:
+
+    ```bash
+    export YUNO_PUBLIC_KEY="your-sandbox-public-key"
+    export YUNO_PRIVATE_KEY="your-sandbox-private-key"
+    export YUNO_ACCOUNT_CODE="your-sandbox-account-code"
+    export YUNO_ENVIRONMENT="sandbox"
+    ```
+
+    <Warning>
+    Only use sandbox credentials with MCP. Never configure production credentials in AI development tools.
+    </Warning>
+  </Step>
+
+  <Step title="Connect to your AI tool">
+    Configure your AI tool to use the Yuno MCP server. See [Remote MCP Server Setup](/ai/remote-mcp-server) for tool-specific configuration.
+  </Step>
+</Steps>
+
+## Usage Examples
+
+### Natural Language Queries
+
+Once connected, you can interact with Yuno through natural language:
+
+- "Create a checkout session for $50 USD in Colombia"
+- "Show me the last 10 failed payments"
+- "What payment methods are available for Brazil?"
+- "Validate this payment payload for PIX"
+- "Get the details of payment pay_abc123"
+
+### AI-Assisted Debugging
+
+Use MCP to debug integration issues directly in your IDE:
+
+```
+Developer: "I'm getting a 400 error when creating a PIX payment.
+Can you validate my payload?"
+
+AI Assistant: [Calls validate_payload tool]
+"Your payload is missing the customer.document field.
+PIX requires a CPF or CNPJ for Brazilian transactions.
+Here's the corrected payload: ..."
+```
+
+## Supported AI Tools
+
+| Tool | MCP Support | Configuration |
+|------|-------------|---------------|
+| Claude Code | Native | `.claude/settings.json` |
+| Cursor | Via extension | Settings > MCP |
+| Windsurf | Via extension | Settings > MCP |
+| VS Code + Continue | Via extension | `.continue/config.json` |
+
+## Security Considerations
+
+- MCP tools run in your local environment with your credentials
+- All API calls go through the standard Yuno API with your sandbox keys
+- No payment data is sent to the AI model's training pipeline
+- Use sandbox credentials exclusively for MCP integrations
+- Rotate credentials if they are accidentally exposed
+
+## Rate Limits
+
+MCP tool calls count against your standard API rate limits. The sandbox has more lenient limits, but avoid excessive automated queries.

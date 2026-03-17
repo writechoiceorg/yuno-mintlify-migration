@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – BIN Routing Decision</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  .node {
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a0a0a;
+    text-align: center;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+  }
+
+  .node.blue   { border-color: #2563eb; background: #ffffff; }
+  .node.green  { border-color: #16a34a; background: #f0fdf4; }
+  .node.red    { border-color: #dc2626; background: #fff1f2; }
+  .node.orange { border-color: #f97316; background: #fff7ed; }
+  .node.indigo { border-color: #6366f1; background: #eef2ff; }
+  .node.amber  { border-color: #b45309; background: #fef3c7; }
+
+  .node.diamond {
+    border-radius: 4px;
+    transform: translateX(-50%) rotate(45deg);
+    padding: 18px;
+    width: 52px;
+    height: 52px;
+  }
+  .node.diamond span {
+    transform: rotate(-45deg);
+    display: block;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .edge-label {
+    position: absolute;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #64748b;
+    transform: translateX(-50%);
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<!--
+  Layout:
+  Extract BIN        cx=770  top=100
+  Known BIN?         cx=770  top=230  (diamond)
+  Domestic Acquirer? cx=400  top=370  (diamond)
+  Intl Route         cx=1100 top=370
+  Route Domestic     cx=250  top=520
+  Regional Acquirer  cx=550  top=520
+  Process Txn        cx=770  top=650
+  Approved?          cx=770  top=740  (implicit via success/retry)
+-->
+
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.08)"/>
+    </filter>
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#94a3b8"/>
+    </marker>
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background card -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.6"/>
+
+  <!-- Dashed grid — vertical -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="190"  y1="48" x2="190"  y2="826"/>
+    <line x1="340"  y1="48" x2="340"  y2="826"/>
+    <line x1="490"  y1="48" x2="490"  y2="826"/>
+    <line x1="640"  y1="48" x2="640"  y2="826"/>
+    <line x1="790"  y1="48" x2="790"  y2="826"/>
+    <line x1="940"  y1="48" x2="940"  y2="826"/>
+    <line x1="1090" y1="48" x2="1090" y2="826"/>
+    <line x1="1240" y1="48" x2="1240" y2="826"/>
+    <line x1="1390" y1="48" x2="1390" y2="826"/>
+  </g>
+
+  <!-- Dashed grid — horizontal -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="40" y1="135" x2="1500" y2="135"/>
+    <line x1="40" y1="285" x2="1500" y2="285"/>
+    <line x1="40" y1="435" x2="1500" y2="435"/>
+    <line x1="40" y1="585" x2="1500" y2="585"/>
+    <line x1="40" y1="735" x2="1500" y2="735"/>
+  </g>
+
+  <!-- Connectors -->
+  <!-- p0: Extract BIN → Known BIN? -->
+  <path id="p0" d="M 770,136 L 770,224"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p1: Known BIN? → YES → Domestic Acquirer? -->
+  <path id="p1" d="M 744,256 C 680,290 400,310 400,364"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p2: Known BIN? → NO → International Route -->
+  <path id="p2" d="M 796,256 C 860,290 1100,310 1100,370"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p3: Domestic Acquirer? → YES → Route Domestic -->
+  <path id="p3" d="M 374,396 C 330,440 250,460 250,520"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p4: Domestic Acquirer? → NO → Regional Acquirer -->
+  <path id="p4" d="M 426,396 C 470,440 550,460 550,520"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p5: Route Domestic → Process Transaction -->
+  <path id="p5" d="M 250,556 C 250,600 770,600 770,650"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p6: Regional Acquirer → Process Transaction -->
+  <path id="p6" d="M 550,556 C 550,600 770,600 770,650"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p7: International Route → Process Transaction -->
+  <path id="p7" d="M 1100,406 C 1100,520 770,560 770,650"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p8: Process Transaction → Success -->
+  <path id="p8" d="M 770,686 L 770,740"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p9: Process Transaction → Soft Decline / Retry -->
+  <path id="p9" d="M 840,668 C 920,700 1100,720 1100,750"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Animated sparks -->
+  <g clip-path="url(#diagram-clip)">
+    <circle r="3.5" fill="#2563eb" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.0s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p0"/>
+      </animateMotion>
+    </circle>
+    <circle r="3.5" fill="#6366f1" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="0.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p1"/>
+      </animateMotion>
+    </circle>
+    <circle r="3.5" fill="#b45309" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="0.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p2"/>
+      </animateMotion>
+    </circle>
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.6s" begin="1.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p3"/>
+      </animateMotion>
+    </circle>
+    <circle r="3.5" fill="#f97316" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.6s" begin="1.5s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p4"/>
+      </animateMotion>
+    </circle>
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="2.4s" begin="2.0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p5"/>
+      </animateMotion>
+    </circle>
+    <circle r="3.5" fill="#f97316" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2.2s" begin="2.3s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p7"/>
+      </animateMotion>
+    </circle>
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="0.8s" begin="3.0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p8"/>
+      </animateMotion>
+    </circle>
+    <circle r="3.5" fill="#f97316" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.4s" begin="3.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p9"/>
+      </animateMotion>
+    </circle>
+  </g>
+</svg>
+
+<!-- Edge labels -->
+<div class="edge-label" style="left:620px; top:270px;">Yes</div>
+<div class="edge-label" style="left:920px; top:270px;">No</div>
+<div class="edge-label" style="left:300px; top:440px;">Yes</div>
+<div class="edge-label" style="left:500px; top:440px;">No</div>
+
+<!-- Nodes -->
+<div class="node blue" style="left:770px; top:100px;">Extract BIN</div>
+
+<!-- Diamond: Known BIN? -->
+<div class="node indigo diamond" style="left:770px; top:230px;"><span>Known BIN?</span></div>
+
+<!-- Diamond: Domestic Acquirer? -->
+<div class="node indigo diamond" style="left:400px; top:370px;"><span>Domestic?</span></div>
+
+<!-- International Route -->
+<div class="node amber" style="left:1100px; top:370px;">International Route</div>
+
+<!-- Route Domestic -->
+<div class="node green" style="left:250px; top:520px;">Route Domestic</div>
+
+<!-- Regional Acquirer -->
+<div class="node orange" style="left:550px; top:520px;">Regional Acquirer</div>
+
+<!-- Process Transaction -->
+<div class="node blue" style="left:770px; top:650px;">Process Transaction</div>
+
+<!-- Success -->
+<div class="node green" style="left:770px; top:750px;">Success</div>
+
+<!-- Soft Decline Retry -->
+<div class="node orange" style="left:1100px; top:750px;">Soft Decline &rarr; Retry</div>
+
+</div>
+</div>
+</body>
+</html>

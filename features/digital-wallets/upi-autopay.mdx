@@ -1,0 +1,95 @@
+---
+title: "UPI Autopay"
+description: "Enable recurring payments in India with UPI mandates and Pre-Debit Notifications (PDN)."
+---
+
+## Overview
+
+UPI Autopay enables recurring payments through customer-approved mandates in India. Once a customer authorizes a mandate, Yuno can schedule subsequent charges automatically. Before each debit, customers receive a Pre-Debit Notification (PDN) via SMS or email, providing time to review and cancel if desired.
+
+<Info>
+  UPI Autopay is initially available through **Adyen** and **Billdesk** as payment providers.
+</Info>
+
+## How It Works
+
+### Initial Charge (CIT)
+
+The first payment operates as a **Customer-Initiated Transaction (CIT)** to establish the mandate and authorize future recurring debits.
+
+### Subsequent Charges (MIT)
+
+For subsequent charges, Yuno:
+
+1. Sends a Pre-Debit Notification to the customer **36–48 hours** before the scheduled debit.
+2. Waits the notice period.
+3. Executes the **Merchant-Initiated Transaction (MIT)** debit during an approved IST window.
+
+If the customer cancels during the notice period, the debit does not proceed.
+
+## Amount Thresholds
+
+Two flows exist based on transaction amount:
+
+| Scenario | Flow |
+|----------|------|
+| **Below INR 50,000** | Yuno sends PDN, waits notice period, then executes MIT debit automatically |
+| **Above INR 50,000** | Yuno sends a CIT notification 72–48 hours in advance. Customer must actively complete the payment |
+
+<Warning>
+  MIT autopay is allowed up to **INR 50,000**. Any amount above that requires a customer-initiated payment (CIT).
+</Warning>
+
+## Integration
+
+Access UPI Autopay through the `stored_credentials` field in the payment request. The full path is `payment_method.detail.detail.bank_transfer.stored_credentials`.
+
+### Usage Values
+
+| `usage` Value | Behavior |
+|---------------|----------|
+| `FIRST` | Execute direct charge (CIT) and store mandate reference for future debits |
+| `USED` | Send PDN, wait notice period, then run MIT debit |
+
+## Pre-Debit Notification (PDN)
+
+PDN messages:
+
+- Support multiple languages: English, Hindi, Tamil, Telugu, Bengali, Marathi
+- Are white-labeled with your merchant branding
+- Include a cancellation link for customer opt-out
+- Are delivered via SMS and/or email
+
+## Dunning & Retry Strategy
+
+When MIT debits fail, Yuno implements automatic retry scheduling:
+
+| Attempt | Customer Message |
+|---------|-----------------|
+| 1st failure | "Payment failed. We'll retry tomorrow. No action needed." |
+| 2nd failure | "Payment still pending. Retry in 2 days." (includes link to update payment method) |
+| 3rd failure | "Final retry scheduled for [date]. Please ensure funds are available." |
+| Final failure | "Payment could not be processed. Contact [merchant] to resolve." |
+
+<Note>
+  NPCI allows **1 execution attempt plus up to 3 retries**.
+</Note>
+
+## Regulatory Compliance (NPCI)
+
+| Requirement | Details |
+|-------------|---------|
+| **Advance notice** | PDNs require 36–48 hour advance notice (NPCI minimum: 24 hours) |
+| **Customer opt-out** | PDNs include cancellation links via SMS/email |
+| **Execution windows (IST)** | Before 10:00 AM, 1:00–5:00 PM, or after 9:30 PM |
+| **MIT amount limit** | Up to INR 50,000 |
+| **Retry limits** | 1 execution attempt + up to 3 retries |
+
+## Payment Status Lifecycle
+
+| Status | Description |
+|--------|-------------|
+| `PENDING` | PDN sent, waiting for notice period or customer action |
+| `SUCCEEDED` | Debit completed successfully |
+| `DECLINED` | Provider or bank rejected the debit |
+| `CANCELLED` | Customer cancelled via PDN link |

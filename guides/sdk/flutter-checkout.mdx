@@ -1,0 +1,548 @@
+---
+title: "Flutter SDK Integration"
+description: "Integrate Yuno payments into your Flutter app with Full Checkout or Seamless Checkout using a single Dart codebase"
+---
+
+## Overview
+
+The Yuno Flutter SDK provides a cross-platform payment integration that works on both iOS and Android from a single Dart codebase. It wraps the native iOS and Android SDKs, providing a Flutter-idiomatic API with widgets and streams.
+
+<Note>
+The Flutter SDK maintains SAQ-A PCI compliance on both platforms. Card data never touches your servers.
+</Note>
+
+## Prerequisites
+
+- Flutter 3.16+
+- Dart 3.2+
+- iOS 14.0+ deployment target
+- Android minimum SDK: API 21 (Android 5.0)
+- Xcode 15+ (for iOS builds)
+- Android Studio (for Android builds)
+- Yuno API keys ([Authentication](/getting-started/authentication))
+- At least one payment method enabled in your [Dashboard](/platform/dashboard/connections)
+
+## Installation
+
+<Steps>
+  <Step title="Add the dependency">
+    Add `yuno_sdk_flutter` to your `pubspec.yaml`:
+
+    ```yaml
+    dependencies:
+      yuno_sdk_flutter: ^1.5.0
+    ```
+
+    Then run:
+
+    ```bash
+    flutter pub get
+    ```
+  </Step>
+
+  <Step title="iOS platform setup">
+    Set the minimum iOS deployment target in `ios/Podfile`:
+
+    ```ruby
+    platform :ios, '14.0'
+    ```
+
+    Install iOS dependencies:
+
+    ```bash
+    cd ios && pod install && cd ..
+    ```
+
+    If using Apple Pay, add the following to `ios/Runner/Info.plist`:
+
+    ```xml
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
+    ```
+  </Step>
+
+  <Step title="Android platform setup">
+    Set the minimum SDK version in `android/app/build.gradle.kts`:
+
+    ```kotlin
+    android {
+        defaultConfig {
+            minSdk = 21
+        }
+    }
+    ```
+
+    Add the Yuno Maven repository in `android/build.gradle.kts`:
+
+    ```kotlin
+    allprojects {
+        repositories {
+            google()
+            mavenCentral()
+            maven { url = uri("https://yunopayments.jfrog.io/artifactory/snapshots") }
+        }
+    }
+    ```
+
+    If using Google Pay, add to `android/app/src/main/AndroidManifest.xml`:
+
+    ```xml
+    <application>
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
+    </application>
+    ```
+  </Step>
+</Steps>
+
+## SDK Initialization
+
+Initialize the SDK early in your app, typically in `main.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:yuno_sdk_flutter/yuno_sdk_flutter.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await YunoSDK.initialize(
+    config: YunoConfig(
+      publicApiKey: 'your-public-api-key',
+      environment: YunoEnvironment.sandbox, // Use .production for live
+    ),
+  );
+
+  runApp(const MyApp());
+}
+```
+
+### Configuration options
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `publicApiKey` | `String` | Yes | Your Yuno public API key |
+| `environment` | `YunoEnvironment` | Yes | `sandbox` or `production` |
+| `language` | `YunoLanguage` | No | UI language. Defaults to device locale |
+| `cardFlow` | `CardFlow` | No | `oneStep` (default) or `multiStep` |
+
+<Warning>
+Never embed your private secret key in the Flutter app. Use only the public API key for client-side initialization.
+</Warning>
+
+## Full Checkout
+
+Full Checkout renders all enabled payment methods with a single widget.
+
+<Steps>
+  <Step title="Create a checkout session (server-side)">
+    Create a session from your backend:
+
+    ```json
+    // POST https://api-sandbox.y.uno/v1/checkout/sessions
+    {
+      "amount": { "currency": "USD", "value": 50.00 },
+      "country": "CO",
+      "merchant_order_id": "order-123",
+      "workflow": "SDK_CHECKOUT"
+    }
+    ```
+
+    Pass the `checkout_session` token to your Flutter app.
+  </Step>
+
+  <Step title="Launch Full Checkout">
+    ```dart
+    import 'package:yuno_sdk_flutter/yuno_sdk_flutter.dart';
+
+    class CheckoutScreen extends StatefulWidget {
+      final String checkoutSession;
+
+      const CheckoutScreen({super.key, required this.checkoutSession});
+
+      @override
+      State<CheckoutScreen> createState() => _CheckoutScreenState();
+    }
+
+    class _CheckoutScreenState extends State<CheckoutScreen> {
+      @override
+      Widget build(BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('Checkout')),
+          body: Center(
+            child: ElevatedButton(
+              onPressed: _startCheckout,
+              child: const Text('Pay Now'),
+            ),
+          ),
+        );
+      }
+
+      Future<void> _startCheckout() async {
+        final result = await YunoSDK.startFullCheckout(
+          context: context,
+          checkoutSession: widget.checkoutSession,
+          countryCode: 'CO',
+        );
+
+        if (!mounted) return;
+
+        switch (result.status) {
+          case PaymentStatus.succeeded:
+            _navigateToConfirmation(result.paymentId!);
+          case PaymentStatus.failed:
+            _showError(result.errorMessage ?? 'Payment failed');
+          case PaymentStatus.processing:
+            _showProcessingState();
+          case PaymentStatus.cancelled:
+            _showCancelledState();
+        }
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Verify payment (server-side)">
+    Always confirm the payment status from your backend:
+
+    ```dart
+    // Server-side verification
+    // GET https://api-sandbox.y.uno/v1/payments/{payment_id}
+    ```
+
+    <Warning>
+    Client-side callbacks indicate the UI outcome only. Always verify the final payment status server-side via webhooks or the GET Payment API.
+    </Warning>
+  </Step>
+</Steps>
+
+### Using the YunoCheckout widget
+
+For declarative integration, use the `YunoCheckout` widget:
+
+```dart
+class CheckoutPage extends StatelessWidget {
+  final String checkoutSession;
+
+  const CheckoutPage({super.key, required this.checkoutSession});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Checkout')),
+      body: YunoCheckout(
+        checkoutSession: checkoutSession,
+        countryCode: 'CO',
+        onPaymentSuccess: (result) {
+          Navigator.pushReplacementNamed(
+            context,
+            '/confirmation',
+            arguments: result.paymentId,
+          );
+        },
+        onPaymentError: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.message)),
+          );
+        },
+        onPaymentProcessing: () {
+          // Show processing indicator
+        },
+        onCancel: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+}
+```
+
+## Seamless Checkout
+
+Seamless Checkout gives you control over payment method selection while Yuno handles the payment form.
+
+<Steps>
+  <Step title="Retrieve available payment methods">
+    ```dart
+    final methods = await YunoSDK.getPaymentMethods(
+      checkoutSession: sessionToken,
+      countryCode: 'CO',
+    );
+
+    // Display methods in your custom UI
+    setState(() {
+      paymentMethods = methods;
+    });
+    ```
+  </Step>
+
+  <Step title="Launch Seamless Checkout for selected method">
+    ```dart
+    Future<void> _onMethodSelected(YunoPaymentMethod method) async {
+      final result = await YunoSDK.startSeamlessCheckout(
+        context: context,
+        checkoutSession: sessionToken,
+        paymentMethodType: method.type,
+        countryCode: 'CO',
+        onCreatePayment: (oneTimeToken, tokenData) async {
+          // Create payment on your server
+          final success = await PaymentApi.createPayment(oneTimeToken);
+          if (success) {
+            YunoSDK.continuePayment();
+          }
+        },
+      );
+
+      _handleResult(result);
+    }
+    ```
+  </Step>
+</Steps>
+
+### Payment callbacks via streams
+
+For reactive architectures, listen to the payment event stream:
+
+```dart
+class CheckoutBloc {
+  late final StreamSubscription<YunoPaymentEvent> _subscription;
+
+  void init() {
+    _subscription = YunoSDK.paymentEvents.listen((event) {
+      switch (event) {
+        case PaymentSuccessEvent(paymentId: final id):
+          _handleSuccess(id);
+        case PaymentErrorEvent(error: final error):
+          _handleError(error);
+        case PaymentProcessingEvent():
+          _handleProcessing();
+        case PaymentCancelledEvent():
+          _handleCancelled();
+      }
+    });
+  }
+
+  void dispose() {
+    _subscription.cancel();
+  }
+}
+```
+
+## 3DS Handling
+
+The SDK handles 3D Secure authentication automatically on both platforms. When a payment requires 3DS, the SDK presents the authentication challenge within the checkout flow.
+
+No additional code is required. The payment result includes the final outcome after 3DS completes.
+
+<Tip>
+Test 3DS flows in sandbox using Yuno's test card numbers. Check the [Testing guide](/guides/testing) for available test credentials.
+</Tip>
+
+## Platform Channels for Native Features
+
+### Apple Pay (iOS only)
+
+```dart
+if (Platform.isIOS) {
+  final result = await YunoSDK.startFullCheckout(
+    context: context,
+    checkoutSession: sessionToken,
+    countryCode: 'US',
+    applePay: YunoApplePayConfig(
+      merchantId: 'merchant.com.yourapp.pay',
+      countryCode: 'US',
+    ),
+  );
+}
+```
+
+### Google Pay (Android only)
+
+```dart
+if (Platform.isAndroid) {
+  final result = await YunoSDK.startFullCheckout(
+    context: context,
+    checkoutSession: sessionToken,
+    countryCode: 'US',
+    googlePay: YunoGooglePayConfig(
+      merchantName: 'Your Store Name',
+      countryCode: 'US',
+    ),
+  );
+}
+```
+
+## Customization
+
+Customize the checkout appearance to match your app's design:
+
+```dart
+await YunoSDK.initialize(
+  config: YunoConfig(
+    publicApiKey: 'your-public-api-key',
+    environment: YunoEnvironment.sandbox,
+    appearance: YunoAppearance(
+      primaryColor: const Color(0xFF6200EE),
+      backgroundColor: Colors.white,
+      textColor: Colors.black,
+      cornerRadius: 12.0,
+      fontFamily: 'Roboto',
+      buttonStyle: YunoButtonStyle.rounded,
+    ),
+  ),
+);
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `primaryColor` | `Color` | Primary accent color for buttons and highlights |
+| `backgroundColor` | `Color` | Background color of the checkout sheet |
+| `textColor` | `Color` | Primary text color |
+| `cornerRadius` | `double` | Corner radius for cards and buttons |
+| `fontFamily` | `String` | Font family name |
+| `buttonStyle` | `YunoButtonStyle` | `rounded` or `rectangular` |
+
+### Localization
+
+The SDK supports automatic localization based on the device locale. Override with:
+
+```dart
+await YunoSDK.initialize(
+  config: YunoConfig(
+    publicApiKey: 'your-public-api-key',
+    environment: YunoEnvironment.sandbox,
+    language: YunoLanguage.spanish,
+  ),
+);
+```
+
+Supported languages: English, Spanish, Portuguese, Indonesian, Malay, Thai.
+
+## Error Handling
+
+```dart
+Future<void> _startCheckout() async {
+  try {
+    final result = await YunoSDK.startFullCheckout(
+      context: context,
+      checkoutSession: sessionToken,
+      countryCode: 'CO',
+    );
+
+    _handleResult(result);
+  } on YunoException catch (e) {
+    switch (e.code) {
+      case YunoErrorCode.networkError:
+        _showRetryAlert('Check your internet connection');
+      case YunoErrorCode.authenticationFailed:
+        _showError('Invalid API key. Verify your configuration.');
+      case YunoErrorCode.sessionExpired:
+        _refreshSessionAndRetry();
+      default:
+        _showError(e.message);
+    }
+  }
+}
+```
+
+### Common error codes
+
+| Code | Description | Resolution |
+|------|-------------|------------|
+| `networkError` | Network connectivity issue | Check device connectivity and retry |
+| `authenticationFailed` | Invalid public API key | Verify key in Dashboard > API Keys |
+| `sessionExpired` | Checkout session has expired | Create a new checkout session |
+| `invalidConfiguration` | SDK misconfiguration | Check initialization parameters |
+| `providerError` | Payment provider rejected | Review error details, check payment method |
+
+## Testing in Sandbox
+
+<Steps>
+  <Step title="Use sandbox environment">
+    Set `environment: YunoEnvironment.sandbox` during initialization.
+  </Step>
+
+  <Step title="Use test credentials">
+    Use sandbox API keys from **Dashboard > API Keys > Sandbox**.
+  </Step>
+
+  <Step title="Test on both platforms">
+    Run tests on both iOS simulator and Android emulator to verify platform-specific behavior:
+
+    ```bash
+    flutter run -d ios
+    flutter run -d android
+    ```
+  </Step>
+
+  <Step title="Test with Yuno test cards">
+    Use Yuno-provided test card numbers to simulate different outcomes. See [Testing](/guides/testing).
+  </Step>
+</Steps>
+
+<Note>
+Sandbox transactions use simulated providers. Some payment methods may have limited availability in sandbox compared to production.
+</Note>
+
+## Troubleshooting
+
+### SDK not initializing
+
+- Verify `YunoSDK.initialize()` is called before `runApp()` in `main.dart`
+- Ensure `WidgetsFlutterBinding.ensureInitialized()` is called first
+- Confirm the public API key is correct and matches your environment
+
+### iOS build fails
+
+- Verify `platform :ios, '14.0'` is set in `ios/Podfile`
+- Run `cd ios && pod install --repo-update && cd ..`
+- Clean the build: `flutter clean && flutter pub get`
+
+### Android build fails
+
+- Verify `minSdk = 21` is set in `android/app/build.gradle.kts`
+- Ensure the Yuno Maven repository is added to project-level `build.gradle.kts`
+- Sync Gradle: `cd android && ./gradlew clean && cd ..`
+
+### Checkout not appearing
+
+- Ensure the checkout session token is valid and not expired
+- Verify `context` is from a mounted widget when calling `startFullCheckout`
+- Check that at least one payment method is enabled in Dashboard for the specified country
+
+### Platform-specific issues
+
+- Use `flutter doctor` to verify your development environment
+- Test on physical devices in addition to simulators/emulators
+- Check platform-specific logs:
+  - **iOS**: Xcode console
+  - **Android**: Logcat with tag filter `YunoSDK`
+
+### Hot reload limitations
+
+SDK initialization state is preserved during hot reload but not hot restart. If checkout behavior is unexpected during development, perform a full restart:
+
+```bash
+flutter run --no-hot
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Mobile SDK Overview" icon="mobile" href="/guides/sdk/mobile-overview">
+    Compare all mobile SDK options.
+  </Card>
+  <Card title="iOS SDK" icon="apple" href="/guides/sdk/ios-checkout">
+    Need native iOS integration instead?
+  </Card>
+  <Card title="Android SDK" icon="android" href="/guides/sdk/android-checkout">
+    Need native Android integration instead?
+  </Card>
+  <Card title="Testing" icon="vial" href="/guides/testing">
+    Test card numbers and sandbox setup.
+  </Card>
+</CardGroup>

@@ -1,0 +1,111 @@
+---
+title: "API Changelog"
+description: "Version history for the Yuno REST API"
+---
+
+## Overview
+
+This changelog tracks updates to the Yuno REST API, including new endpoints, request/response changes, and deprecations.
+
+## v1.18.0 (February 2026)
+
+### New Features
+- **Partial capture support** expanded to additional providers (dLocal, Kushki)
+- **Idempotency key** now supported on refund endpoints
+- **Payment metadata** field increased from 10 to 25 key-value pairs
+
+### Improvements
+- Reduced average API response time by 15% for payment creation
+- Improved error messages for document validation failures (PIX, PSE)
+
+### Bug Fixes
+- Fixed edge case where `REQUIRES_ACTION` status was not returned for certain 3DS flows
+- Resolved inconsistent `created_at` timestamps in webhook payloads
+
+---
+
+## v1.17.0 (January 2026)
+
+### New Features
+- **MCP Server endpoint** general availability for AI development tool integration
+- **Bulk payment status** endpoint: `GET /v1/payments/bulk-status` accepts up to 100 payment IDs
+- **Webhook event filtering** via API: configure event subscriptions programmatically
+
+### Improvements
+- Enhanced rate limit headers with `x-ratelimit-reset` timestamp
+- Added `provider.raw_response` field to payment detail responses
+
+### Deprecations
+- `GET /v1/payments/search` deprecated in favor of `GET /v1/payments` with query parameters
+  - Sunset date: July 2026
+
+---
+
+## v1.16.0 (December 2025)
+
+### New Features
+- **New webhook events:** `payment.authorized`, `payment.capture_failed`
+- **Webhook retry configuration** via API: customize retry intervals per endpoint
+- **Customer list** endpoint: `GET /v1/customers` with pagination
+
+### Improvements
+- Webhook delivery reliability improved to 99.9% SLA
+- Added `x-request-id` to all error responses for easier debugging
+
+### Bug Fixes
+- Fixed rare duplicate webhook delivery for `payment.succeeded` events
+- Resolved 500 error when creating sessions with special characters in `merchant_order_id`
+
+---
+
+## v1.15.0 (November 2025)
+
+### New Features
+- **Installment support** for card payments in Brazil and Mexico
+- **Dynamic currency conversion** (DCC) for cross-border card payments
+- **Payment links** API: `POST /v1/payment-links` for no-code payment collection
+
+### Improvements
+- Improved PIX QR code generation performance
+- Added `payment_method.installments` field to payment responses
+
+---
+
+## v1.14.0 (October 2025)
+
+### New Features
+- **Recurring payments** API: create subscriptions with `POST /v1/subscriptions`
+- **Card BIN lookup** endpoint: `GET /v1/bins/{bin}` returns card brand, type, issuer, country
+
+### Improvements
+- Enhanced sandbox test card coverage with new decline scenarios
+- Added currency validation on session creation (reject unsupported currency/country combinations)
+
+---
+
+## Migration Guides
+
+<Accordion title="Migrating from /payments/search to /payments">
+The `GET /v1/payments/search` endpoint is deprecated. Replace with `GET /v1/payments` using query parameters:
+
+**Before:**
+```
+GET /v1/payments/search
+Body: { "status": "SUCCEEDED", "country": "BR" }
+```
+
+**After:**
+```
+GET /v1/payments?status=SUCCEEDED&country=BR
+```
+
+All filter parameters are identical. The new endpoint uses query strings instead of a request body.
+</Accordion>
+
+## API Versioning
+
+The current API version is **v1**. All endpoints use the `/v1/` prefix. Breaking changes will introduce a new version (`/v2/`). Non-breaking additions are released under the current version.
+
+<Note>
+Subscribe to API changelog notifications in **Dashboard > Settings > Notifications** to receive updates when new API versions are released.
+</Note>

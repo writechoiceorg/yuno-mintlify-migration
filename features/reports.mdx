@@ -1,0 +1,131 @@
+---
+title: "Reports"
+description: "Generate and download transaction, settlement, and dispute reports from Yuno's reporting API."
+---
+
+
+## Overview
+
+Yuno's Reports API allows you to generate and download detailed reports for transactions, settlements, disputes, and other operational data. Reports can be filtered by date range, payment method, status, and other criteria to support reconciliation, accounting, and analytics workflows.
+
+## Available Report Types
+
+| Report Type | Description | Common Use Case |
+|------------|-------------|-----------------|
+| `TRANSACTIONS` | All payment transactions | Daily reconciliation |
+| `SETTLEMENTS` | Settlement batches and details | Accounting and finance |
+| `DISPUTES` | Chargebacks and dispute cases | Dispute management |
+| `REFUNDS` | Refund transactions | Customer service tracking |
+| `PAYOUTS` | Outbound payout transactions | Seller/partner payments |
+
+## Generating a Report
+
+Reports are generated asynchronously. You submit a report request, then poll or wait for a webhook notification when the report is ready.
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/reports \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "type": "TRANSACTIONS",
+    "date_range": {
+      "start": "2026-02-01T00:00:00Z",
+      "end": "2026-02-28T23:59:59Z"
+    },
+    "filters": {
+      "status": ["APPROVED", "DECLINED"],
+      "payment_method": ["CARD", "PIX"],
+      "country": "BR"
+    },
+    "format": "CSV"
+  }'
+```
+
+```json Response
+{
+  "id": "rpt_feb2026_001",
+  "type": "TRANSACTIONS",
+  "status": "PROCESSING",
+  "format": "CSV",
+  "created_at": "2026-02-28T14:00:00Z"
+}
+```
+</CodeGroup>
+
+<Warning>
+  Date range parameters must use **datetime format** (ISO 8601 with time component), not just a date. Using `"2026-02-01"` instead of `"2026-02-01T00:00:00Z"` will result in a validation error.
+</Warning>
+
+## Downloading a Report
+
+Once the report status is `COMPLETED`, retrieve the download URL.
+
+```bash
+curl --request GET \
+  --url https://api.y.uno/v1/reports/rpt_feb2026_001 \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+```json
+{
+  "id": "rpt_feb2026_001",
+  "type": "TRANSACTIONS",
+  "status": "COMPLETED",
+  "format": "CSV",
+  "download_url": "https://reports.y.uno/download/rpt_feb2026_001.csv",
+  "download_expires_at": "2026-03-07T14:00:00Z",
+  "row_count": 15234,
+  "created_at": "2026-02-28T14:00:00Z",
+  "completed_at": "2026-02-28T14:05:00Z"
+}
+```
+
+<Info>
+  Download URLs are temporary and expire after 7 days. Generate a new download URL by querying the report endpoint again if the link has expired.
+</Info>
+
+## Report Formats
+
+| Format | Description | Best For |
+|--------|-------------|----------|
+| `CSV` | Comma-separated values | Spreadsheets, data import |
+| `JSON` | Structured JSON | Programmatic processing |
+| `XLSX` | Excel workbook | Business reporting |
+
+## Webhook Events
+
+| Event | Trigger |
+|-------|---------|
+| `report.completed` | Report is ready for download |
+| `report.failed` | Report generation failed |
+
+## Filtering Options
+
+| Filter | Type | Description |
+|--------|------|-------------|
+| `status` | Array | Payment statuses to include |
+| `payment_method` | Array | Payment method types |
+| `country` | String | ISO country code |
+| `provider` | String | Payment provider identifier |
+| `currency` | String | ISO 4217 currency code |
+| `min_amount` | Number | Minimum transaction amount |
+| `max_amount` | Number | Maximum transaction amount |
+
+## Scheduling Reports
+
+For recurring report needs, you can set up scheduled reports in the Yuno Dashboard under **Reports > Scheduled Reports**. Configure daily, weekly, or monthly reports that are automatically generated and delivered to your email or webhook endpoint.
+
+<Note>
+  Large reports (over 100,000 rows) may take several minutes to generate. Use webhooks instead of polling to efficiently detect report completion. For very large datasets, consider narrowing your date range or filters to reduce processing time.
+</Note>
+
+## Best Practices
+
+- **Use datetime format**: Always include the time component in date filters (e.g., `2026-02-01T00:00:00Z`).
+- **Set up webhooks**: Listen for `report.completed` events instead of polling the API.
+- **Automate reconciliation**: Schedule daily transaction reports to match against your internal records.
+- **Archive reports**: Download and store reports in your own systems before download links expire.

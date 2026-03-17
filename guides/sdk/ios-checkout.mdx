@@ -1,0 +1,578 @@
+---
+title: "iOS SDK Integration"
+description: "Integrate Yuno payments into your iOS app with Swift using Full Checkout or Seamless Checkout"
+---
+
+## Overview
+
+The Yuno iOS SDK provides a pre-built payment UI that handles payment method rendering, card tokenization, and 3DS authentication. It supports UIKit and SwiftUI.
+
+<Note>
+The iOS SDK maintains SAQ-A PCI compliance (the simplest compliance level — card data never touches your servers).
+</Note>
+
+## Prerequisites
+
+- Xcode 15 or later
+- iOS 14.0+ deployment target
+- Swift 5.9+
+- Yuno API keys ([Authentication](/getting-started/authentication))
+- At least one payment method enabled in your [Dashboard](/platform/dashboard/connections)
+
+## Installation
+
+<Tabs>
+  <Tab title="CocoaPods">
+    Add the Yuno SDK to your `Podfile`:
+
+    ```ruby
+    platform :ios, '14.0'
+    use_frameworks!
+
+    target 'YourApp' do
+      pod 'YunoSDK', '~> 1.5'
+    end
+    ```
+
+    Then install:
+
+    ```bash
+    pod install
+    ```
+
+    Open the `.xcworkspace` file (not `.xcodeproj`) after installation.
+  </Tab>
+  <Tab title="Swift Package Manager">
+    In Xcode, go to **File > Add Package Dependencies** and enter the repository URL:
+
+    ```
+    https://github.com/yuno-payments/yuno-sdk-ios
+    ```
+
+    Select the latest version and add the `YunoSDK` package to your target.
+
+    Alternatively, add it to your `Package.swift`:
+
+    ```swift
+    dependencies: [
+        .package(url: "https://github.com/yuno-payments/yuno-sdk-ios", from: "1.5.0")
+    ]
+    ```
+  </Tab>
+</Tabs>
+
+## SDK Initialization
+
+Initialize the SDK early in your app lifecycle, typically in `AppDelegate` or `@main` App struct.
+
+<CodeGroup>
+```swift AppDelegate
+import YunoSDK
+
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+
+        Yuno.initialize(config: YunoConfig(
+            publicApiKey: "your-public-api-key",
+            environment: .sandbox // Use .production for live payments
+        ))
+
+        return true
+    }
+}
+```
+
+```swift SwiftUI App
+import SwiftUI
+import YunoSDK
+
+@main
+struct YourApp: App {
+    init() {
+        Yuno.initialize(config: YunoConfig(
+            publicApiKey: "your-public-api-key",
+            environment: .sandbox
+        ))
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+</CodeGroup>
+
+### Configuration options
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `publicApiKey` | `String` | Yes | Your Yuno public API key |
+| `environment` | `YunoEnvironment` | Yes | `.sandbox` or `.production` |
+| `language` | `YunoLanguage` | No | UI language (`.english`, `.spanish`, `.portuguese`). Defaults to device locale |
+| `cardFlow` | `CardFlow` | No | `.oneStep` (default) or `.multiStep` for card entry |
+
+<Snippet file="no-secret-key-client.mdx" />
+
+## Full Checkout
+
+Full Checkout renders all enabled payment methods with a single call. Yuno manages the entire UI.
+
+<Steps>
+  <Step title="Create a checkout session (server-side)">
+    Create a session from your backend:
+
+    ```swift
+    // Server-side — do NOT include this in your iOS app
+    // POST https://api-sandbox.y.uno/v1/checkout/sessions
+    // Headers: public-api-key, private-secret-key, account-code
+    // Body:
+    {
+      "amount": { "currency": "USD", "value": 50.00 },
+      "country": "CO",
+      "merchant_order_id": "order-123",
+      "workflow": "SDK_CHECKOUT"
+    }
+    ```
+
+    Pass the `checkout_session` token to your iOS app.
+  </Step>
+
+  <Step title="Present Full Checkout (UIKit)">
+    ```swift
+    import YunoSDK
+
+    class CheckoutViewController: UIViewController {
+
+        func startCheckout(sessionToken: String) {
+            Yuno.startFullCheckout(
+                from: self,
+                checkoutSession: sessionToken,
+                countryCode: "CO",
+                delegate: self
+            )
+        }
+    }
+
+    extension CheckoutViewController: YunoPaymentDelegate {
+
+        func yunoPaymentResult(_ result: YunoPaymentResult) {
+            switch result.status {
+            case .succeeded:
+                navigateToConfirmation(paymentId: result.paymentId)
+            case .failed:
+                showError(message: result.errorMessage ?? "Payment failed")
+            case .processing:
+                showProcessingState()
+            case .cancelled:
+                showCancelledState()
+            @unknown default:
+                break
+            }
+        }
+
+        func yunoDidCancel() {
+            dismiss(animated: true)
+        }
+    }
+    ```
+  </Step>
+
+  <Step title="Present Full Checkout (SwiftUI)">
+    ```swift
+    import SwiftUI
+    import YunoSDK
+
+    struct CheckoutView: View {
+        let checkoutSession: String
+        @State private var showCheckout = false
+        @State private var paymentResult: YunoPaymentResult?
+
+        var body: some View {
+            VStack {
+                Button("Pay Now") {
+                    showCheckout = true
+                }
+            }
+            .yunoFullCheckout(
+                isPresented: $showCheckout,
+                checkoutSession: checkoutSession,
+                countryCode: "CO",
+                onResult: { result in
+                    paymentResult = result
+                },
+                onCancel: {
+                    showCheckout = false
+                }
+            )
+        }
+    }
+    ```
+  </Step>
+
+  <Step title="Verify payment (server-side)">
+    Always confirm the payment status from your backend:
+
+    ```swift
+    // Server-side verification
+    // GET https://api-sandbox.y.uno/v1/payments/{payment_id}
+    ```
+
+    <Snippet file="verify-server-side.mdx" />
+  </Step>
+</Steps>
+
+## Seamless Checkout
+
+Seamless Checkout gives you control over payment method selection while Yuno handles the payment form.
+
+<Steps>
+  <Step title="Retrieve available payment methods">
+    Use the checkout session to fetch available methods:
+
+    ```swift
+    Yuno.getPaymentMethods(
+        checkoutSession: sessionToken,
+        countryCode: "CO"
+    ) { methods in
+        // Display methods in your custom UI
+        self.paymentMethods = methods
+    }
+    ```
+  </Step>
+
+  <Step title="Start Seamless Checkout for selected method">
+    ```swift
+    func didSelectPaymentMethod(_ method: YunoPaymentMethod) {
+        Yuno.startSeamlessCheckout(
+            from: self,
+            checkoutSession: sessionToken,
+            paymentMethodType: method.type,
+            countryCode: "CO",
+            delegate: self
+        )
+    }
+    ```
+  </Step>
+
+  <Step title="Handle the payment creation callback">
+    ```swift
+    extension CheckoutViewController: YunoSeamlessDelegate {
+
+        func yunoCreatePayment(
+            oneTimeToken: String,
+            tokenWithInformation: YunoTokenData
+        ) {
+            // Create payment on your server using the oneTimeToken
+            PaymentAPI.createPayment(token: oneTimeToken) { success in
+                if success {
+                    Yuno.continuePayment()
+                }
+            }
+        }
+
+        func yunoPaymentResult(_ result: YunoPaymentResult) {
+            handlePaymentResult(result)
+        }
+    }
+    ```
+  </Step>
+</Steps>
+
+## 3DS Handling
+
+The SDK handles 3D Secure authentication automatically. When a payment requires 3DS, the SDK presents the authentication challenge within the checkout flow.
+
+No additional code is required. The `yunoPaymentResult` delegate method receives the final result after 3DS completes.
+
+<Tip>
+Test 3DS flows in sandbox using Yuno's test card numbers. Check the [Testing guide](/guides/testing) for available test credentials.
+</Tip>
+
+## Apple Pay
+
+To enable Apple Pay in the Yuno iOS SDK:
+
+<Steps>
+  <Step title="Configure Apple Pay in Xcode">
+    Enable the **Apple Pay** capability in your target's **Signing & Capabilities** tab. Add your merchant identifier.
+  </Step>
+
+  <Step title="Enable Apple Pay in Yuno Dashboard">
+    Navigate to **Dashboard > Settings > Payment Methods** and enable Apple Pay for your account.
+  </Step>
+
+  <Step title="Pass Apple Pay configuration">
+    ```swift
+    Yuno.startFullCheckout(
+        from: self,
+        checkoutSession: sessionToken,
+        countryCode: "US",
+        applePay: YunoApplePayConfig(
+            merchantId: "merchant.com.yourapp.pay",
+            countryCode: "US"
+        ),
+        delegate: self
+    )
+    ```
+  </Step>
+</Steps>
+
+## Customization
+
+Customize the checkout appearance to match your app's design.
+
+```swift
+let appearance = YunoAppearance(
+    primaryColor: UIColor(hex: "#6200EE"),
+    backgroundColor: .systemBackground,
+    textColor: .label,
+    cornerRadius: 12.0,
+    fontFamily: "Avenir",
+    buttonStyle: .rounded
+)
+
+Yuno.initialize(config: YunoConfig(
+    publicApiKey: "your-public-api-key",
+    environment: .sandbox,
+    appearance: appearance
+))
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `primaryColor` | `UIColor` | Primary accent color for buttons and highlights |
+| `backgroundColor` | `UIColor` | Background color of the checkout sheet |
+| `textColor` | `UIColor` | Primary text color |
+| `cornerRadius` | `CGFloat` | Corner radius for cards and buttons |
+| `fontFamily` | `String` | Font family name |
+| `buttonStyle` | `ButtonStyle` | `.rounded` or `.rectangular` |
+
+### Localization
+
+The SDK supports automatic localization based on the device locale. Override with:
+
+```swift
+Yuno.initialize(config: YunoConfig(
+    publicApiKey: "your-public-api-key",
+    environment: .sandbox,
+    language: .spanish
+))
+```
+
+Supported languages: English, Spanish, Portuguese, Indonesian, Malay, Thai.
+
+## Error Handling
+
+Handle SDK errors through the delegate:
+
+```swift
+extension CheckoutViewController: YunoPaymentDelegate {
+
+    func yunoPaymentResult(_ result: YunoPaymentResult) {
+        if let error = result.error {
+            switch error.code {
+            case .networkError:
+                showRetryAlert(message: "Check your internet connection")
+            case .authenticationFailed:
+                showError(message: "Invalid API key. Verify your configuration.")
+            case .sessionExpired:
+                refreshSessionAndRetry()
+            case .cancelled:
+                // User cancelled — no action needed
+                break
+            default:
+                showError(message: error.localizedDescription)
+            }
+        }
+    }
+}
+```
+
+### Common error codes
+
+<Snippet file="error-codes-mobile.mdx" />
+
+## Testing in Sandbox
+
+<Steps>
+  <Step title="Use sandbox environment">
+    Set `environment: .sandbox` during initialization.
+  </Step>
+
+  <Step title="Use test credentials">
+    Use sandbox API keys from **Dashboard > API Keys > Sandbox**.
+  </Step>
+
+  <Step title="Test with Yuno test cards">
+    Use Yuno-provided test card numbers to simulate different outcomes (approval, decline, 3DS). See [Testing](/guides/testing).
+  </Step>
+</Steps>
+
+<Note>
+Sandbox transactions use simulated providers. Some payment methods may have limited availability in sandbox compared to production.
+</Note>
+
+## Troubleshooting
+
+### SDK not initializing
+
+- Verify you are calling `Yuno.initialize()` before any other SDK method
+- Confirm the public API key is correct and matches your environment
+- Check that the deployment target is iOS 14.0+
+
+### Checkout not appearing
+
+- Ensure the checkout session token is valid and not expired
+- Verify the presenting view controller is in the view hierarchy
+- Check that at least one payment method is enabled in Dashboard for the specified country
+
+### Payment failing silently
+
+- Implement the `yunoPaymentResult` delegate method to capture all outcomes
+- Enable verbose logging for debugging:
+
+```swift
+Yuno.initialize(config: YunoConfig(
+    publicApiKey: "your-public-api-key",
+    environment: .sandbox,
+    enableLogging: true
+))
+```
+
+- Check Xcode console for SDK log output
+
+### Build errors after installation
+
+- **CocoaPods**: Run `pod deintegrate && pod install` to clean and reinstall
+- **SPM**: Reset package caches via **File > Packages > Reset Package Caches**
+- Ensure `use_frameworks!` is present in your Podfile
+
+## API Reference
+
+<Accordion title="Full parameter reference, delegate methods, enrollment, and Info.plist entries">
+
+### YunoConfig Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `publicApiKey` | `String` | Yes | — | Your Yuno public API key |
+| `environment` | `YunoEnvironment` | Yes | — | `.sandbox` or `.production` |
+| `language` | `YunoLanguage` | No | Device locale | UI language (`.english`, `.spanish`, `.portuguese`, `.indonesian`, `.malay`, `.thai`) |
+| `cardFlow` | `CardFlow` | No | `.oneStep` | `.oneStep` (single form) or `.multiStep` (step-by-step card entry) |
+| `enableLogging` | `Bool` | No | `false` | Enable verbose SDK logging to Xcode console |
+| `appearance` | `YunoAppearance` | No | Default theme | Visual customization |
+
+### Full Checkout Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `from` | `UIViewController` | Yes | Presenting view controller |
+| `checkoutSession` | `String` | Yes | Checkout session ID from your server |
+| `countryCode` | `String` | Yes | ISO 3166-1 alpha-2 country code |
+| `applePay` | `YunoApplePayConfig` | No | Apple Pay configuration |
+| `delegate` | `YunoPaymentDelegate` | Yes | Delegate to receive payment results |
+
+### Seamless Checkout Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `from` | `UIViewController` | Yes | Presenting view controller |
+| `checkoutSession` | `String` | Yes | Checkout session ID |
+| `paymentMethodType` | `String` | Yes | Payment method type (e.g., `"CARD"`, `"PIX"`) |
+| `countryCode` | `String` | Yes | ISO 3166-1 alpha-2 country code |
+| `vaultedToken` | `String?` | No | Vaulted token for saved payment methods |
+| `delegate` | `YunoSeamlessDelegate` | Yes | Delegate to receive payment lifecycle events |
+
+### Delegate Methods
+
+**YunoPaymentDelegate:**
+
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `yunoPaymentResult(_:)` | `YunoPaymentResult` | Called with the final payment outcome |
+| `yunoDidCancel()` | — | Called when the user dismisses the checkout |
+
+**YunoSeamlessDelegate:**
+
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `yunoCreatePayment(oneTimeToken:tokenWithInformation:)` | `String`, `YunoTokenData` | Called when a token is generated. Create payment server-side, then call `Yuno.continuePayment()` |
+| `yunoPaymentResult(_:)` | `YunoPaymentResult` | Called with the final payment outcome |
+| `yunoDidFail(error:)` | `YunoError` | Called when the SDK encounters an error |
+
+### Enrollment
+
+Start card enrollment (vaulting) for returning customers:
+
+```swift
+Yuno.startEnrollment(
+    from: self,
+    enrollmentSession: "your-enrollment-session-id",
+    countryCode: "CO",
+    customerId: "customer-001",
+    delegate: self
+)
+```
+
+**YunoEnrollmentDelegate:**
+
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `yunoDidCompleteEnrollment(result:)` | `YunoEnrollmentResult` | Called when enrollment completes |
+| `yunoDidFailEnrollment(error:)` | `YunoError` | Called when enrollment encounters an error |
+
+**Enrollment Statuses:** `CREATED`, `READY_TO_ENROLL`, `ENROLLED`, `ENROLL_FAILED`, `EXPIRED`, `REJECTED`, `DECLINED`, `UNENROLLED`
+
+### Extended Customization
+
+Additional appearance properties beyond the basics:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `errorColor` | `UIColor` | Color for error messages and invalid field states |
+| `borderColor` | `UIColor` | Border color for input fields |
+| `borderWidth` | `CGFloat` | Border width for input fields |
+
+**Dark Mode:** The SDK supports iOS dark mode automatically with dynamic colors. Use semantic colors (`.systemBackground`, `.label`) for automatic adaptation.
+
+### Info.plist Entries
+
+**Apple Pay:**
+```xml
+<key>com.apple.developer.in-app-payments</key>
+<array>
+    <string>merchant.com.yourapp.pay</string>
+</array>
+```
+
+**Camera Access (for card scanning):**
+```xml
+<key>NSCameraUsageDescription</key>
+<string>Camera access is needed to scan payment cards</string>
+```
+
+</Accordion>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Mobile SDK Overview" icon="mobile" href="/guides/sdk/mobile-overview">
+    Compare all mobile SDK options.
+  </Card>
+  <Card title="Android SDK" icon="android" href="/guides/sdk/android-checkout">
+    Building for Android? Start here.
+  </Card>
+  <Card title="Customization" icon="palette" href="/guides/sdk/customization">
+    Theme and style your checkout.
+  </Card>
+  <Card title="Testing" icon="vial" href="/guides/testing">
+    Test card numbers and sandbox setup.
+  </Card>
+</CardGroup>

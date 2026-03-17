@@ -1,0 +1,131 @@
+---
+title: "Smart Retries"
+description: "Automatically retry failed subscription payments with configurable schedules and dunning management."
+---
+
+
+## Overview
+
+Smart Retries is Yuno's automatic retry mechanism for failed subscription payments. When a recurring payment fails (due to insufficient funds, expired card, or temporary processor issues), Smart Retries attempts to collect the payment again based on a configurable schedule. Combined with dunning management, this feature helps recover revenue and reduce involuntary churn.
+
+## How Smart Retries Work
+
+1. A scheduled subscription payment fails.
+2. The subscription enters `PAST_DUE` status.
+3. Smart Retries schedules retry attempts according to your configuration.
+4. Between retries, optional dunning emails notify the customer.
+5. If a retry succeeds, the subscription returns to `ACTIVE`.
+6. If all retries are exhausted, the subscription is cancelled (or a custom action is triggered).
+
+<Info>
+  Smart Retries use intelligent timing to maximize recovery rates. Yuno analyzes historical payment patterns to determine optimal retry windows, such as retrying near typical payday dates.
+</Info>
+
+## Configuring Retry Schedules
+
+Define your retry schedule when creating or updating a subscription configuration.
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/subscription-configs \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "retry_schedule": {
+      "max_retries": 4,
+      "intervals": [1, 3, 5, 7],
+      "interval_unit": "DAYS"
+    },
+    "dunning": {
+      "enabled": true,
+      "notify_customer": true,
+      "final_action": "CANCEL"
+    }
+  }'
+```
+
+```json Response
+{
+  "id": "sc_config_001",
+  "retry_schedule": {
+    "max_retries": 4,
+    "intervals": [1, 3, 5, 7],
+    "interval_unit": "DAYS"
+  },
+  "dunning": {
+    "enabled": true,
+    "notify_customer": true,
+    "final_action": "CANCEL"
+  }
+}
+```
+</CodeGroup>
+
+## Retry Schedule Options
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `max_retries` | Integer | Maximum number of retry attempts (1-10) |
+| `intervals` | Array | Days between each retry attempt |
+| `interval_unit` | String | Unit for intervals: `HOURS` or `DAYS` |
+
+### Example Schedules
+
+| Strategy | Intervals (days) | Total Window | Best For |
+|----------|-----------------|--------------|----------|
+| Aggressive | [1, 1, 2, 3] | 7 days | Low-cost subscriptions |
+| Standard | [1, 3, 5, 7] | 16 days | General purpose |
+| Conservative | [3, 5, 7, 14] | 29 days | High-value subscriptions |
+
+## Dunning Management
+
+Dunning is the process of communicating with customers about failed payments. Yuno can automatically send notifications at each retry stage.
+
+### Dunning Configuration
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `enabled` | Boolean | Enable/disable dunning notifications |
+| `notify_customer` | Boolean | Send email notifications to the customer |
+| `final_action` | String | Action after all retries exhausted: `CANCEL`, `PAUSE`, or `NONE` |
+
+<Warning>
+  If `final_action` is set to `CANCEL`, the subscription will be permanently cancelled after all retries are exhausted. Use `PAUSE` if you want to allow manual recovery.
+</Warning>
+
+## Decline Categories and Retry Logic
+
+Not all payment failures should be retried. Yuno categorizes declines to optimize retry behavior:
+
+| Decline Type | Description | Retry? | Example |
+|-------------|-------------|--------|---------|
+| **Soft decline** | Temporary issue, likely to resolve | Yes | Insufficient funds, timeout |
+| **Hard decline** | Permanent issue, will not resolve | No | Stolen card, closed account |
+| **Processor error** | Infrastructure issue | Yes | Gateway timeout, network error |
+
+<Info>
+  Hard declines (stolen card, invalid account) are not retried regardless of your retry schedule. This prevents unnecessary processing and potential fraud flags.
+</Info>
+
+## Webhook Events for Retries
+
+| Event | Description |
+|-------|-------------|
+| `subscription.payment.retry_scheduled` | A retry has been scheduled |
+| `subscription.payment.retry_success` | A retry payment succeeded |
+| `subscription.payment.retry_failed` | A retry payment failed |
+| `subscription.dunning.final_action` | All retries exhausted, final action taken |
+
+## Best Practices
+
+- **Start with the Standard schedule** (1, 3, 5, 7 days) and optimize based on recovery data.
+- **Enable dunning notifications** to give customers a chance to update their payment method.
+- **Use `PAUSE` instead of `CANCEL`** for high-value subscriptions to allow manual recovery.
+- **Monitor retry metrics** in the Yuno Dashboard to identify patterns and adjust schedules.
+- **Implement `subscription.payment.retry_failed` webhooks** to trigger in-app notifications or support outreach.
+
+<Note>
+  You can view retry history and recovery rates in the Yuno Dashboard under **Subscriptions > Analytics > Recovery**.
+</Note>

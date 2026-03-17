@@ -1,0 +1,117 @@
+---
+title: "Apple Pay"
+description: "Accept Apple Pay on web (Safari) and iOS apps for fast, secure checkout with biometric authentication."
+---
+
+
+## Overview
+
+Apple Pay enables customers to pay using cards stored in their Apple Wallet. Transactions are authenticated with Face ID, Touch ID, or device passcode, providing a seamless and secure checkout experience. Through Yuno, you can accept Apple Pay on Safari (web), iOS apps, and in-app contexts.
+
+## Prerequisites
+
+Before integrating Apple Pay, ensure you have completed the following:
+
+<Steps>
+  <Step title="SSL Certificate">
+    Your domain must serve content over HTTPS with a valid SSL/TLS certificate. Apple Pay will not function on HTTP or self-signed certificates.
+  </Step>
+  <Step title="Domain Verification">
+    Register and verify your payment domain with Apple through the Yuno Dashboard. Navigate to **Settings > Digital Wallets > Apple Pay** and add your domain.
+  </Step>
+  <Step title="Apple Developer Account">
+    You need an Apple Developer account to create a Merchant ID and configure payment processing certificates.
+  </Step>
+  <Step title="Yuno Configuration">
+    Enable Apple Pay in your Yuno Dashboard and upload the required Apple merchant certificates.
+  </Step>
+</Steps>
+
+<Warning>
+  Domain verification is mandatory. Apple Pay buttons will not render on unverified domains. The verification file must be accessible at `https://yourdomain.com/.well-known/apple-developer-merchantid-domain-association`.
+</Warning>
+
+## Integration with Full Checkout SDK
+
+When using Yuno's Full Checkout SDK, the Apple Pay button renders automatically on supported devices.
+
+```javascript
+const checkout = yuno.checkout({
+  countryCode: "BR",
+  currency: "BRL",
+  amount: "150.00",
+  checkoutSession: "session_abc123",
+  // Apple Pay button appears automatically on Safari/iOS
+});
+
+checkout.mount("#checkout-container");
+```
+
+## Direct API Integration
+
+For Direct API integrations, you handle the Apple Pay session and pass the payment token to Yuno.
+
+<CodeGroup>
+```javascript Web (Safari)
+// 1. Create an Apple Pay session
+const session = new ApplePaySession(3, {
+  countryCode: "BR",
+  currencyCode: "BRL",
+  supportedNetworks: ["visa", "masterCard"],
+  merchantCapabilities: ["supports3DS"],
+  total: {
+    label: "Your Store",
+    amount: "150.00"
+  }
+});
+
+// 2. Handle payment authorization
+session.onpaymentauthorized = async (event) => {
+  const applePayToken = event.payment.token;
+
+  // 3. Send token to Yuno
+  const response = await fetch("/api/pay", {
+    method: "POST",
+    body: JSON.stringify({
+      payment_method: {
+        type: "APPLE_PAY",
+        token: applePayToken.paymentData
+      }
+    })
+  });
+};
+
+session.begin();
+```
+</CodeGroup>
+
+## Supported Countries and Networks
+
+| Network | Countries |
+|---------|-----------|
+| Visa | US, BR, MX, CO, CL, AR, PE, and 60+ more |
+| Mastercard | US, BR, MX, CO, CL, AR, PE, and 60+ more |
+| American Express | US, MX, and select markets |
+
+<Info>
+  Apple Pay supports both credit and debit cards. Card eligibility is determined by the issuing bank's participation in the Apple Pay program.
+</Info>
+
+## Testing in Sandbox
+
+1. Use an Apple sandbox tester account (created in App Store Connect).
+2. Add test cards to the Apple Wallet on a physical device or simulator.
+3. Process test transactions using your Yuno sandbox credentials.
+
+<Note>
+  Apple Pay cannot be tested in desktop browsers without a paired iPhone or Apple Watch. Use the iOS Simulator in Xcode or a physical Apple device for testing.
+</Note>
+
+## Troubleshooting
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| Button not rendering | Unverified domain | Complete domain verification in Dashboard |
+| "Payment not completed" | Expired certificate | Renew Apple merchant certificate |
+| Session timeout | Network latency | Ensure server-to-Apple communication is under 30 seconds |
+| Unsupported device | Non-Apple device | Apple Pay only works on Apple devices with Safari |

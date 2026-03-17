@@ -1,0 +1,87 @@
+---
+title: "Update Onboarding"
+description: "Update an existing onboarding process for a recipient."
+api: "PATCH https://api-sandbox.y.uno/v1/recipients/{recipient_id}/onboardings/{onboarding_id}"
+---
+
+Updates an existing onboarding process. Use this to modify provider details, upload additional documentation, update withdrawal methods, or add legal representative information.
+
+## Path Parameters
+
+<ParamField path="recipient_id" type="string" required>
+  The unique identifier of the recipient.
+</ParamField>
+
+<ParamField path="onboarding_id" type="string" required>
+  The unique identifier of the onboarding process.
+</ParamField>
+
+## Request Body
+
+All fields are optional — include only the fields you want to update.
+
+<ParamField body="type" type="string">
+  Onboarding type.
+
+  Values: `PREVIOUSLY_ONBOARDED`, `ONBOARD_ONTO_THE_PROVIDER`
+</ParamField>
+
+<ParamField body="workflow" type="string">
+  Workflow type.
+
+  Values: `HOSTED_BY_PROVIDER`, `DIRECT`
+</ParamField>
+
+<ParamField body="callback_url" type="string">
+  URL to redirect the recipient after provider-hosted onboarding.
+</ParamField>
+
+<ParamField body="provider" type="object">
+  Updated provider details.
+  <Expandable title="provider">
+    <ParamField body="id" type="string">
+      Provider identifier (e.g., `PAGARME`, `STRIPE`, `ADYEN`).
+    </ParamField>
+    <ParamField body="connection_id" type="string">
+      Yuno connection identifier.
+    </ParamField>
+    <ParamField body="recipient_id" type="string">
+      Provider's recipient identifier.
+    </ParamField>
+    <ParamField body="recipient_type" type="string">
+      Values: `MEAL`, `FOOD`, `MULTI_BENEFITS`, `FLEET`
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="documentation" type="array">
+  Updated or additional supporting documents.
+  <Expandable title="documentation item">
+    <ParamField body="file_name" type="string">
+      Document filename.
+    </ParamField>
+    <ParamField body="content_type" type="string">
+      Document classification.
+    </ParamField>
+    <ParamField body="content_category" type="string">
+      Category (e.g., `INVOICE`, `ID_PROOF`).
+    </ParamField>
+    <ParamField body="content" type="string">
+      Base64-encoded file content. Max 1 MB.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="withdrawal_methods" type="array">
+  Updated bank account details for payouts.
+</ParamField>
+
+<ParamField body="legal_representatives" type="array">
+  Organization owners or beneficial owners information.
+</ParamField>
+
+## Related Pages
+
+- [Get Onboarding](/api-reference/recipients/get-onboarding) — Retrieve current onboarding state
+- [Onboarding Statuses](/api-reference/recipients/onboarding-statuses) — Status lifecycle reference
+- [Continue Onboarding](/api-reference/recipients/continue-onboarding) — Resume after updating

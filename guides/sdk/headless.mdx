@@ -1,0 +1,143 @@
+---
+title: "Headless Checkout"
+description: "Build your own checkout UI with full control over the payment experience"
+---
+
+Headless Checkout gives you complete control over the checkout UI. You build the entire payment form, and Yuno handles tokenization, 3DS challenges, and PCI compliance behind the scenes.
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/headless-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/headless-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+<Warning>
+This is the most complex SDK integration. Consider [Full Checkout](/guides/sdk/full-checkout) or [Seamless Checkout](/guides/sdk/seamless-checkout) unless you need complete UI control.
+</Warning>
+
+## How it works
+
+1. You build and render your own payment form
+2. Collect card data or use a vaulted token
+3. Call `generateToken()` to create a one-time token via Yuno's SDK (PCI-safe)
+4. Create the payment server-side using the token
+5. Handle any 3DS or provider challenges
+
+## Integration steps
+
+### 1. Create a checkout session
+
+Create a checkout session from your server using the [Create Checkout Session](/api-reference/checkout-sessions/create) endpoint.
+
+### 2. Initialize the SDK
+
+```javascript
+const yuno = await Yuno.initialize({
+  publicApiKey: "YOUR_PUBLIC_API_KEY",
+});
+```
+
+### 3. Create the Headless client
+
+```javascript
+const apiClientPayment = yuno.apiClientPayment({
+  countryCode: "US",
+  checkoutSession: "your-checkout-session-id",
+});
+```
+
+### 4. Generate a one-time token
+
+From raw card data:
+
+```javascript
+const oneTimeToken = await apiClientPayment.generateToken({
+  checkout_session: "your-checkout-session-id",
+  payment_method: {
+    type: "CARD",
+    vaulted_token: null,
+    card: {
+      save: false,
+      detail: {
+        expiration_month: 11,
+        expiration_year: 25,
+        number: "4111111111111111", // Yuno sandbox test card number
+        security_code: "123",
+        holder_name: "ANDREA B",
+        type: "DEBIT",
+      },
+    },
+  },
+});
+```
+
+From a vaulted token (saved card):
+
+```javascript
+const oneTimeToken = await apiClientPayment.generateToken({
+  checkout_session: "your-checkout-session-id",
+  payment_method: {
+    type: "CARD",
+    vaulted_token: "your-vaulted-token",
+    card: {
+      detail: { security_code: "123" },
+    },
+  },
+});
+```
+
+### 5. Create the payment (server-side)
+
+```javascript
+await createPayment({
+  checkout_session: "your-checkout-session-id",
+  one_time_token: oneTimeToken.token,
+});
+```
+
+### 6. Handle 3DS challenges
+
+```javascript
+const challengeData = await apiClientPayment.getThreeDSecureChallenge(
+  checkoutSession
+);
+
+// Redirect the customer to complete 3DS
+window.location.href = challengeData.url;
+```
+
+Check for additional actions after payment creation:
+
+```javascript
+const continueData = await apiClientPayment.getContinuePaymentAction({
+  checkoutSession: "your-checkout-session-id",
+});
+```
+
+## Key methods
+
+| Method | Description |
+|--------|-------------|
+| `yuno.apiClientPayment(config)` | Initialize the Headless client |
+| `apiClientPayment.generateToken(payload)` | Create a one-time token from card data or vaulted token |
+| `apiClientPayment.getThreeDSecureChallenge(session)` | Get the 3DS challenge URL |
+| `apiClientPayment.getContinuePaymentAction(config)` | Check for additional actions needed |
+
+## Card vaulting
+
+Set `save: true` in the card object to vault the card on successful payment.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Full Checkout" icon="credit-card" href="/guides/sdk/full-checkout">
+    Let Yuno handle the entire UI.
+  </Card>
+  <Card title="Seamless Checkout" icon="bolt" href="/guides/sdk/seamless-checkout">
+    SDK convenience with payment method control.
+  </Card>
+</CardGroup>

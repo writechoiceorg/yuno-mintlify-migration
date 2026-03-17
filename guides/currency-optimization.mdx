@@ -1,0 +1,304 @@
+---
+title: "Currency Optimization"
+description: "Optimize FX rates, settlement currencies, and multi-currency payment flows"
+---
+
+
+## Overview
+
+Currency optimization reduces the cost of cross-border payments by routing transactions through providers with the best exchange rates, settling in optimal currencies, and minimizing unnecessary currency conversions. For merchants operating across Latin America, effective currency management can reduce FX costs by 0.5-2.0% of transaction volume.
+
+## Currency Pair Routing
+
+Different providers offer different exchange rates for the same currency pair. Route transactions to the provider with the most favorable rate for each pair.
+
+### How Currency Pair Routing Works
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/currency-routing.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/currency-routing.html"
+    width="100%"
+    height="450"
+    style={{ border: 'none', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', pointerEvents: 'none' }}
+    loading="lazy"
+  />
+</a>
+
+### Configuring Currency-Based Routing
+
+In **Dashboard > Routing Rules**, create rules that consider the settlement currency:
+
+```
+Rule: USD-to-BRL Best Rate
+Conditions: currency = USD AND settlement_currency = BRL
+Strategy: Cost (FX-optimized)
+Providers:
+  1. Provider C (best BRL rate historically)
+  2. Provider A (fallback)
+```
+
+<Note>
+  FX rates fluctuate throughout the day. Yuno's cost-optimized routing evaluates rates at transaction time, not based on static configuration. Provider ranking may shift intraday.
+</Note>
+
+## FX Margin Optimization
+
+FX margin is the markup a provider adds to the mid-market exchange rate. Reducing this margin directly increases your revenue on cross-border transactions.
+
+| Strategy | Description | Savings Potential |
+|----------|-------------|-------------------|
+| **Negotiate rates** | Use transaction volume as leverage to negotiate lower FX margins with providers | 0.2-0.5% |
+| **Compare providers** | Route to the provider with the lowest markup for each currency pair | 0.1-0.3% |
+| **Lock rates** | Use Yuno's [rate quote API](/features/currency-conversion) to lock favorable rates within the validity window | Avoid adverse movement |
+| **Batch settlement** | Consolidate settlements to reduce per-transaction FX conversion fees | 0.1-0.2% |
+| **Local currency pricing** | Price in local currency to avoid DCC and its associated markup | 1.0-3.0% |
+
+### Monitoring FX Margins
+
+Track your effective FX costs in **Dashboard > Analytics > Currency**:
+
+| Metric | Description | Target |
+|--------|-------------|--------|
+| **Effective rate vs. mid-market** | Your actual rate compared to the interbank rate | &lt;1.5% markup |
+| **FX cost per transaction** | Total currency conversion cost per payment | Minimize |
+| **Rate lock utilization** | Percentage of transactions using locked rates | >80% for cross-border |
+
+## Multi-Currency Settlement
+
+Choose whether to settle in the customer's local currency or convert to your home currency.
+
+### Settlement Strategy Comparison
+
+| Strategy | Pros | Cons | Best For |
+|----------|------|------|----------|
+| **Local currency settlement** | No FX conversion, lower fees, faster settlement | Requires local bank accounts, currency exposure | Merchants with local entities |
+| **Home currency settlement** | Simple treasury management, no currency exposure | FX conversion fees, potentially lower approval rates | Merchants without local entities |
+| **Hybrid** | Optimize per market based on volume and cost | More complex treasury operations | Large multi-market merchants |
+
+### Configuring Settlement Currency
+
+Set your settlement currency per provider in **Dashboard > Providers > [Provider Name] > Settlement**:
+
+```
+Provider: PagSeguro (Brazil)
+Settlement Currency: BRL
+Settlement Account: [Brazilian bank account]
+Settlement Frequency: Daily
+
+Provider: Adyen (Global)
+Settlement Currency: USD
+Settlement Account: [US bank account]
+Settlement Frequency: Weekly
+```
+
+<Tip>
+  If you process more than $100K monthly in a single market, consider opening a local bank account and settling in local currency. The FX savings typically exceed the cost of maintaining the account.
+</Tip>
+
+## Dynamic Currency Conversion (DCC)
+
+DCC allows international cardholders to pay in their home currency rather than the merchant's currency. The customer sees the converted amount at checkout and chooses whether to pay in their currency or the merchant's.
+
+### DCC Best Practices
+
+| Practice | Description |
+|----------|-------------|
+| **Transparency** | Always display both the original and converted amounts, the exchange rate, and any markup |
+| **Customer choice** | Let the customer choose their preferred currency; never force DCC |
+| **Rate disclosure** | Show the margin over mid-market rate where required by regulation |
+| **Selective offering** | Only offer DCC when the card currency differs from the transaction currency |
+
+<Warning>
+  EU regulations (PSD2) and card network rules require explicit customer consent for DCC and clear disclosure of the exchange rate markup. Non-compliance can result in chargebacks and fines.
+</Warning>
+
+### Implementing DCC with Yuno
+
+1. Enable DCC in **Dashboard > Settings > Currency > Dynamic Currency Conversion**
+2. Yuno detects international cards via BIN lookup
+3. A DCC offer is presented to the customer in the checkout flow
+4. If accepted, the payment processes in the cardholder's home currency
+5. Settlement occurs in your configured settlement currency
+
+## Country-Currency Compatibility Matrix
+
+Use this matrix to determine the correct currency for each market:
+
+| Country | Local Currency | Common Alt. Currencies | Settlement Options | Notes |
+|---------|---------------|----------------------|-------------------|-------|
+| Brazil | BRL | USD | BRL (preferred), USD | PIX requires BRL; cards accept USD with conversion |
+| Mexico | MXN | USD | MXN, USD | OXXO/SPEI require MXN |
+| Colombia | COP | USD | COP, USD | PSE requires COP |
+| Argentina | ARS | USD | ARS, USD | Currency controls may affect USD settlement |
+| Chile | CLP | USD | CLP, USD | High-value transactions common due to CLP denomination |
+| Peru | PEN | USD | PEN, USD | Both currencies widely accepted |
+| Uruguay | UYU | USD | UYU, USD | Small market, USD settlement common |
+
+<Note>
+  Local payment methods (PIX, OXXO, PSE, Boleto) almost always require the local currency. Card payments are more flexible with currency options.
+</Note>
+
+## Settlement Timing Considerations
+
+Settlement timing affects your FX exposure and cash flow:
+
+| Factor | Impact | Recommendation |
+|--------|--------|----------------|
+| **Settlement frequency** | Daily settlement reduces FX exposure; weekly may offer better batch rates | Daily for volatile currencies (ARS), weekly for stable (USD-BRL) |
+| **Cut-off times** | Transactions after cut-off settle in the next cycle | Align cut-off with your peak transaction hours |
+| **Weekend/holiday gaps** | No settlement on non-business days increases exposure | Factor in 2-3 day gaps for weekend settlements |
+| **Provider settlement speed** | Varies from T+1 to T+7 depending on provider and country | Prefer T+1 or T+2 providers for high-volume markets |
+
+## Using Yuno's Currency Conversion API
+
+Yuno provides a currency conversion API that lets you quote, lock, and apply exchange rates within your payment flow.
+
+### Rate Quote Workflow
+
+<Steps>
+  <Step title="Request a rate quote">
+    Call the `/v1/currency/convert` endpoint with the source currency, target currency, and amount:
+
+    ```bash
+    curl --request GET \
+      --url "https://api.y.uno/v1/currency/convert?from=USD&to=BRL&amount=100.00" \
+      --header 'X-Api-Key: YOUR_API_KEY' \
+      --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+    ```
+  </Step>
+
+  <Step title="Present the converted amount">
+    Display both the original and converted amounts to the customer, along with the exchange rate. The response includes a `rate_id` and `valid_until` timestamp.
+  </Step>
+
+  <Step title="Submit payment with locked rate">
+    Include the `rate_id` in your payment request to lock the quoted rate:
+
+    ```json
+    {
+      "amount": {"value": 100.00, "currency": "USD"},
+      "settlement_currency": "BRL",
+      "currency_conversion": {"rate_id": "rate_abc123"}
+    }
+    ```
+  </Step>
+
+  <Step title="Handle rate expiration">
+    If the `valid_until` timestamp has passed, request a new quote before submitting the payment. Implement client-side countdown to prompt re-quoting.
+  </Step>
+</Steps>
+
+<Warning>
+  The currency conversion endpoint may not be available in sandbox environments. Contact Yuno support to enable it for your account if you receive a 404 response.
+</Warning>
+
+## Currency Hedging Strategies
+
+Effective hedging reduces exposure to exchange rate volatility, particularly important in LatAm markets where currencies like ARS and BRL can swing 5-10% in a month.
+
+### Natural Hedging
+
+The simplest hedging approach is matching your revenue and expense currencies. If you collect BRL in Brazil and also pay suppliers or staff in BRL, the exposure nets out.
+
+- **Match revenue to expenses**: Open local accounts and pay local costs (hosting, salaries, marketing) in the same currency you collect
+- **Reinvest locally**: Use local currency revenue for market expansion rather than converting to USD
+- **Time settlements strategically**: Align settlement dates with known local currency obligations
+
+### Forward Contracts
+
+For predictable cross-border flows, lock in exchange rates for future settlement periods:
+
+1. Estimate your monthly settlement volume per currency (e.g., $200K BRL equivalent)
+2. Contract a forward rate with your banking partner for 30, 60, or 90 days
+3. Apply the locked rate at settlement via your treasury management system
+4. Compare realized rate against spot to measure hedging effectiveness
+
+### Netting Across Markets
+
+If you operate in multiple LatAm countries, net opposing currency flows before converting:
+
+- Offset BRL collections against BRL payouts (e.g., seller payouts in a marketplace)
+- Consolidate USD needs across MXN, COP, and CLP settlements into a single conversion
+- Reduce the total volume subject to FX conversion fees
+
+### Hedging Cost-Benefit Analysis
+
+| Strategy | Setup Cost | Ongoing Cost | Risk Reduction | Best For |
+|----------|-----------|-------------|----------------|----------|
+| **Natural hedging** | Low (requires local entity) | Minimal | Medium | Merchants with local operations |
+| **Forward contracts** | Medium (banking relationship) | 0.1-0.5% premium | High | Predictable monthly volumes >$100K |
+| **Options contracts** | High (premiums) | 1-3% premium | Very high | Large merchants with volatile corridors |
+| **Netting** | Low (operational process) | Minimal | Medium | Multi-market merchants with two-way flows |
+| **No hedging** | None | None | None | Small volumes or stable currency pairs |
+
+<Tip>
+  For most LatAm merchants processing under $500K/month, natural hedging combined with rate locking via Yuno's currency conversion API provides the best cost-to-protection ratio without the complexity of financial derivatives.
+</Tip>
+
+## Corridor-Specific FX Patterns
+
+Understanding the characteristics of each currency corridor helps you choose the right strategy and set realistic FX cost expectations.
+
+| Corridor | Typical Spread | Volatility | Liquidity | Recommended Strategy |
+|----------|---------------|------------|-----------|---------------------|
+| USD to BRL | 1.0-2.5% | High | High | Rate locking for large transactions; daily settlement to limit exposure |
+| USD to MXN | 0.8-2.0% | Medium | High | Cost-optimized routing; weekly settlement acceptable |
+| USD to COP | 1.5-3.0% | Medium-High | Medium | Local acquirer preferred; forward contracts for >$200K/month |
+| USD to ARS | 3.0-8.0% | Very High | Low | Settle daily; minimize ARS holdings; consider parallel rate implications |
+| EUR to BRL | 1.2-3.0% | High | Medium | Avoid double conversion (EUR to USD to BRL); use direct EUR/BRL providers |
+| USD to CLP | 1.0-2.5% | Medium | Medium | Standard routing; batch settlements effective |
+| USD to PEN | 1.0-2.0% | Low-Medium | Medium | Stable corridor; weekly settlement acceptable |
+
+<Warning>
+  The ARS corridor is subject to government-imposed capital controls that change frequently. Official and parallel exchange rates can diverge significantly. Always verify current regulations before configuring ARS settlement flows.
+</Warning>
+
+### Seasonal and Event-Driven Volatility
+
+Plan for known volatility windows in LatAm FX markets:
+
+- **Central bank rate decisions**: BRL and MXN often move 1-3% on rate announcement days (typically monthly)
+- **Election cycles**: ARS and BRL show elevated volatility during presidential campaigns
+- **Commodity price shifts**: CLP (copper) and COP (oil) correlate with commodity markets
+- **US Federal Reserve meetings**: All LatAm currencies react to USD policy changes
+
+## FX Rate Monitoring Dashboard
+
+Track these metrics daily in **Dashboard > Analytics > Currency** to identify optimization opportunities and detect anomalies.
+
+### Key Metrics to Track
+
+| Metric | Description | Frequency | Alert Threshold |
+|--------|-------------|-----------|-----------------|
+| **Mid-market rate deviation** | Difference between your effective rate and the interbank mid-market rate | Real-time | >2.0% deviation |
+| **Provider markup comparison** | Side-by-side FX markup across your active providers for each currency pair | Daily | >0.5% variance between providers |
+| **Locked rate utilization** | Percentage of eligible cross-border transactions using a pre-quoted locked rate | Daily | &lt;70% utilization |
+| **Settlement FX impact** | FX cost incurred between authorization time and settlement time | Per settlement | >0.3% slippage |
+| **Conversion volume by pair** | Total amount converted per currency pair per day | Daily | Monitor for concentration risk |
+| **Failed rate quotes** | Rate quote API calls that failed or expired before use | Daily | >15% failure rate |
+
+### Setting Up FX Alerts
+
+Configure automated alerts in **Dashboard > Analytics > Currency > Alerts**:
+
+1. **Rate spike alert**: Notify when a currency pair moves more than 2% from the daily open
+2. **Provider markup alert**: Notify when any provider's markup exceeds your configured threshold
+3. **Settlement slippage alert**: Notify when settlement FX differs from authorization FX by more than 0.3%
+4. **Volume concentration alert**: Notify when more than 80% of FX volume routes to a single provider
+
+<Note>
+  FX monitoring data is available with a 15-minute delay in the Dashboard. For real-time rate data, use the currency conversion API's rate quote endpoint and compare against a third-party mid-market feed.
+</Note>
+
+## Best Practices for Cross-Border Payments
+
+- **Price in local currency** whenever possible to avoid DCC markup and improve conversion rates
+- **Use rate locking** for large transactions to protect against adverse FX movements
+- **Monitor FX margins daily** across providers and renegotiate when volume justifies it
+- **Settle locally** in markets where you process >$100K/month
+- **Match settlement currency to expense currency** to create natural hedges
+- **Route by currency pair** to the provider with the best rate for each pair
+- **Avoid double conversion** (e.g., USD to EUR to BRL) by routing to providers that support direct pairs
+- **Track effective rate vs. mid-market** as your primary FX cost metric
+- **Consider currency volatility** when choosing settlement frequency; daily for volatile pairs
+- **Comply with local regulations** on DCC disclosure and customer consent

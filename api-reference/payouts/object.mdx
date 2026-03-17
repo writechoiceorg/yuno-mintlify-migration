@@ -1,0 +1,133 @@
+---
+title: "The Payout Object"
+description: "Represents a disbursement of funds from a merchant to a recipient."
+---
+
+The Payout object represents a disbursement of funds from a merchant's account to a recipient, such as a seller, freelancer, or partner. Payouts are used for marketplace disbursements, refund alternatives, and any merchant-to-individual fund transfers.
+
+<Info>
+  **Recipients required** — Before creating a payout, you must register the recipient via the [Recipients API](/api-reference/recipients/create). The recipient record holds banking details and identity information needed to route the funds.
+</Info>
+
+## Object Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier of the payout (UUID).
+
+  Example: `po_3f4a5b6c-7d8e-9f01-2345-6789abcdef01`
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current payout status. Transitions depend on provider processing times and fund availability.
+
+  Values: `PENDING`, `PROCESSING`, `SUCCEEDED`, `FAILED`, `CANCELLED`
+
+  - `PENDING` — Payout created but not yet submitted to the provider.
+  - `PROCESSING` — Submitted to the provider; awaiting confirmation.
+  - `SUCCEEDED` — Funds successfully disbursed to the recipient.
+  - `FAILED` — Provider rejected the payout (invalid account, insufficient funds, etc.).
+  - `CANCELLED` — Cancelled by the merchant before processing began.
+
+  Example: `SUCCEEDED`
+</ResponseField>
+
+<ResponseField name="amount" type="object">
+  The payout amount details.
+  <Expandable title="amount">
+    <ResponseField name="value" type="number">
+      The disbursement amount.
+
+      Example: `250.00`
+    </ResponseField>
+    <ResponseField name="currency" type="string">
+      ISO 4217 currency code.
+
+      Example: `USD`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  The country where the payout is executed. ISO 3166-1 alpha-2 code. Determines which providers and banking rails are available.
+
+  Example: `US`
+</ResponseField>
+
+<ResponseField name="recipient_id" type="string">
+  ID of the recipient receiving the funds. Links to the [Recipient Object](/api-reference/recipients/object).
+
+  Example: `rcp_a1b2c3d4-e5f6-7890-abcd-ef1234567890`
+</ResponseField>
+
+<ResponseField name="merchant_reference" type="string">
+  The merchant's own reference identifier for this payout, used for reconciliation between your system and Yuno. Must be unique per merchant account.
+
+  Example: `payout-seller-20260310-001`
+</ResponseField>
+
+<ResponseField name="provider" type="object">
+  Information about the provider that processed the payout.
+  <Expandable title="provider">
+    <ResponseField name="name" type="string">
+      Provider name that handled the disbursement.
+
+      Example: `MERCADOPAGO`
+    </ResponseField>
+    <ResponseField name="transaction_id" type="string">
+      The provider's own transaction reference for tracking on their platform.
+
+      Example: `mp_txn_9876543210`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  A human-readable description of the payout purpose (MAX 255).
+
+  Example: `Marketplace seller payout - March 2026`
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the payout was created.
+
+  Example: `2026-03-10T16:00:00.000Z`
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 timestamp of the last payout update.
+
+  Example: `2026-03-10T16:05:30.000Z`
+</ResponseField>
+
+## Example
+
+```json
+{
+  "id": "po_3f4a5b6c-7d8e-9f01-2345-6789abcdef01",
+  "status": "SUCCEEDED",
+  "amount": {
+    "value": 250.00,
+    "currency": "USD"
+  },
+  "country": "US",
+  "recipient_id": "rcp_a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "merchant_reference": "payout-seller-20260310-001",
+  "provider": {
+    "name": "MERCADOPAGO",
+    "transaction_id": "mp_txn_9876543210"
+  },
+  "description": "Marketplace seller payout - March 2026",
+  "created_at": "2026-03-10T16:00:00.000Z",
+  "updated_at": "2026-03-10T16:05:30.000Z"
+}
+```
+
+## Related Endpoints
+
+- [Create Payout](/api-reference/payouts/create) — `POST /v1/payouts`
+- [Get Payout](/api-reference/payouts/get) — `GET /v1/payouts/{payout_id}`
+- [Get Payout by Merchant Reference](/api-reference/payouts/get-by-merchant-ref) — `GET /v1/payouts?merchant_reference={reference}`
+
+## Related Concepts
+
+- [Payouts](/guides/payouts/overview) — How disbursements work in Yuno

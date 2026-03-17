@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Subscription Creation Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  /* ── Swim lane labels ───────────────────────────────────────── */
+  .lane-label {
+    position: absolute;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0a0a0a;
+    line-height: 1.43;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  /* ── Step boxes ─────────────────────────────────────────────── */
+  .step {
+    position: absolute;
+    width: 104px;
+    height: 98px;
+    background: #ffffff;
+    border: 1px solid #3e4fe0;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #0a0a0a;
+    text-align: center;
+    line-height: 1.35;
+  }
+
+  /* ── Self-action box (yellow note style) ────────────────────── */
+  .step.self {
+    border-style: dashed;
+    border-color: #ca8a04;
+    background: #fefce8;
+  }
+
+  /* ── Loop block ─────────────────────────────────────────────── */
+  .loop-block {
+    position: absolute;
+    border: 1.5px dashed #64748b;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SVG: background, swim lane dividers, connectors, sparks
+
+     2 swim lanes:
+       Lane 0 (Agent):    y=48  → y=437  cy=242  box_top=193
+       Lane 1 (Yuno API): y=437 → y=826  cy=631  box_top=582
+
+     Lane separator at y=437
+     Left label panel divider at x=181
+
+     9 columns at 140px spacing, starting at left=211:
+       Col   left   cx
+         1    211   263
+         2    351   403
+         3    491   543
+         4    631   683
+         5    771   823
+         6    911   963
+         7   1051  1103  ← self-action (no Lane1 box)
+         8   1191  1243  ← loop
+         9   1331  1383  ← loop
+
+     Solid  = request  (down, Agent → Yuno API)
+     Dashed = response (up,   Yuno API → Agent)
+═══════════════════════════════════════════════════════════════ -->
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.07)"/>
+    </filter>
+    <marker id="arr-dn" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#64748b"/>
+    </marker>
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background card ───────────────────────────────────────── -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.55"/>
+
+  <!-- ── Yuno API lane tint ─────────────────────────────────────── -->
+  <rect x="40" y="437" width="1460" height="389" fill="#fafafa" opacity="1"/>
+
+  <!-- ── Lane separator ───────────────────────────────────────── -->
+  <line x1="40" y1="437" x2="1500" y2="437" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ── Left label panel divider ─────────────────────────────── -->
+  <line x1="181" y1="48" x2="181" y2="826" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CONNECTOR PATHS  (box_bottom Lane0=291 · box_top Lane1=582)
+  ════════════════════════════════════════════════════════════════ -->
+
+  <!-- v1: Col1 Lane0→Lane1  POST /v1/customers (solid down) -->
+  <path id="v1" d="M 263,291 L 263,582"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v2: Col2 Lane1→Lane0  201 { customer_uuid } (dashed up) -->
+  <path id="v2" d="M 403,582 L 403,291"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v3: Col3 Lane0→Lane1  POST /v1/checkout/sessions (solid down) -->
+  <path id="v3" d="M 543,291 L 543,582"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v4: Col4 Lane1→Lane0  200 { checkout_session } (dashed up) -->
+  <path id="v4" d="M 683,582 L 683,291"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v5: Col5 Lane0→Lane1  POST /v1/payments initial charge (solid down) -->
+  <path id="v5" d="M 823,291 L 823,582"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v6: Col6 Lane1→Lane0  200 { SUCCEEDED, vaulted_token } (dashed up) -->
+  <path id="v6" d="M 963,582 L 963,291"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v8: Col8 Lane0→Lane1  POST /v1/checkout/sessions loop (solid down) -->
+  <path id="v8" d="M 1243,291 L 1243,582"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v9: Col9 Lane0→Lane1  POST /v1/payments vaulted_token loop (solid down) -->
+  <path id="v9" d="M 1383,291 L 1383,582"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ANIMATED SPARKS
+  ════════════════════════════════════════════════════════════════ -->
+  <g clip-path="url(#diagram-clip)">
+
+    <!-- v1: POST customers (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v1"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v2: 201 customer_uuid (orange, up) -->
+    <circle r="3" fill="#f97316" filter="url(#spark-glow)" opacity="0.8">
+      <animateMotion dur="1.6s" begin="0.5s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v2"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v3: POST checkout/sessions (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="1.0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v4: 200 checkout_session (orange, up) -->
+    <circle r="3" fill="#f97316" filter="url(#spark-glow)" opacity="0.8">
+      <animateMotion dur="1.6s" begin="1.5s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v4"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v5: POST payments initial (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="2.0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v5"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v6: 200 SUCCEEDED + vaulted_token (green, up — success) -->
+    <circle r="3" fill="#15803d" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.6s" begin="2.5s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v6"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v8: POST checkout/sessions loop (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="3.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v8"/>
+      </animateMotion>
+    </circle>
+
+    <!-- v9: POST payments vaulted_token loop (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="3.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#v9"/>
+      </animateMotion>
+    </circle>
+
+  </g>
+</svg>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SWIM LANE LABELS
+═══════════════════════════════════════════════════════════════ -->
+<div class="lane-label" style="left:109px; top:222px;">Agent</div>
+<div class="lane-label" style="left:109px; top:611px;">Yuno<br>API</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LOOP BLOCK  (cols 8–9, left=1161 → right=1500)
+═══════════════════════════════════════════════════════════════ -->
+<div class="loop-block" style="left:1161px; top:57px; width:339px; height:762px;">
+  <span style="position:absolute; left:8px; top:6px; font-size:11px; font-weight:600;
+               color:#64748b; background:#f5f5f5; padding:1px 5px;
+               border-radius:3px; border:1px solid #94a3b8; font-family:'Inter',sans-serif;">loop</span>
+  <span style="position:absolute; left:72px; top:10px; font-size:12px; font-weight:500;
+               color:#0a0a0a; font-family:'Inter',sans-serif;">[Monthly billing]</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STEP BOXES
+     Lane0 top=193  ·  Lane1 top=582
+     Col left: 211  351  491  631  771  911  1051  1191  1331
+═══════════════════════════════════════════════════════════════ -->
+
+<!-- Col 1: POST /v1/customers -->
+<div class="step" style="left:211px; top:193px;">POST<br>/v1/customers</div>
+<div class="step" style="left:211px; top:582px;">Creates<br>customer</div>
+
+<!-- Col 2: 201 { id: customer_uuid } -->
+<div class="step" style="left:351px; top:193px;">201 { id:<br>customer_<br>uuid }</div>
+<div class="step" style="left:351px; top:582px;">Returns<br>customer id</div>
+
+<!-- Col 3: POST /v1/checkout/sessions (customer_id) -->
+<div class="step" style="left:491px; top:193px;">POST /v1/<br>checkout/<br>sessions<br>(customer_id)</div>
+<div class="step" style="left:491px; top:582px;">Creates<br>checkout<br>session</div>
+
+<!-- Col 4: 200 { checkout_session } -->
+<div class="step" style="left:631px; top:193px;">200 {<br>checkout_<br>session }</div>
+<div class="step" style="left:631px; top:582px;">Returns<br>session<br>token</div>
+
+<!-- Col 5: POST /v1/payments (initial charge) -->
+<div class="step" style="left:771px; top:193px;">POST /v1/<br>payments<br>(initial<br>charge)</div>
+<div class="step" style="left:771px; top:582px;">Processes<br>initial<br>payment</div>
+
+<!-- Col 6: 200 { SUCCEEDED, vaulted_token } -->
+<div class="step" style="left:911px; top:193px;">200 {<br>SUCCEEDED,<br>vaulted_<br>token }</div>
+<div class="step" style="left:911px; top:582px;">Returns<br>status +<br>vaulted_<br>token</div>
+
+<!-- Col 7: Store vaulted_token (self-action — no Lane1 box) -->
+<div class="step self" style="left:1051px; top:193px;">Store<br>vaulted_<br>token for<br>recurring</div>
+
+<!-- Col 8: Loop — POST /v1/checkout/sessions -->
+<div class="step" style="left:1191px; top:193px;">POST<br>/v1/checkout<br>/sessions</div>
+<div class="step" style="left:1191px; top:582px;">Creates<br>new<br>session</div>
+
+<!-- Col 9: Loop — POST /v1/payments (vaulted_token) -->
+<div class="step" style="left:1331px; top:193px;">POST /v1/<br>payments<br>(vaulted_<br>token)</div>
+<div class="step" style="left:1331px; top:582px;">Charges with<br>vaulted_<br>token</div>
+
+</div><!-- /diagram -->
+</div><!-- /scroll-wrapper -->
+</body>
+</html>

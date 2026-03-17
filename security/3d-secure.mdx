@@ -1,0 +1,126 @@
+---
+title: "3D Secure"
+description: "Authenticate cardholders and reduce fraud with 3D Secure (3DS) for card-not-present transactions."
+---
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/three-ds-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/three-ds-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## Overview
+
+3D Secure (3DS) is a card network authentication protocol that adds an additional verification step during online card payments. It protects merchants from fraud-related chargebacks through **liability shift** -- when a 3DS-authenticated transaction results in a dispute, the liability shifts from the merchant to the card issuer.
+
+Yuno supports both 3DS 1.0 and 3DS 2.x, with automatic version selection based on issuer capabilities.
+
+## 3DS Versions
+
+| Version | Experience | Authentication | Status |
+|---------|-----------|----------------|--------|
+| **3DS 1.0** | Full-page redirect to issuer | Password-based | Legacy (being deprecated) |
+| **3DS 2.0** | In-app/in-browser challenge | OTP, biometric, app-based | Current standard |
+| **3DS 2.1** | Enhanced risk-based auth | Frictionless flow supported | Current standard |
+| **3DS 2.2** | Decoupled authentication | Out-of-band auth supported | Latest |
+
+<Info>
+  3DS 2.x introduces **frictionless authentication**, where low-risk transactions are approved without any customer interaction. The issuer evaluates risk signals and may approve the transaction silently, providing the best customer experience while maintaining security.
+</Info>
+
+## ECI Indicators
+
+The Electronic Commerce Indicator (ECI) returned after 3DS authentication indicates the level of authentication achieved:
+
+| ECI (Visa) | ECI (MC) | Meaning | Liability Shift |
+|-----------|----------|---------|-----------------|
+| 05 | 02 | Fully authenticated | Yes |
+| 06 | 01 | Authentication attempted | Yes (partial) |
+| 07 | 00 | Not authenticated | No |
+
+<Warning>
+  An ECI of 07 (Visa) or 00 (Mastercard) means authentication failed or was not performed. These transactions do NOT receive liability shift and carry the same chargeback risk as non-3DS transactions.
+</Warning>
+
+## Integration
+
+### With Checkout SDK
+
+When using Yuno's Checkout SDK, 3DS is handled automatically. The SDK manages the authentication flow, including rendering challenges when required.
+
+```javascript
+const checkout = yuno.checkout({
+  countryCode: "BR",
+  currency: "BRL",
+  amount: "500.00",
+  checkoutSession: "session_abc123",
+  // 3DS is handled automatically by the SDK
+});
+```
+
+### With Direct API
+
+For Direct API integrations, include the `three_d_secure` object in your payment request:
+
+```json
+POST /v1/payments
+{
+  "amount": { "value": 500.00, "currency": "BRL" },
+  "country": "BR",
+  "payment_method": {
+    "type": "CARD",
+    "token": "tok_card_abc123"
+  },
+  "three_d_secure": {
+    "enabled": true,
+    "version": "2.2"
+  }
+}
+```
+
+If a challenge is required, the response includes a redirect URL:
+
+```json
+{
+  "id": "pay_3ds_xyz",
+  "status": "PENDING_3DS",
+  "three_d_secure": {
+    "status": "CHALLENGE_REQUIRED",
+    "redirect_url": "https://3ds.y.uno/challenge/pay_3ds_xyz",
+    "version": "2.2"
+  }
+}
+```
+
+## 3DS Flow Types
+
+| Flow | Description | Customer Action |
+|------|-------------|-----------------|
+| **Frictionless** | Issuer approves silently based on risk analysis | None -- seamless experience |
+| **Challenge** | Issuer requires customer verification | OTP, biometric, or app confirmation |
+| **Fallback** | 3DS 2.x unavailable, falls back to 1.0 | Full-page redirect for password entry |
+
+## When to Use 3DS
+
+| Scenario | Recommendation |
+|----------|---------------|
+| High-value transactions | Always enable 3DS |
+| First-time customers | Strongly recommended |
+| Recurring payments (initial) | Enable for enrollment, skip for subsequent |
+| Low-risk repeat customers | Consider SCA exemptions |
+| Regulatory requirement (PSD2/SCA) | Mandatory in applicable regions |
+
+<Note>
+  In regions subject to Strong Customer Authentication (SCA) regulations, such as the European Economic Area, 3DS is mandatory for most card-not-present transactions. See [SCA Exemptions](/security/sca-exemptions) for eligible exemption categories.
+</Note>
+
+## Best Practices
+
+- **Enable 3DS 2.x by default**: It provides better UX than 1.0 with frictionless flows.
+- **Send rich data**: Provide browser info, device data, and billing address to increase frictionless approval rates.
+- **Handle challenges gracefully**: Ensure your UI accommodates the challenge iframe/redirect without breaking the checkout flow.
+- **Monitor authentication rates**: Track frictionless vs. challenge ratios in the Dashboard to optimize data quality.

@@ -1,0 +1,420 @@
+---
+title: "Vue Components"
+description: "Integrate Yuno checkout in Vue 3 applications with composables and components"
+---
+
+
+## Overview
+
+The `@yuno-payments/vue` package provides Vue 3 components and composables for embedding Yuno checkout in your application. The plugin manages SDK initialization and provides reactive state for payment flows.
+
+<Note>
+Vue components require Vue 3.3+ with Composition API support. Vue 2 is not supported.
+</Note>
+
+## Prerequisites
+
+- Vue 3.3+ application
+- Yuno API keys ([Authentication](/getting-started/authentication))
+- At least one payment method enabled in your [Dashboard](/platform/dashboard/connections)
+
+## Installation
+
+<CodeGroup>
+
+```bash npm
+npm install @yuno-payments/vue
+```
+
+```bash yarn
+yarn add @yuno-payments/vue
+```
+
+```bash pnpm
+pnpm add @yuno-payments/vue
+```
+
+</CodeGroup>
+
+## Plugin Setup
+
+Register the Yuno plugin in your application entry point:
+
+```typescript
+// main.ts
+import { createApp } from 'vue';
+import { YunoPlugin } from '@yuno-payments/vue';
+import App from './App.vue';
+
+const app = createApp(App);
+
+app.use(YunoPlugin, {
+  publicApiKey: 'your-public-api-key',
+  country: 'CO',
+  language: 'es',
+  environment: 'sandbox', // 'sandbox' | 'production'
+});
+
+app.mount('#app');
+```
+
+### Plugin Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `publicApiKey` | `string` | Yes | Your Yuno public API key |
+| `country` | `string` | Yes | ISO 3166-1 alpha-2 country code |
+| `language` | `'en' \| 'es' \| 'pt'` | No | UI language (auto-detected if omitted) |
+| `environment` | `'sandbox' \| 'production'` | No | Defaults to `'production'` |
+| `theme` | `YunoTheme` | No | Theme configuration object |
+
+## YunoCheckout Component
+
+Renders the full checkout UI with all available payment methods.
+
+```vue
+<template>
+  <YunoCheckout
+    v-model:status="paymentStatus"
+    :checkout-session="sessionId"
+    :country="'CO'"
+    :language="'es'"
+    @payment-complete="handleComplete"
+    @payment-processing="handleProcessing"
+    @error="handleError"
+  />
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { YunoCheckout } from '@yuno-payments/vue';
+
+const sessionId = ref('session_abc123');
+const paymentStatus = ref('');
+
+function handleComplete(data: { payment_id: string; status: string }) {
+  console.log('Payment completed:', data.payment_id);
+  window.location.href = `/confirmation?id=${data.payment_id}`;
+}
+
+function handleProcessing() {
+  console.log('Payment processing...');
+}
+
+function handleError(error: { code: string; message: string }) {
+  console.error('Payment error:', error.code, error.message);
+}
+</script>
+```
+
+### YunoCheckout Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `checkoutSession` | `string` | Yes | Checkout session ID from server-side creation |
+| `country` | `string` | Yes | ISO 3166-1 alpha-2 country code |
+| `language` | `'en' \| 'es' \| 'pt'` | No | Overrides plugin language setting |
+| `layout` | `LayoutOptions` | No | Layout direction and display settings |
+
+### YunoCheckout Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `payment-complete` | `PaymentResult` | Emitted when payment succeeds or is pending |
+| `payment-processing` | None | Emitted when async processing begins |
+| `error` | `YunoError` | Emitted on payment failure |
+| `update:status` | `string` | Two-way binding for payment status |
+
+<Warning>
+Always verify the final payment status server-side via webhooks or the GET payment API. Client-side events should not be the sole source of truth.
+</Warning>
+
+## YunoPaymentForm Component
+
+Renders a card-only payment form for custom checkout flows.
+
+```vue
+<template>
+  <YunoPaymentForm
+    :checkout-session="sessionId"
+    payment-method-type="CARD"
+    @ready="onReady"
+    @error="onError"
+  />
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { YunoPaymentForm } from '@yuno-payments/vue';
+
+const sessionId = ref('session_abc123');
+
+function onReady() {
+  console.log('Payment form rendered');
+}
+
+function onError(error: { code: string; message: string }) {
+  console.error(error);
+}
+</script>
+```
+
+## Composables
+
+### useYunoPayment
+
+Provides imperative control over the payment flow with reactive state.
+
+```vue
+<template>
+  <div>
+    <YunoPaymentForm
+      :checkout-session="sessionId"
+      payment-method-type="CARD"
+    />
+    <button @click="handleSubmit" :disabled="isSubmitting">
+      {{ isSubmitting ? 'Processing...' : 'Pay Now' }}
+    </button>
+    <p v-if="error" class="error">{{ error.message }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { YunoPaymentForm, useYunoPayment } from '@yuno-payments/vue';
+
+const sessionId = ref('session_abc123');
+
+const { submit, reset, getPaymentStatus, isSubmitting, error } =
+  useYunoPayment();
+
+async function handleSubmit() {
+  const result = await submit();
+  if (result.status === 'APPROVED') {
+    window.location.href = '/success';
+  }
+}
+</script>
+```
+
+### useYunoPayment Return Values
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `submit` | `() => Promise<PaymentResult>` | Submits the current payment form |
+| `reset` | `() => void` | Resets the form to its initial state |
+| `getPaymentStatus` | `() => Promise<PaymentStatus>` | Queries current payment status |
+| `isSubmitting` | `Ref<boolean>` | Reactive ref, `true` during submission |
+| `error` | `Ref<YunoError \| null>` | Reactive ref with most recent error |
+
+## Slots
+
+Components expose slots for customizing sections of the checkout UI:
+
+```vue
+<template>
+  <YunoCheckout
+    :checkout-session="sessionId"
+    :country="'CO'"
+    @payment-complete="handleComplete"
+  >
+    <template #header>
+      <div class="custom-header">
+        <img src="/logo.svg" alt="Store Logo" />
+        <h2>Complete Your Purchase</h2>
+      </div>
+    </template>
+
+    <template #loading>
+      <div class="custom-loader">
+        <span class="spinner" />
+        <p>Preparing your checkout...</p>
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="custom-footer">
+        <p>Secured by Yuno</p>
+        <img src="/pci-badge.svg" alt="PCI Compliant" />
+      </div>
+    </template>
+  </YunoCheckout>
+</template>
+```
+
+### Available Slots
+
+| Slot | Description |
+|------|-------------|
+| `#header` | Content rendered above the payment form |
+| `#footer` | Content rendered below the payment form |
+| `#loading` | Custom loading indicator while SDK initializes |
+
+## Theming
+
+Apply themes through the plugin options or override with CSS variables:
+
+```typescript
+app.use(YunoPlugin, {
+  publicApiKey: 'your-public-api-key',
+  country: 'CO',
+  theme: {
+    primary: '#0066FF',
+    secondary: '#1A1A2E',
+    background: '#FFFFFF',
+    text: '#333333',
+    borderRadius: '8px',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    mode: 'light',
+  },
+});
+```
+
+Override with CSS variables:
+
+```css
+:root {
+  --yuno-primary: #0066FF;
+  --yuno-border-radius: 8px;
+  --yuno-font-family: 'Inter', system-ui, sans-serif;
+}
+```
+
+## Nuxt.js Integration
+
+Create a Nuxt plugin to register the Yuno plugin on the client side only:
+
+```typescript
+// plugins/yuno.client.ts
+import { YunoPlugin } from '@yuno-payments/vue';
+
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.use(YunoPlugin, {
+    publicApiKey: useRuntimeConfig().public.yunoPublicKey,
+    country: 'CO',
+    language: 'es',
+  });
+});
+```
+
+```typescript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      yunoPublicKey: process.env.YUNO_PUBLIC_KEY,
+    },
+  },
+});
+```
+
+<Warning>
+The `.client.ts` suffix ensures the plugin runs only in the browser. Yuno SDK components require browser APIs and will fail during server-side rendering.
+</Warning>
+
+## Complete Example
+
+A full checkout page in Vue with session management:
+
+```vue
+<template>
+  <div class="checkout-page">
+    <h1>Checkout</h1>
+
+    <div v-if="isLoading" class="loading">Preparing checkout...</div>
+    <div v-else-if="sessionError" class="error">
+      Failed to create session: {{ sessionError.message }}
+    </div>
+
+    <YunoCheckout
+      v-else-if="session"
+      :checkout-session="session.checkout_session"
+      :country="'CO'"
+      :language="'es'"
+      @payment-complete="onPaymentComplete"
+      @error="onPaymentError"
+    >
+      <template #header>
+        <div class="order-summary">
+          <h2>Order #{{ orderId }}</h2>
+          <p class="total">Total: ${{ amount }} USD</p>
+        </div>
+      </template>
+    </YunoCheckout>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { YunoCheckout } from '@yuno-payments/vue';
+
+const props = defineProps<{
+  orderId: string;
+  amount: number;
+}>();
+
+const session = ref(null);
+const isLoading = ref(true);
+const sessionError = ref(null);
+
+onMounted(async () => {
+  try {
+    const response = await fetch('/api/checkout/sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: { currency: 'USD', value: props.amount },
+        country: 'CO',
+        merchant_order_id: props.orderId,
+        workflow: 'SDK_CHECKOUT',
+      }),
+    });
+    session.value = await response.json();
+  } catch (err) {
+    sessionError.value = err;
+  } finally {
+    isLoading.value = false;
+  }
+});
+
+function onPaymentComplete(data) {
+  window.location.href = `/confirmation?id=${data.payment_id}`;
+}
+
+function onPaymentError(error) {
+  console.error('Payment failed:', error.code);
+}
+</script>
+```
+
+## Testing with Vue Test Utils
+
+```typescript
+import { mount } from '@vue/test-utils';
+import { YunoCheckout } from '@yuno-payments/vue';
+
+// Mock the component for unit tests
+vi.mock('@yuno-payments/vue', async () => {
+  const actual = await vi.importActual('@yuno-payments/vue');
+  return {
+    ...actual,
+    YunoCheckout: {
+      template: '<div data-testid="yuno-checkout"><slot name="header" /></div>',
+      props: ['checkoutSession', 'country'],
+    },
+  };
+});
+
+describe('CheckoutPage', () => {
+  it('renders checkout with session', () => {
+    const wrapper = mount(CheckoutPage, {
+      props: { orderId: 'order-1', amount: 50 },
+    });
+    expect(wrapper.find('[data-testid="yuno-checkout"]').exists()).toBe(true);
+  });
+});
+```
+
+<Note>
+Mock Yuno components in unit tests. Use end-to-end tests (e.g., Cypress, Playwright) for full integration testing against the sandbox environment.
+</Note>

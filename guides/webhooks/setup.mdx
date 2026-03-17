@@ -1,0 +1,129 @@
+---
+title: "Webhook Setup"
+description: "Register webhook endpoints to receive real-time payment event notifications"
+---
+
+## Overview
+
+Webhooks notify your server in real time when payment events occur (e.g., payment approved, refund completed). They are essential for reliable payment processing because API responses alone may not reflect the final transaction state.
+
+<Warning>
+Never rely solely on synchronous API responses for payment fulfillment. Always use webhooks as the authoritative source for final payment status.
+</Warning>
+
+## Register a Webhook Endpoint
+
+<Steps>
+  <Step title="Prepare your endpoint">
+    Create an HTTPS endpoint on your server that accepts POST requests and returns a `200` status code:
+
+    ```javascript
+    // Express.js example
+    app.post('/webhooks/yuno', (req, res) => {
+      const event = req.body;
+      console.log('Received event:', event.type);
+
+      // Process the event
+      switch (event.type) {
+        case 'payment.succeeded':
+          handlePaymentSuccess(event.data);
+          break;
+        case 'payment.failed':
+          handlePaymentFailure(event.data);
+          break;
+        case 'refund.succeeded':
+          handleRefund(event.data);
+          break;
+      }
+
+      res.status(200).send('OK');
+    });
+    ```
+  </Step>
+
+  <Step title="Register in the Dashboard">
+    1. Navigate to **Dashboard > Settings > Webhooks**
+    2. Click **Add Endpoint**
+    3. Enter your HTTPS URL (e.g., `https://api.yoursite.com/webhooks/yuno`)
+    4. Select the events you want to receive
+    5. Save the configuration
+    6. Copy the **signing secret** for signature verification
+  </Step>
+
+  <Step title="Register via API (alternative)">
+    ```bash
+    curl -X POST https://api-sandbox.y.uno/v1/webhooks \
+      -H "public-api-key: YOUR_PUBLIC_KEY" \
+      -H "private-secret-key: YOUR_PRIVATE_KEY" \
+      -H "account-code: YOUR_ACCOUNT_CODE" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "url": "https://api.yoursite.com/webhooks/yuno",
+        "events": ["payment.succeeded", "payment.failed", "refund.succeeded"]
+      }'
+    ```
+  </Step>
+</Steps>
+
+## Webhook Events
+
+| Event | Description |
+|-------|-------------|
+| `payment.created` | Payment request submitted |
+| `payment.succeeded` | Payment approved and captured |
+| `payment.failed` | Payment declined or errored |
+| `payment.pending` | Payment awaiting async confirmation |
+| `payment.cancelled` | Payment voided/cancelled |
+| `refund.succeeded` | Refund processed |
+| `refund.failed` | Refund could not be processed |
+| `enrollment.succeeded` | Card enrolled successfully |
+
+## Webhook Payload Structure
+
+```json
+{
+  "id": "evt_abc123",
+  "type": "payment.succeeded",
+  "created_at": "2026-02-28T10:00:00Z",
+  "data": {
+    "id": "pay_xyz789",
+    "status": "SUCCEEDED",
+    "amount": { "currency": "USD", "value": 100.00 },
+    "payment_method": { "type": "CARD", "brand": "VISA" },
+    "merchant_order_id": "order-123"
+  }
+}
+```
+
+## URL Requirements
+
+- Must use HTTPS (HTTP is not accepted)
+- Must be publicly accessible (not `localhost`)
+- Must respond with `200` status within 30 seconds
+- Must accept `POST` requests with `Content-Type: application/json`
+
+## Retry Policy
+
+If your endpoint fails to respond with `200`, Yuno retries with exponential backoff:
+
+| Attempt | Delay |
+|---------|-------|
+| 1st retry | 1 minute |
+| 2nd retry | 5 minutes |
+| 3rd retry | 30 minutes |
+| 4th retry | 2 hours |
+| 5th retry | 24 hours |
+
+After 5 failed retries, the webhook is marked as failed. Check **Dashboard > Webhooks > Failed Events** to review and manually retry.
+
+<Note>
+In sandbox, some webhook event types may return 404 errors. This is a known limitation. Test your webhook handler with the events that are available in sandbox and verify full coverage when switching to production.
+</Note>
+
+## Best Practices
+
+- Always [verify webhook signatures](/guides/webhooks/verify-signatures) to prevent spoofing
+- Process webhooks idempotently (handle duplicate deliveries gracefully)
+- Respond with `200` immediately, then process the event asynchronously
+- Log all received webhook events for debugging and reconciliation
+- Use a webhook testing tool (like ngrok) for local development

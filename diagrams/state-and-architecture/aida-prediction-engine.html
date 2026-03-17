@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Aida ML Prediction Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  .node {
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a0a0a;
+    text-align: center;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+  }
+
+  .node.blue   { border-color: #2563eb; background: #ffffff; }
+  .node.red    { border-color: #dc2626; background: #fff1f2; }
+  .node.orange { border-color: #f97316; background: #fff7ed; }
+  .node.green  { border-color: #16a34a; background: #f0fdf4; }
+  .node.indigo { border-color: #6366f1; background: #eef2ff; }
+  .node.amber  { border-color: #b45309; background: #fef3c7; }
+
+  .badge {
+    position: absolute;
+    background: #eef2ff;
+    border: 1px solid #6366f1;
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #4338ca;
+    font-family: 'Inter', sans-serif;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.08)"/>
+    </filter>
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#94a3b8"/>
+    </marker>
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background card -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.6"/>
+
+  <!-- Dashed grid — vertical -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="190"  y1="48" x2="190"  y2="826"/>
+    <line x1="340"  y1="48" x2="340"  y2="826"/>
+    <line x1="490"  y1="48" x2="490"  y2="826"/>
+    <line x1="640"  y1="48" x2="640"  y2="826"/>
+    <line x1="790"  y1="48" x2="790"  y2="826"/>
+    <line x1="940"  y1="48" x2="940"  y2="826"/>
+    <line x1="1090" y1="48" x2="1090" y2="826"/>
+    <line x1="1240" y1="48" x2="1240" y2="826"/>
+    <line x1="1390" y1="48" x2="1390" y2="826"/>
+  </g>
+
+  <!-- Dashed grid — horizontal -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="40" y1="135" x2="1500" y2="135"/>
+    <line x1="40" y1="285" x2="1500" y2="285"/>
+    <line x1="40" y1="435" x2="1500" y2="435"/>
+    <line x1="40" y1="585" x2="1500" y2="585"/>
+    <line x1="40" y1="735" x2="1500" y2="735"/>
+  </g>
+
+  <!-- ── CONNECTOR PATHS ── -->
+
+  <!-- p0: Transaction Request → Feature Extraction -->
+  <path id="p0" d="M 770,136 L 770,230"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p1: Feature Extraction → ML Prediction -->
+  <path id="p1" d="M 770,266 L 770,430"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p2: ML Prediction → Provider Scoring -->
+  <path id="p2" d="M 730,466 C 700,520 520,520 500,580"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p3: ML Prediction → Business Rules -->
+  <path id="p3" d="M 810,466 C 840,520 1020,520 1040,580"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p4: Provider Scoring → Optimal Routing -->
+  <path id="p4" d="M 500,616 C 500,670 730,670 770,720"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p5: Business Rules → Optimal Routing -->
+  <path id="p5" d="M 1040,616 C 1040,670 810,670 770,720"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Badge connector lines (subtle, thinner) -->
+  <g stroke="#c4b5fd" stroke-width="1" stroke-dasharray="3 3" fill="none">
+    <line x1="470" y1="210" x2="670" y2="240"/>
+    <line x1="570" y1="180" x2="680" y2="240"/>
+    <line x1="680" y1="175" x2="720" y2="230"/>
+    <line x1="860" y1="175" x2="820" y2="230"/>
+    <line x1="970" y1="180" x2="860" y2="240"/>
+    <line x1="1070" y1="210" x2="870" y2="240"/>
+  </g>
+
+  <!-- ── ANIMATED SPARKS ── -->
+  <g clip-path="url(#diagram-clip)">
+    <!-- Transaction → Feature (blue) -->
+    <circle r="3.5" fill="#2563eb" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.2s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p0"/>
+      </animateMotion>
+    </circle>
+
+    <!-- Feature → ML (indigo) -->
+    <circle r="3.5" fill="#6366f1" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.6s" begin="0.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p1"/>
+      </animateMotion>
+    </circle>
+
+    <!-- ML → Provider Scoring (amber) -->
+    <circle r="3.5" fill="#b45309" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="1.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p2"/>
+      </animateMotion>
+    </circle>
+
+    <!-- ML → Business Rules (amber) -->
+    <circle r="3.5" fill="#b45309" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="1.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- Provider Scoring → Optimal Routing (green) -->
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="2.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p4"/>
+      </animateMotion>
+    </circle>
+
+    <!-- Business Rules → Optimal Routing (green) -->
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="2.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p5"/>
+      </animateMotion>
+    </circle>
+  </g>
+</svg>
+
+<!-- ── HTML NODES ── -->
+
+<!-- Transaction Request: cx=770, top=100 -->
+<div class="node blue" style="left:770px; top:100px;">Transaction Request</div>
+
+<!-- Feature Extraction: cx=770, top=230 -->
+<div class="node indigo" style="left:770px; top:230px;">Feature Extraction</div>
+
+<!-- Input badges around Feature Extraction -->
+<div class="badge" style="left:470px; top:195px;">BIN</div>
+<div class="badge" style="left:570px; top:168px;">Amount</div>
+<div class="badge" style="left:680px; top:162px;">Country</div>
+<div class="badge" style="left:860px; top:162px;">Payment Method</div>
+<div class="badge" style="left:970px; top:168px;">Time</div>
+<div class="badge" style="left:1070px; top:195px;">Customer History</div>
+
+<!-- ML Prediction: cx=770, top=430 -->
+<div class="node indigo" style="left:770px; top:430px;">ML Prediction</div>
+
+<!-- Provider Scoring: cx=500, top=580 -->
+<div class="node amber" style="left:500px; top:580px;">Provider Scoring</div>
+
+<!-- Business Rules: cx=1040, top=580 -->
+<div class="node amber" style="left:1040px; top:580px;">Business Rules</div>
+
+<!-- Optimal Routing: cx=770, top=720 -->
+<div class="node green" style="left:770px; top:720px;">Optimal Routing</div>
+
+</div>
+</div>
+</body>
+</html>

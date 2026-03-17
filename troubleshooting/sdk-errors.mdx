@@ -1,0 +1,152 @@
+---
+title: "SDK Errors"
+description: "Common SDK initialization and runtime errors with diagnostic steps and solutions"
+---
+
+## Overview
+
+This guide covers common errors encountered when integrating the Yuno Web SDK (`@yuno-payments/sdk-web`), including initialization failures, mounting issues, and runtime errors.
+
+## Initialization Errors
+
+<Accordion title="SDK_INIT_FAILED: Invalid public API key">
+**Cause:** The `publicApiKey` passed to `Yuno.initialize()` is invalid, empty, or belongs to a different environment.
+
+**Solution:**
+1. Verify the key in **Dashboard > Settings > API Keys**
+2. Ensure you are using the correct environment key (sandbox vs. production)
+3. Check for leading/trailing whitespace in the key string
+
+```javascript
+// Correct — pass public API key as a string, not an object
+const yuno = Yuno.initialize('your-valid-public-key');
+```
+</Accordion>
+
+<Accordion title="SDK_INIT_FAILED: Invalid checkout session">
+**Cause:** The `checkoutSession` ID is expired, invalid, or was created with different API keys.
+
+**Solution:**
+1. Create a fresh checkout session server-side before calling `startCheckout()`
+2. Ensure the session was created with the same API keys
+3. Checkout sessions expire after 24 hours; generate a new one if needed
+
+<Note>
+An invalid session ID may cause a React DOM error (`NotFoundError: Failed to execute 'removeChild' on 'Node'`) rather than a user-friendly message. This is a known SDK behavior.
+</Note>
+</Accordion>
+
+<Accordion title="publicApiKey=[object Object] is not valid">
+**Cause:** An object was passed to `Yuno.initialize()` instead of a string.
+
+**Solution:** Pass the public API key as a string argument, not inside a configuration object:
+```javascript
+// Wrong — causes "[object Object] is not valid" error
+const yuno = Yuno.initialize({ publicApiKey: 'key' });
+
+// Correct
+const yuno = Yuno.initialize('your-public-api-key');
+```
+</Accordion>
+
+## Mounting Errors
+
+<Accordion title="MOUNT_ERROR: Element not found">
+**Cause:** The `elementSelector` does not match any element in the DOM at the time of mounting.
+
+**Solution:**
+1. Verify the selector matches an existing element: `document.querySelector('#yuno-checkout')`
+2. Ensure the element exists in the DOM before calling `mount` (not inside a conditional render that has not rendered yet)
+3. For React/Vue/Angular, mount inside `useEffect`, `onMounted`, or `ngAfterViewInit`
+
+```javascript
+// React example
+useEffect(() => {
+  yuno.startCheckout({
+    checkoutSession: sessionId,
+    countryCode: 'BR',
+    language: 'en',
+    elementSelector: '#yuno-checkout',
+    yunoCreatePayment: async (oneTimeToken) => {
+      // Create payment server-side
+    },
+  });
+  yuno.mountCheckout();
+}, [yuno]);
+```
+</Accordion>
+
+<Accordion title="MOUNT_ERROR: Already mounted">
+**Cause:** Attempting to mount the checkout multiple times without unmounting first.
+
+**Solution:** Call `yuno.unmount()` before re-mounting, or guard against duplicate mounts:
+```javascript
+yuno.unmount();
+yuno.startCheckout({ /* config */ });
+yuno.mountCheckout();
+```
+</Accordion>
+
+## Runtime Errors
+
+<Accordion title="PAYMENT_ERROR: Token generation failed">
+**Cause:** Secure Fields could not generate a one-time token due to invalid card data or network issues.
+
+**Solution:**
+1. Ensure all required Secure Fields are mounted and filled (card number, expiry, CVV)
+2. Validate field states via the `onFieldChange` callback before calling `generateToken()`
+3. Check browser console for network errors
+</Accordion>
+
+<Accordion title="CORS errors in browser console">
+**Cause:** Cross-Origin Resource Sharing policy blocking SDK requests.
+
+**Solution:**
+1. Verify your domain is registered in **Dashboard > Settings > Allowed Origins**
+2. Add both `http://localhost:PORT` (development) and your production domain
+3. Do not use `file://` protocol; serve your page from an HTTP server
+
+<Warning>
+CORS errors are often misdiagnosed as API errors. Always check the browser console Network tab for the actual failing request.
+</Warning>
+</Accordion>
+
+<Accordion title="3DS challenge not displaying">
+**Cause:** `continuePayment()` not called after payment creation, or popup blockers interfering.
+
+**Solution:**
+1. Always call `yuno.continuePayment()` after your server creates the payment
+2. Ensure the call happens in response to a user action (not in a background timer)
+3. Check for popup/iframe blockers in the browser
+4. Verify the payment response contains `status: 'REQUIRES_ACTION'`
+</Accordion>
+
+## Version-Specific Issues
+
+| SDK Version | Known Issue | Workaround |
+|-------------|------------|------------|
+| All versions | `Yuno.initialize()` requires string argument | Pass public API key as string: `Yuno.initialize('key')` |
+| All versions | `mountCheckout()` required after `startCheckout()` | Always call both methods in sequence |
+
+## Debugging Tips
+
+<Steps>
+  <Step title="Enable verbose logging">
+    ```javascript
+    const yuno = Yuno.initialize('your-public-api-key');
+    // Check browser console for verbose SDK logging
+    ```
+  </Step>
+  <Step title="Check the browser console">
+    Open DevTools (F12) > Console tab for SDK error messages and warnings.
+  </Step>
+  <Step title="Inspect network requests">
+    Open DevTools > Network tab, filter by "y.uno" to see all SDK API calls and their responses.
+  </Step>
+  <Step title="Verify SDK version">
+    ```javascript
+    console.log(Yuno.version);
+    ```
+    Compare with the latest version on [npm](https://www.npmjs.com/package/@yuno-payments/sdk-web).
+  </Step>
+</Steps>

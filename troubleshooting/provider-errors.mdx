@@ -1,0 +1,107 @@
+---
+title: "Provider Errors"
+description: "Understand provider decline codes, soft vs hard declines, and recommended actions"
+---
+
+## Overview
+
+When a payment is declined, the response includes provider-specific error information. Understanding whether a decline is "soft" (temporary) or "hard" (permanent) determines whether you should retry the transaction or prompt the customer for alternative action.
+
+## Soft vs Hard Declines
+
+| Type | Description | Retry? | Examples |
+|------|-------------|--------|----------|
+| **Soft Decline** | Temporary issue that may resolve | Yes (with backoff) | Insufficient funds, issuer timeout, network error |
+| **Hard Decline** | Permanent issue, will not resolve on retry | No | Invalid card number, stolen card, closed account |
+
+<Note>
+Retrying hard declines wastes processing resources and can trigger fraud detection systems. Always classify the decline type before deciding to retry.
+</Note>
+
+## Common Provider Decline Codes
+
+### Card Declines
+
+| Code | Description | Type | Recommended Action |
+|------|-------------|------|-------------------|
+| `01` | Refer to issuer | Soft | Ask customer to contact their bank |
+| `02` | Refer to issuer (special) | Soft | Ask customer to contact their bank |
+| `04` | Pick up card | Hard | Do not retry; card reported lost/stolen |
+| `05` | Do not honor | Soft | Retry once; if fails, ask for alternate method |
+| `12` | Invalid transaction | Hard | Verify transaction parameters |
+| `13` | Invalid amount | Hard | Check amount format and limits |
+| `14` | Invalid card number | Hard | Ask customer to re-enter card details |
+| `41` | Lost card | Hard | Do not retry |
+| `43` | Stolen card | Hard | Do not retry |
+| `51` | Insufficient funds | Soft | Inform customer; suggest lower amount or retry later |
+| `54` | Expired card | Hard | Ask customer for a valid card |
+| `55` | Incorrect PIN | Soft | Ask customer to re-enter PIN |
+| `57` | Transaction not permitted | Hard | Card type not allowed for this transaction |
+| `61` | Exceeds withdrawal limit | Soft | Suggest lower amount or retry next day |
+| `65` | Activity count limit exceeded | Soft | Retry later |
+
+### Network/Gateway Errors
+
+| Code | Description | Type | Recommended Action |
+|------|-------------|------|-------------------|
+| `91` | Issuer unavailable | Soft | Retry with exponential backoff |
+| `96` | System malfunction | Soft | Retry after delay |
+| `timeout` | No response from issuer | Soft | Retry; check with provider if persistent |
+| `gateway_error` | Gateway processing error | Soft | Retry; check provider status page |
+
+## MCC (Merchant Category Code) Restrictions
+
+Some declines relate to the Merchant Category Code (MCC) assigned to your account:
+
+| Scenario | Cause | Resolution |
+|----------|-------|------------|
+| "Transaction not permitted" for specific card types | MCC restriction by issuer | Contact Yuno support to verify MCC assignment |
+| High decline rates for certain countries | MCC flagged for risk in that region | Review with provider |
+| Recurring payment declines | MCC not enabled for recurring | Update MCC configuration |
+
+## Provider-Specific Error Mapping
+
+Yuno normalizes provider errors into standard codes. The raw provider response is available in the payment detail:
+
+```json
+{
+  "status": "DECLINED",
+  "provider": {
+    "name": "ProviderName",
+    "response_code": "51",
+    "response_message": "Insufficient funds",
+    "raw_response": { /* provider-specific fields */ }
+  }
+}
+```
+
+## Retry Strategy
+
+<Steps>
+  <Step title="Classify the decline">
+    Check if the provider code indicates a soft or hard decline using the tables above.
+  </Step>
+  <Step title="Soft decline: retry with backoff">
+    ```javascript
+    const softDeclineCodes = ['01', '02', '05', '51', '61', '65', '91', '96'];
+    if (softDeclineCodes.includes(providerCode)) {
+      // Retry after delay, max 3 attempts
+    }
+    ```
+  </Step>
+  <Step title="Hard decline: do not retry">
+    Prompt the customer to use a different payment method or correct their card details.
+  </Step>
+</Steps>
+
+<Warning>
+Network retry limits exist. Most card networks allow a maximum of 15 retry attempts within 30 days for the same card and merchant. Exceeding this limit can result in fines from the card network.
+</Warning>
+
+## Escalating Provider Issues
+
+If you encounter persistent provider errors not listed here, escalate to Yuno support with:
+
+- Payment ID and `x-request-id`
+- Provider name and raw response code
+- Timestamp and frequency of occurrence

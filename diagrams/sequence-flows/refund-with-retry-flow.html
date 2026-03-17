@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Refund with Retry Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  .lane-label {
+    position: absolute;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0a0a0a;
+    line-height: 1.43;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  .step {
+    position: absolute;
+    width: 104px;
+    height: 98px;
+    background: #ffffff;
+    border: 1px solid #3e4fe0;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #0a0a0a;
+    text-align: center;
+    line-height: 1.35;
+  }
+
+  /* Self-action boxes (Agent acting on itself) */
+  .step.self {
+    border-style: dashed;
+    background: #f8fafc;
+  }
+
+  .alt-block {
+    position: absolute;
+    border: 2px dashed rgba(100,116,139,0.55);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.15);
+    pointer-events: none;
+  }
+
+  .alt-badge {
+    position: absolute;
+    background: #475569;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 3px 3px 3px 0;
+    line-height: 1.6;
+    pointer-events: none;
+  }
+
+  .alt-section {
+    position: absolute;
+    font-size: 11px;
+    font-weight: 500;
+    color: #475569;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SVG: background, swim lane dividers, connectors, sparks
+
+     2 swim lanes (Agent / Yuno API):
+       Lane 0 (Agent)   : y=48  → y=437  cy=242  box top=193  bottom=291
+       Lane 1 (Yuno API): y=437 → y=826  cy=631  box top=582  bottom=680
+       Separator: y=437
+
+     10 columns, 128px spacing, starting at left=211:
+       Col1=211 Col2=339 Col3=467 Col4=595 Col5=723
+       Col6=851 Col7=979 Col8=1107 Col9=1235 Col10=1363
+       cx: 263  391  519  647  775  903  1031  1159  1287  1415
+
+     Alt block: cols 4–10  (x=590 → x=1471)
+       Section dividers: x=711 (Success|Transient)  x=1223 (Transient|Business)
+
+     Self-loops at Col6 and Col10 (Agent lane, no Lane1 box)
+═══════════════════════════════════════════════════════════════ -->
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.07)"/>
+    </filter>
+    <marker id="arr-dn" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#64748b"/>
+    </marker>
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background card ───────────────────────────────────────── -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.55"/>
+
+  <!-- ── Yuno API lane tint ─────────────────────────────────────── -->
+  <rect x="40" y="437" width="1460" height="389" fill="#fafafa" opacity="1"/>
+
+  <!-- ── Lane divider ──────────────────────────────────────────── -->
+  <line x1="40" y1="437" x2="1500" y2="437" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ── Left label panel ──────────────────────────────────────── -->
+  <line x1="181" y1="48" x2="181" y2="826" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="5 6"/>
+
+  <!-- ── Alt block internal section dividers ───────────────────── -->
+  <!-- Success | Transient: x=711 -->
+  <line x1="711" y1="63" x2="711" y2="820" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4" opacity="0.7"/>
+  <!-- Transient | Business: x=1223 -->
+  <line x1="1223" y1="63" x2="1223" y2="820" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4" opacity="0.7"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CONNECTOR PATHS
+  ════════════════════════════════════════════════════════════════ -->
+
+  <!-- Entry -->
+  <path id="h0" d="M 181,242 L 211,242"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v1: Col1  Lane0→Lane1  GET /v1/payments/{id} (solid down) -->
+  <path id="v1" d="M 263,291 L 263,582"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v2: Col2  Lane1→Lane0  200 SUCCEEDED (dashed up) -->
+  <path id="v2" d="M 391,582 L 391,291"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v3: Col3  Lane0→Lane1  POST refund (solid down) -->
+  <path id="v3" d="M 519,291 L 519,582"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v4: Col4  Lane1→Lane0  200 REFUNDED [Success] (dashed up) -->
+  <path id="v4" d="M 647,582 L 647,291"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v5: Col5  Lane1→Lane0  500 [Transient failure] (dashed up) -->
+  <path id="v5" d="M 775,582 L 775,291"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- sl6: Col6  self-loop in Lane0 (Agent waits) -->
+  <path id="sl6" d="M 930,291 C 970,320 990,370 970,405 C 952,428 918,425 903,410"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v7: Col7  Lane0→Lane1  POST refund (retry) (solid down) -->
+  <path id="v7" d="M 1031,291 L 1031,582"
+        stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v8: Col8  Lane1→Lane0  200 REFUNDED (retry) (dashed up) -->
+  <path id="v8" d="M 1159,582 L 1159,291"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- v9: Col9  Lane1→Lane0  400 { error } [Business error] (dashed up) -->
+  <path id="v9" d="M 1287,582 L 1287,291"
+        stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"
+        fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- sl10: Col10  self-loop in Lane0 (Agent surfaces error, loop to the left) -->
+  <path id="sl10" d="M 1390,291 C 1355,320 1338,370 1358,405 C 1376,428 1408,425 1415,410"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr-dn)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ANIMATED SPARKS
+  ════════════════════════════════════════════════════════════════ -->
+  <g clip-path="url(#diagram-clip)">
+
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="0.5s" begin="0s" repeatCount="indefinite" calcMode="linear"><mpath href="#h0"/></animateMotion>
+    </circle>
+    <!-- v1: GET payment (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="2s" begin="0.2s" repeatCount="indefinite" calcMode="linear"><mpath href="#v1"/></animateMotion>
+    </circle>
+    <!-- v2: 200 SUCCEEDED (orange, up) -->
+    <circle r="3" fill="#f97316" filter="url(#spark-glow)" opacity="0.8">
+      <animateMotion dur="2s" begin="0.8s" repeatCount="indefinite" calcMode="linear"><mpath href="#v2"/></animateMotion>
+    </circle>
+    <!-- v3: POST refund (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="2s" begin="1.4s" repeatCount="indefinite" calcMode="linear"><mpath href="#v3"/></animateMotion>
+    </circle>
+    <!-- v4: 200 REFUNDED success (green, up) -->
+    <circle r="3" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2s" begin="2s" repeatCount="indefinite" calcMode="linear"><mpath href="#v4"/></animateMotion>
+    </circle>
+    <!-- v5: 500 error (red, up) -->
+    <circle r="3" fill="#dc2626" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2s" begin="2.4s" repeatCount="indefinite" calcMode="linear"><mpath href="#v5"/></animateMotion>
+    </circle>
+    <!-- sl6: self-loop wait (slate) -->
+    <circle r="3" fill="#64748b" filter="url(#spark-glow)" opacity="0.75">
+      <animateMotion dur="1.6s" begin="3s" repeatCount="indefinite" calcMode="linear"><mpath href="#sl6"/></animateMotion>
+    </circle>
+    <!-- v7: POST retry (blue, down) -->
+    <circle r="3.5" fill="#3e4fe0" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="2s" begin="3.2s" repeatCount="indefinite" calcMode="linear"><mpath href="#v7"/></animateMotion>
+    </circle>
+    <!-- v8: 200 REFUNDED retry (green, up) -->
+    <circle r="3" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2s" begin="3.8s" repeatCount="indefinite" calcMode="linear"><mpath href="#v8"/></animateMotion>
+    </circle>
+    <!-- v9: 400 error (red, up) -->
+    <circle r="3" fill="#dc2626" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2s" begin="2.8s" repeatCount="indefinite" calcMode="linear"><mpath href="#v9"/></animateMotion>
+    </circle>
+    <!-- sl10: self-loop surface error (slate) -->
+    <circle r="3" fill="#64748b" filter="url(#spark-glow)" opacity="0.75">
+      <animateMotion dur="1.6s" begin="3.6s" repeatCount="indefinite" calcMode="linear"><mpath href="#sl10"/></animateMotion>
+    </circle>
+
+  </g>
+</svg>
+
+<!-- ── Alt block overlay ─────────────────────────────────────── -->
+<div class="alt-block" style="left:590px; top:57px; width:881px; height:762px;"></div>
+<div class="alt-badge" style="left:590px; top:57px;">alt</div>
+
+<!-- ── Alt section labels ────────────────────────────────────── -->
+<div class="alt-section" style="left:651px;  top:78px;">[Success]</div>
+<div class="alt-section" style="left:967px;  top:78px;">[Transient failure (500/503)]</div>
+<div class="alt-section" style="left:1347px; top:78px;">[Business error (400)]</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SWIM LANE LABELS
+═══════════════════════════════════════════════════════════════ -->
+<div class="lane-label" style="left:109px; top:228px;">Agent</div>
+<div class="lane-label" style="left:109px; top:617px;">Yuno<br>API</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STEP BOXES
+     Lane 0 top=193 · Lane 1 top=582
+     Col left: 211 339 467 595 723 851 979 1107 1235 1363
+═══════════════════════════════════════════════════════════════ -->
+
+<!-- Col 1: GET /v1/payments/{id} -->
+<div class="step" style="left:211px; top:193px;">GET<br>/v1/payments<br>/{id}</div>
+<div class="step" style="left:211px; top:582px;">Fetches<br>payment<br>status</div>
+
+<!-- Col 2: 200 { status: SUCCEEDED } -->
+<div class="step" style="left:339px; top:193px;">200 {<br>status:<br>SUCCEEDED }</div>
+<div class="step" style="left:339px; top:582px;">Returns<br>SUCCEEDED</div>
+
+<!-- Col 3: POST /v1/payments/{id}/refund -->
+<div class="step" style="left:467px; top:193px;">POST<br>/payments<br>/{id}/refund</div>
+<div class="step" style="left:467px; top:582px;">Processes<br>refund<br>request</div>
+
+<!-- Col 4: [Success] 200 REFUNDED -->
+<div class="step" style="left:595px; top:193px;">200 {<br>status:<br>REFUNDED }</div>
+<div class="step" style="left:595px; top:582px;">Returns<br>REFUNDED</div>
+
+<!-- Col 5: [Transient] 500 error -->
+<div class="step" style="left:723px; top:193px;">Receives<br>500 error</div>
+<div class="step" style="left:723px; top:582px;">Returns<br>500 error</div>
+
+<!-- Col 6: [Transient] Wait (exponential backoff) — self-action -->
+<div class="step self" style="left:851px; top:193px;">Wait<br>(exponential<br>backoff)</div>
+
+<!-- Col 7: [Transient] POST retry -->
+<div class="step" style="left:979px; top:193px;">POST<br>/payments<br>/{id}/refund<br>(retry)</div>
+<div class="step" style="left:979px; top:582px;">Retries<br>refund</div>
+
+<!-- Col 8: [Transient] 200 REFUNDED -->
+<div class="step" style="left:1107px; top:193px;">200 {<br>status:<br>REFUNDED }</div>
+<div class="step" style="left:1107px; top:582px;">Returns<br>REFUNDED</div>
+
+<!-- Col 9: [Business] 400 { error } -->
+<div class="step" style="left:1235px; top:193px;">Receives<br>400<br>{ error }</div>
+<div class="step" style="left:1235px; top:582px;">Returns<br>400<br>{ error }</div>
+
+<!-- Col 10: [Business] Do not retry — self-action -->
+<div class="step self" style="left:1363px; top:193px;">Do not retry<br>surface error</div>
+
+</div><!-- /diagram -->
+</div><!-- /scroll-wrapper -->
+</body>
+</html>

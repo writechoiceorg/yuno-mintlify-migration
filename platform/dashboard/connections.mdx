@@ -1,0 +1,86 @@
+---
+title: "Connections"
+description: "Configure payment providers and processing connections in the Yuno Dashboard"
+---
+
+## Overview
+
+Connections define which payment providers process your transactions. Each connection links a provider (e.g., Stripe, Adyen, Mercado Pago) to your Yuno account with the provider's API credentials.
+
+## Adding a Connection
+
+<Steps>
+  <Step title="Navigate to Connections">
+    Go to **Dashboard > Connections** and click **Add Connection**.
+  </Step>
+
+  <Step title="Select a provider">
+    Browse the provider catalog or search by name. Providers are grouped by region and supported payment methods.
+  </Step>
+
+  <Step title="Enter provider credentials">
+    Input the API keys or credentials required by the selected provider. Each provider has different credential requirements:
+
+    | Provider Type | Typical Credentials |
+    |--------------|-------------------|
+    | Card processors | API key, secret key, merchant ID |
+    | Local methods | API key, account ID |
+    | Bank transfers | API key, branch code |
+
+    <Warning>
+    Store provider credentials securely. Yuno encrypts credentials at rest, but ensure you are entering them in the correct environment (sandbox vs. production).
+    </Warning>
+  </Step>
+
+  <Step title="Configure payment methods">
+    Select which payment methods this connection supports. Available methods depend on the provider and country.
+  </Step>
+
+  <Step title="Set country availability">
+    Specify which countries this connection serves. A provider can be configured for one or multiple countries.
+  </Step>
+
+  <Step title="Activate the connection">
+    Toggle the connection to **Active**. Transactions will begin routing to this provider based on your [Routing Rules](/platform/dashboard/routing).
+  </Step>
+</Steps>
+
+## Managing Connections
+
+### Connection Status
+
+| Status | Description |
+|--------|-------------|
+| **Active** | Accepting transactions |
+| **Inactive** | Configured but not processing |
+| **Error** | Credential or configuration issue |
+
+### Edit a Connection
+
+Click on an existing connection to modify credentials, payment methods, or country availability. Changes take effect immediately.
+
+### Delete a Connection
+
+<Warning>
+Deleting a connection is permanent and cannot be undone. Ensure no active routing rules reference the connection before deletion. In-flight transactions will complete through the existing connection.
+</Warning>
+
+## Multiple Connections
+
+You can configure multiple connections for the same payment method and country. This enables:
+
+- **Failover:** Route to a backup provider if the primary is down
+- **Cost optimization:** Choose the lowest-cost provider per transaction
+- **A/B testing:** Compare provider performance
+
+Use [Routing Rules](/platform/dashboard/routing) to control how traffic is distributed across multiple connections.
+
+## Provider Availability
+
+<Note>
+Provider availability varies by country and payment method. Contact Yuno support if you need a provider that is not listed in the catalog.
+</Note>
+
+## Sandbox Connections
+
+In sandbox, you can use the [Yuno Testing Gateway](/guides/testing/yuno-testing-gateway) as a simulated provider. This is pre-configured in new sandbox accounts and does not require external credentials.

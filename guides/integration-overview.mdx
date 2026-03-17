@@ -1,0 +1,88 @@
+---
+title: "Choose Your Integration"
+description: "Compare Yuno integration options to find the best fit for your checkout experience"
+---
+
+## Overview
+
+Yuno offers multiple integration paths, each balancing development effort, customization, and PCI compliance scope. Choose the approach that best matches your technical requirements and business needs.
+
+## Choose Your Integration Path
+
+<CardGroup cols={2}>
+  <Card title="SDK Integration" icon="browser" href="/guides/sdk/overview">
+    **Best for:** Most merchants. Pre-built UI components handle payment method selection, form rendering, and 3DS authentication. Minimal frontend code required.
+  </Card>
+  <Card title="Direct API" icon="code" href="/guides/direct-api/overview">
+    **Best for:** Merchants who need full UI control or server-to-server integrations. You build the frontend and call Yuno's API directly.
+  </Card>
+</CardGroup>
+
+Regardless of your choice, the server-side flow is the same: create a checkout session, process the payment, and handle webhooks.
+
+## Integration Comparison
+
+| Feature | Full Checkout | Lite Checkout | Secure Fields | Direct API |
+|---------|--------------|---------------|---------------|------------|
+| **UI Control** | Yuno-managed | Partial | Full | Full |
+| **Development Effort** | Low | Medium | Medium-High | High |
+| **PCI Scope** | SAQ-A | SAQ-A | SAQ-A | SAQ-D (Level 1) |
+| **Payment Method Selection** | Automatic | Developer-chosen | Card only | Developer-managed |
+| **3DS Handling** | Automatic | SDK-assisted | SDK-assisted | Manual |
+| **Customization** | Theme/colors | Theme + layout | Full CSS control | N/A (your UI) |
+| **Mobile SDK Support** | Yes | Yes | Yes | N/A |
+| **Best For** | Quick launch | Branded checkout | Custom card forms | Backend systems |
+
+## Integration Options
+
+<CardGroup cols={2}>
+  <Card title="Full Checkout" icon="window-maximize" href="/guides/sdk/full-checkout">
+    **Fastest path to production.** Yuno renders a complete checkout UI with all enabled payment methods. Ideal for merchants who want a turnkey solution with minimal frontend work.
+  </Card>
+  <Card title="Lite Checkout" icon="window-restore" href="/guides/sdk/lite-checkout">
+    **Balanced approach.** Embed a Yuno payment form in your existing checkout page. You control the page layout while Yuno handles the payment form and PCI compliance.
+  </Card>
+  <Card title="Secure Fields" icon="lock" href="/guides/sdk/secure-fields">
+    **Maximum UI control.** Embed individual card input fields (number, expiry, CVV) as secure iframes. Build a fully custom card form while maintaining SAQ-A compliance.
+  </Card>
+  <Card title="Direct API" icon="code" href="/guides/direct-api/overview">
+    **Full server-side control.** Integrate directly with the Yuno REST API for complete flexibility. Requires PCI DSS Level 1 certification for handling raw card data.
+  </Card>
+</CardGroup>
+
+## Decision Guide
+
+<Steps>
+  <Step title="Do you need to handle raw card data server-side?">
+    **Yes** -- Use [Direct API](/guides/direct-api/overview). You must be PCI DSS Level 1 certified.
+
+    **No** -- Continue to the next question.
+  </Step>
+  <Step title="Do you need full control over card input field design?">
+    **Yes** -- Use [Secure Fields](/guides/sdk/secure-fields). You get full CSS control over individual inputs.
+
+    **No** -- Continue to the next question.
+  </Step>
+  <Step title="Do you want to embed the payment form in your page?">
+    **Yes** -- Use [Lite Checkout](/guides/sdk/lite-checkout). The form integrates into your checkout page.
+
+    **No** -- Use [Full Checkout](/guides/sdk/full-checkout) for a complete hosted experience.
+  </Step>
+</Steps>
+
+## PCI Compliance
+
+<Warning>
+Your PCI compliance obligations differ significantly based on your integration choice. Direct API requires PCI DSS Level 1 (the most stringent), while SDK-based integrations qualify for SAQ-A (the simplest self-assessment).
+</Warning>
+
+| Integration | PCI Level | What It Means |
+|-------------|-----------|---------------|
+| Full Checkout | SAQ-A | Card data never touches your servers or pages |
+| Lite Checkout | SAQ-A | Card data handled in Yuno-managed iframes |
+| Secure Fields | SAQ-A | Individual fields rendered in secure iframes |
+| Direct API | SAQ-D Level 1 | You handle, transmit, and store card data |
+
+## Next Steps
+
+After choosing your integration, follow the corresponding guide to get started. All integrations share the same [server-side payment creation](/guides/direct-api/create-payment) and [webhook handling](/guides/webhooks/setup).

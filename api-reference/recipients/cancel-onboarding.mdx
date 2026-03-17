@@ -1,0 +1,27 @@
+---
+title: "Cancel Onboarding"
+description: "Cancel an in-progress onboarding process for a recipient."
+api: "POST https://api-sandbox.y.uno/v1/recipients/{recipient_id}/onboardings/{onboarding_id}/cancel"
+---
+
+Cancels an in-progress onboarding process for a recipient. Once cancelled, the onboarding status transitions to `CANCELLED`. To restart, create a new onboarding.
+
+<Warning>
+  This action is not reversible for the same onboarding record. To resume onboarding after cancellation, you must [Create a new Onboarding](/api-reference/recipients/create-onboarding).
+</Warning>
+
+## Path Parameters
+
+<ParamField path="recipient_id" type="string" required>
+  The unique identifier of the recipient.
+</ParamField>
+
+<ParamField path="onboarding_id" type="string" required>
+  The unique identifier of the onboarding process to cancel.
+</ParamField>
+
+## Related Pages
+
+- [Onboarding Statuses](/api-reference/recipients/onboarding-statuses) — Status lifecycle reference
+- [Create Onboarding](/api-reference/recipients/create-onboarding) — Start a new onboarding after cancellation
+- [Block Onboarding](/api-reference/recipients/block-onboarding) — Temporarily suspend instead of cancelling

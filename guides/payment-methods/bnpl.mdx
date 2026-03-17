@@ -1,0 +1,220 @@
+---
+title: "Buy Now, Pay Later"
+description: "Integrate BNPL payment options for installment-based purchases"
+---
+
+## Overview
+
+Buy Now, Pay Later (BNPL) allows customers to split a purchase into multiple installments, often interest-free. BNPL providers handle the credit risk and pay the merchant upfront, while the customer repays the BNPL provider over time.
+
+Key characteristics:
+- **Higher conversion**: Customers are more likely to complete larger purchases
+- **Merchant receives full payment**: The BNPL provider pays you upfront (minus fees)
+- **Credit risk on provider**: The BNPL provider assumes the risk of customer non-payment
+- **Redirect flow**: Customers are redirected to the BNPL provider for approval
+
+## Supported Providers
+
+BNPL availability varies by country and provider configuration:
+
+| Provider | Countries | Currency | Installments |
+|----------|-----------|----------|-------------|
+| Provider-specific | Varies | Varies | 3-12 months typical |
+
+<Note>
+Available BNPL providers depend on your merchant configuration. Check **Dashboard > Settings > Payment Methods** to see which BNPL options are enabled for your account.
+</Note>
+
+## Redirect Flow
+
+BNPL payments use a redirect flow where the customer completes approval on the provider's site:
+
+1. **Create payment**: Submit the payment request with `type: "BNPL"`
+2. **Redirect customer**: Send the customer to the `redirect_url` from the response
+3. **Customer approves**: The customer reviews installment terms and approves on the BNPL provider's site
+4. **Callback**: Customer is redirected back to your `callback_url`
+5. **Webhook confirmation**: Receive definitive payment status via webhook
+
+## Creating a BNPL Payment
+
+<CodeGroup>
+```javascript Node.js
+const response = await fetch('https://api-sandbox.y.uno/v1/payments', {
+  method: 'POST',
+  headers: {
+    'public-api-key': process.env.YUNO_PUBLIC_KEY,
+    'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+    'account-code': process.env.YUNO_ACCOUNT_CODE,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    checkout_session: 'session-id',
+    payment_method: { type: 'BNPL' },
+    amount: { currency: 'BRL', value: 800.00 },
+    country: 'BR',
+    customer: {
+      email: 'cliente@example.com',
+      first_name: 'Maria',
+      last_name: 'Silva',
+      document: {
+        document_type: 'CPF',
+        document_number: '12345678901',
+      },
+    },
+    callback_url: 'https://your-store.com/payment/callback',
+    description: 'Order #555',
+  }),
+});
+const payment = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api-sandbox.y.uno/v1/payments',
+    headers={
+        'public-api-key': YUNO_PUBLIC_KEY,
+        'private-secret-key': YUNO_PRIVATE_KEY,
+        'account-code': YUNO_ACCOUNT_CODE,
+        'Content-Type': 'application/json',
+    },
+    json={
+        'checkout_session': 'session-id',
+        'payment_method': {'type': 'BNPL'},
+        'amount': {'currency': 'BRL', 'value': 800.00},
+        'country': 'BR',
+        'customer': {
+            'email': 'cliente@example.com',
+            'first_name': 'Maria',
+            'last_name': 'Silva',
+            'document': {
+                'document_type': 'CPF',
+                'document_number': '12345678901',
+            },
+        },
+        'callback_url': 'https://your-store.com/payment/callback',
+        'description': 'Order #555',
+    },
+)
+payment = response.json()
+```
+</CodeGroup>
+
+## Handling the Response
+
+```json
+{
+  "id": "pay_bnpl_abc123",
+  "status": "PENDING",
+  "amount": { "currency": "BRL", "value": 800.00 },
+  "payment_method": {
+    "type": "BNPL",
+    "redirect_url": "https://bnpl-provider.com/approve/abc123"
+  },
+  "created_at": "2026-03-01T10:00:00Z"
+}
+```
+
+Redirect the customer to `redirect_url` immediately after receiving the response:
+
+```javascript
+// Client-side redirect
+window.location.href = payment.payment_method.redirect_url;
+```
+
+## Handling Redirect Callbacks
+
+When the customer completes or cancels the BNPL approval, they are redirected to your `callback_url` with query parameters indicating the result:
+
+```
+https://your-store.com/payment/callback?payment_id=pay_bnpl_abc123&status=approved
+```
+
+<Warning>
+Do not rely on callback URL parameters for fulfillment decisions. The callback redirect may arrive before the payment is fully confirmed. Always use webhooks for definitive payment status.
+</Warning>
+
+## Installment Information
+
+When the BNPL payment is approved, the response includes installment details:
+
+```json
+{
+  "id": "pay_bnpl_abc123",
+  "status": "SUCCEEDED",
+  "payment_method": {
+    "type": "BNPL",
+    "bnpl": {
+      "provider": "bnpl-provider-name",
+      "installments": 4,
+      "installment_amount": { "currency": "BRL", "value": 200.00 },
+      "total_amount": { "currency": "BRL", "value": 800.00 },
+      "first_payment_date": "2026-03-01",
+      "last_payment_date": "2026-06-01"
+    }
+  }
+}
+```
+
+## Refund Handling
+
+BNPL refunds follow specific rules:
+
+- **Full refunds**: The BNPL provider cancels remaining installments and refunds any paid amounts
+- **Partial refunds**: The remaining installment schedule is adjusted proportionally
+- Refund processing time depends on the BNPL provider (typically 5-10 business days)
+
+```bash
+curl -X POST https://api-sandbox.y.uno/v1/payments/{payment_id}/refund \
+  -H "public-api-key: your-public-api-key" \
+  -H "private-secret-key: your-private-secret-key" \
+  -H "account-code: your-account-code" \
+  -H "Content-Type: application/json" \
+  -d '{"amount": {"currency": "BRL", "value": 800.00}}'
+```
+
+<Note>
+BNPL refund policies vary by provider. Some providers may not support partial refunds. Check your provider's specific terms in the Dashboard.
+</Note>
+
+## Country Availability
+
+BNPL availability depends on provider partnerships in each country. Contact your Yuno account manager or check **Dashboard > Settings > Payment Methods** to see available BNPL options for your target markets.
+
+## Common Issues
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| Missing `redirect_url` | `callback_url` not provided | Add `callback_url` to the payment request |
+| Customer denied by BNPL provider | Customer failed credit check | This is expected; offer alternative payment methods |
+| Payment stuck in `PENDING` | Customer did not complete approval | Set a timeout and offer to retry or use another method |
+| 403: `payment method not available` | BNPL not enabled | Enable BNPL in **Dashboard > Settings > Payment Methods** |
+
+## Response Handling
+
+### Synchronous Response
+BNPL payments typically require customer redirect for approval:
+
+```json
+{
+  "id": "pay_abc123",
+  "status": "PENDING",
+  "payment_method": {
+    "type": "BNPL",
+    "redirect_url": "https://bnpl-provider.com/approve/..."
+  }
+}
+```
+
+### Webhook Events
+
+| Event | Status | Action |
+|-------|--------|--------|
+| `payment.succeeded` | `SUCCEEDED` | BNPL provider approved — fulfill the order |
+| `payment.failed` | `FAILED` | Customer declined by BNPL provider — offer alternative |
+| `payment.cancelled` | `CANCELLED` | Customer cancelled the BNPL application |
+
+<Note>
+BNPL approval depends on the provider's credit assessment of the customer. Approval rates vary by provider and customer profile. Always offer alternative payment methods as fallback.
+</Note>

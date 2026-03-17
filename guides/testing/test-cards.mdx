@@ -1,0 +1,104 @@
+---
+title: "Test Cards"
+description: "Test card numbers for simulating different payment outcomes in sandbox"
+---
+
+## Overview
+
+Use these test card numbers in the Yuno sandbox environment to simulate various payment outcomes. These cards work with any expiry date in the future and any 3-digit CVV.
+
+<Warning>
+Test cards only work in the **sandbox environment** (`api-sandbox.y.uno`). Never use real card numbers in sandbox or test card numbers in production.
+</Warning>
+
+## Test Card Numbers
+
+### Successful Payments
+
+| Card Number | Brand | Result | Description |
+|-------------|-------|--------|-------------|
+| `4111111111111111` | Visa | Approved | Standard successful payment |
+| `5500000000000004` | Mastercard | Approved | Standard successful payment |
+| `378282246310005` | Amex | Approved | American Express approved |
+| `6011111111111117` | Discover | Approved | Discover approved |
+
+### Declined Payments
+
+| Card Number | Brand | Result | Decline Reason |
+|-------------|-------|--------|----------------|
+| `4000000000000002` | Visa | Declined | Generic decline |
+| `4000000000000069` | Visa | Declined | Expired card |
+| `4000000000000127` | Visa | Declined | Incorrect CVV |
+| `4000000000009995` | Visa | Declined | Insufficient funds |
+| `4000000000000119` | Visa | Declined | Processing error |
+
+### 3DS Authentication
+
+| Card Number | Brand | Result | 3DS Behavior |
+|-------------|-------|--------|--------------|
+| `4000000000003220` | Visa | 3DS Required | Full 3DS challenge flow |
+| `4000000000003063` | Visa | 3DS Frictionless | 3DS passes without challenge |
+| `4000000000003097` | Visa | 3DS Failed | 3DS authentication fails |
+
+### Special Scenarios
+
+| Card Number | Brand | Result | Scenario |
+|-------------|-------|--------|----------|
+| `4000000000000259` | Visa | Pending | Async payment processing |
+| `4000000000003436` | Visa | Requires Action | Redirect required |
+
+## Test Card Details
+
+For all test cards, use:
+
+| Field | Value |
+|-------|-------|
+| **Expiry Month** | Any future month (e.g., `12`) |
+| **Expiry Year** | Any future year (e.g., `2028`) |
+| **CVV** | Any 3 digits (e.g., `123`), 4 digits for Amex |
+| **Cardholder Name** | Any name (e.g., `Test User`) |
+
+## Test Customer Data
+
+Use these values for customer fields in sandbox:
+
+```json
+{
+  "customer": {
+    "email": "test@example.com",
+    "first_name": "Test",
+    "last_name": "User",
+    "document": {
+      "document_type": "CPF",
+      "document_number": "12345678901"
+    },
+    "phone": {
+      "country_code": "55",
+      "number": "11999999999"
+    }
+  }
+}
+```
+
+<Note>
+Document validation is relaxed in sandbox. The CPF number `12345678901` is accepted for testing purposes even though it is not a valid CPF.
+</Note>
+
+## Usage Example
+
+```javascript
+const payment = await fetch('https://api-sandbox.y.uno/v1/payments', {
+  method: 'POST',
+  headers: { /* sandbox auth headers */ },
+  body: JSON.stringify({
+    checkout_session: 'session-id',
+    payment_method: {
+      type: 'CARD',
+      token: tokenFromTestCard,  // Token created with 4111111111111111
+    },
+    amount: { currency: 'USD', value: 10.00 },
+    country: 'CO',
+  }),
+});
+// Expected: 200 with status "SUCCEEDED"
+```

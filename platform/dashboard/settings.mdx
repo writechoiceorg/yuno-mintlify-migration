@@ -1,0 +1,111 @@
+---
+title: "Settings"
+description: "Configure Yuno account settings including API keys, team management, and notifications"
+---
+
+## Overview
+
+The Settings section in the Yuno Dashboard lets you manage API credentials, invite team members, configure notifications, and control account-level preferences.
+
+## API Keys
+
+Navigate to **Settings > API Keys** to view and manage your credentials.
+
+| Key | Purpose | Visibility |
+|-----|---------|------------|
+| `public-api-key` | Client-side SDK initialization | Safe to expose in frontend |
+| `private-secret-key` | Server-side API authentication | Never expose publicly |
+| `account-code` | Merchant account identifier | Required in all API requests |
+
+<Warning>
+Your `private-secret-key` grants full API access to your account. Never include it in client-side code, version control, or logs. Use environment variables for secure storage.
+</Warning>
+
+### Rotating Keys
+
+<Steps>
+  <Step title="Generate new keys">
+    Click **Rotate Keys** in the API Keys section. New keys are generated immediately.
+  </Step>
+  <Step title="Update your integration">
+    Replace old credentials in your server configuration with the new keys.
+  </Step>
+  <Step title="Verify functionality">
+    Test a sandbox transaction to confirm the new keys work correctly.
+  </Step>
+  <Step title="Old keys expire">
+    Previous keys remain active for 24 hours after rotation to allow for zero-downtime migration.
+  </Step>
+</Steps>
+
+## Team Management
+
+Invite team members under **Settings > Team**.
+
+### Roles
+
+| Role | Permissions |
+|------|------------|
+| **Admin** | Full access: settings, API keys, team management, all features |
+| **Developer** | View transactions, connections, routing; no settings access |
+| **Viewer** | Read-only access to payments and analytics |
+| **Finance** | Access to reconciliations, settlements, and financial reports |
+
+### Inviting Members
+
+1. Go to **Settings > Team > Invite Member**
+2. Enter the email address
+3. Select a role
+4. Click **Send Invitation**
+
+The invitee receives an email with a link to join your Yuno account.
+
+<Note>
+Team members have access to the selected environment only (sandbox or production). Invite members to both environments if needed.
+</Note>
+
+## Notifications
+
+Configure alerts under **Settings > Notifications**.
+
+| Notification Type | Channel | Trigger |
+|-------------------|---------|---------|
+| **Payment failures** | Email, Slack | Transaction declined or errored |
+| **Webhook failures** | Email | Webhook delivery failed after retries |
+| **Risk alerts** | Email, Slack | Transaction flagged by risk conditions |
+| **Settlement** | Email | New settlement report available |
+| **API key rotation** | Email | API keys rotated |
+
+### Slack Integration
+
+Connect Slack under **Settings > Integrations > Slack** to receive notifications in a channel:
+
+1. Click **Connect Slack**
+2. Authorize the Yuno app in your Slack workspace
+3. Select the target channel
+4. Choose which notification types to send
+
+## Account Preferences
+
+| Setting | Options | Description |
+|---------|---------|-------------|
+| **Default Currency** | ISO 4217 code | Pre-fill currency in Dashboard forms |
+| **Timezone** | IANA timezone | Timestamps in Dashboard and reports |
+| **Language** | EN, ES, PT | Dashboard UI language |
+| **Two-Factor Auth** | Enable/Disable | Require 2FA for all team members |
+
+<Warning>
+Enabling two-factor authentication is strongly recommended for production accounts. Once enabled, all team members must configure 2FA on their next login.
+</Warning>
+
+## Environments
+
+Each environment (sandbox and production) maintains independent settings for:
+
+- API keys
+- Provider connections
+- Routing rules
+- Webhook endpoints
+- Risk conditions
+
+Switch environments using the toggle in the top navigation bar.

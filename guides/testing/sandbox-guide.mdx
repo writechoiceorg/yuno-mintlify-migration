@@ -1,0 +1,97 @@
+---
+title: "Sandbox Guide"
+description: "Set up and use the Yuno sandbox environment for testing your integration"
+---
+
+## Overview
+
+The Yuno sandbox is an isolated testing environment that simulates payment processing without moving real funds. Use it to validate your integration, test edge cases, and verify webhook handling before going to production.
+
+## Base URL
+
+| Environment | Base URL |
+|-------------|----------|
+| **Sandbox** | `https://api-sandbox.y.uno` |
+| Production | `https://api.y.uno` |
+
+<Warning>
+Sandbox and production use **separate API keys**. Ensure you are using sandbox credentials when testing. Find them in **Dashboard > Settings > API Keys** under the Sandbox tab.
+</Warning>
+
+## Getting Started
+
+<Steps>
+  <Step title="Create a sandbox account">
+    Sign up at [dashboard.y.uno](https://dashboard.y.uno) and select the sandbox environment. Your account starts with test credentials pre-configured.
+  </Step>
+
+  <Step title="Retrieve API keys">
+    Navigate to **Dashboard > Settings > API Keys**. Copy your sandbox `public-api-key`, `private-secret-key`, and `account-code`.
+  </Step>
+
+  <Step title="Configure your integration">
+    Point your API client to the sandbox base URL and use sandbox credentials:
+
+    ```javascript
+    const BASE_URL = 'https://api-sandbox.y.uno';
+
+    const headers = {
+      'public-api-key': process.env.YUNO_SANDBOX_PUBLIC_KEY,
+      'private-secret-key': process.env.YUNO_SANDBOX_PRIVATE_KEY,
+      'account-code': process.env.YUNO_SANDBOX_ACCOUNT_CODE,
+      'Content-Type': 'application/json',
+    };
+    ```
+  </Step>
+
+  <Step title="Use test payment data">
+    Use [test cards](/guides/testing/test-cards) and test customer data to simulate transactions. Never use real card numbers in sandbox.
+  </Step>
+</Steps>
+
+## Sandbox Limitations
+
+| Feature | Sandbox Behavior |
+|---------|-----------------|
+| **Payment methods** | Limited set; not all production methods available |
+| **Webhooks** | May return 404 for some event types |
+| **Providers** | Uses simulated provider responses |
+| **Funds** | No real money is transferred |
+| **3DS** | Simulated challenge flow |
+| **Rate limits** | More lenient than production |
+| **Settlement** | Not applicable |
+| **Reconciliation** | Not available |
+
+<Note>
+Some payment methods (like specific bank transfers) may not be available in sandbox. Use the [Yuno Testing Gateway](/guides/testing/yuno-testing-gateway) to simulate these methods without external provider credentials.
+</Note>
+
+## Sandbox vs Production Checklist
+
+Before switching to production, verify:
+
+- [ ] Replace sandbox API keys with production keys
+- [ ] Update base URL from `api-sandbox.y.uno` to `api.y.uno`
+- [ ] Configure production webhook endpoints
+- [ ] Enable payment methods in the production Dashboard
+- [ ] Verify provider credentials are set for production
+- [ ] Test with real low-value transactions
+- [ ] Enable error monitoring and logging
+
+## Environment Variables
+
+Recommended structure for managing environments:
+
+```bash
+# .env.sandbox
+YUNO_BASE_URL=https://api-sandbox.y.uno
+YUNO_PUBLIC_KEY=sandbox_pub_xxx
+YUNO_PRIVATE_KEY=sandbox_priv_xxx
+YUNO_ACCOUNT_CODE=sandbox_acc_xxx
+
+# .env.production
+YUNO_BASE_URL=https://api.y.uno
+YUNO_PUBLIC_KEY=prod_pub_xxx
+YUNO_PRIVATE_KEY=prod_priv_xxx
+YUNO_ACCOUNT_CODE=prod_acc_xxx
+```

@@ -1,0 +1,112 @@
+---
+title: "Provider Installments"
+description: "Offer bank or provider-funded installment plans where the financial institution finances the payment split."
+---
+
+
+## Overview
+
+Provider installments are financing plans offered by the customer's bank or card issuer. Unlike merchant-funded installments, the financial institution covers the upfront cost and collects payments from the customer over time, typically with interest. The merchant receives the full payment amount from the provider according to standard settlement terms.
+
+This model is common across Latin American banking systems, where issuers routinely offer installment options on credit card transactions.
+
+## How It Works
+
+1. The customer initiates a payment at checkout.
+2. Yuno queries the payment provider or card issuer for available installment options.
+3. The customer selects a provider-funded plan, which includes interest rates set by the issuer.
+4. The payment is processed as an installment transaction with the provider.
+5. The merchant receives the full transaction amount per normal settlement schedules.
+6. The customer repays the issuer in monthly installments with interest.
+
+<Info>
+  With provider-funded installments, you receive the full payment amount. The customer's relationship with their bank governs the interest rate and repayment schedule.
+</Info>
+
+## Querying Available Plans
+
+Before presenting installment options, query the available provider plans for the transaction context.
+
+```json
+POST /v1/payments/installment-options
+{
+  "amount": {
+    "value": 500.00,
+    "currency": "BRL"
+  },
+  "country": "BR",
+  "payment_method": {
+    "type": "CARD",
+    "token": "tok_card_abc123"
+  }
+}
+```
+
+The response includes the installment options offered by the card issuer:
+
+```json
+{
+  "installment_options": [
+    {
+      "installments": 1,
+      "total_amount": 500.00,
+      "installment_amount": 500.00,
+      "interest_rate": 0.0,
+      "funded_by": "PROVIDER"
+    },
+    {
+      "installments": 3,
+      "total_amount": 524.50,
+      "installment_amount": 174.83,
+      "interest_rate": 1.63,
+      "funded_by": "PROVIDER"
+    },
+    {
+      "installments": 6,
+      "total_amount": 555.00,
+      "installment_amount": 92.50,
+      "interest_rate": 1.82,
+      "funded_by": "PROVIDER"
+    }
+  ]
+}
+```
+
+## Customer Experience
+
+The customer sees a clear breakdown of each installment option:
+
+| Installments | Installment Amount | Total Cost | Interest Rate |
+|-------------|-------------------|------------|---------------|
+| 1x | R$ 500.00 | R$ 500.00 | 0% |
+| 3x | R$ 174.83 | R$ 524.50 | 1.63% p.m. |
+| 6x | R$ 92.50 | R$ 555.00 | 1.82% p.m. |
+
+<Warning>
+  Interest rates and available installment counts are determined entirely by the card issuer. These may vary per cardholder, card type, and issuer policy. Always query available options dynamically rather than hardcoding.
+</Warning>
+
+## Key Differences from Merchant Installments
+
+| Aspect | Merchant Installments | Provider Installments |
+|--------|----------------------|----------------------|
+| Interest bearer | Merchant | Customer |
+| Customer total cost | Same as original price | Higher due to interest |
+| Merchant settlement | Discounted amount | Full amount |
+| Plan configuration | Merchant controls | Issuer controls |
+| Availability | Always (if configured) | Depends on card/issuer |
+
+## Supported Providers
+
+Provider installment availability depends on your configured payment providers and the markets they serve. Common providers supporting issuer-funded installments include major acquirers in Brazil, Mexico, Colombia, Argentina, and Chile.
+
+<Note>
+  Not all card issuers offer installment plans. When no provider installments are available, consider offering merchant-funded installments as a fallback to maintain conversion rates.
+</Note>
+
+## Best Practices
+
+- **Always query dynamically**: Installment availability and rates change per card and issuer.
+- **Display total cost clearly**: Show both the installment amount and total cost including interest for transparency.
+- **Combine with merchant plans**: Offer merchant-funded interest-free options alongside provider plans to give customers choice.
+- **Handle unavailability gracefully**: If no provider plans are returned, fall back to single payment or merchant installments.

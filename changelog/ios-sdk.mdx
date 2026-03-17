@@ -1,0 +1,140 @@
+---
+title: "iOS SDK Changelog"
+description: "Release notes for the Yuno iOS SDK"
+---
+
+## Overview
+
+Release history for the Yuno iOS SDK. Install or update via Swift Package Manager or CocoaPods:
+
+<CodeGroup>
+```swift SPM (Package.swift)
+.package(url: "https://github.com/yuno-payments/yuno-sdk-ios", from: "3.1.0")
+```
+
+```ruby CocoaPods
+pod 'YunoSDK', '~> 3.1.0'
+```
+</CodeGroup>
+
+---
+
+## v3.1.0 (February 2026)
+
+### New Features
+- **SwiftUI Secure Fields:** Native SwiftUI views for card number, expiry, and CVV inputs
+- **Async/await support:** All SDK methods now support Swift concurrency
+
+```swift
+// SwiftUI Secure Fields
+struct PaymentView: View {
+    @StateObject var yuno = YunoSDK()
+
+    var body: some View {
+        VStack {
+            YunoCardNumberField()
+            YunoExpiryField()
+            YunoCVVField()
+            Button("Pay") {
+                Task {
+                    let token = try await yuno.generateToken()
+                    // Create payment with token
+                }
+            }
+        }
+    }
+}
+```
+
+### Improvements
+- Reduced SDK binary size by 20% with modular architecture
+- Improved VoiceOver accessibility for all checkout elements
+- Added support for visionOS (experimental)
+
+### Bug Fixes
+- Fixed Secure Fields not rendering correctly in iOS 17 landscape mode
+- Resolved memory leak in 3DS challenge WebView
+- Fixed dark mode appearance glitch when switching modes during checkout
+
+---
+
+## v3.0.0 (December 2025)
+
+### Breaking Changes
+
+<Warning>
+v3.0.0 requires iOS 16+ and Xcode 15+. Swift 5.9 is the minimum supported Swift version.
+</Warning>
+
+- **Minimum iOS version raised** from 13 to 16
+- **Swift concurrency:** All completion handler APIs replaced with async/await
+- **Removed:** Objective-C compatibility layer
+- **Renamed:** `YunoPaymentManager` to `YunoSDK`
+
+### Migration from v2.x
+
+```swift
+// v2.x (removed)
+let manager = YunoPaymentManager(publicKey: "key")
+manager.startCheckout(session: "id") { result in
+    switch result {
+    case .success(let payment): break
+    case .failure(let error): break
+    }
+}
+
+// v3.x (current)
+let yuno = try await YunoSDK.initialize(
+    publicApiKey: "key",
+    checkoutSession: "id",
+    country: "BR"
+)
+let result = try await yuno.startCheckout()
+```
+
+### New Features
+- Native Swift concurrency with structured tasks
+- SwiftUI `View` modifiers for checkout embedding
+- Observation framework support (`@Observable`)
+
+---
+
+## v2.x (Legacy)
+
+<Note>
+v2.x is deprecated and will reach end-of-life in June 2026. Upgrade to v3.x using the migration guide above.
+</Note>
+
+---
+
+## v2.5.0 (November 2025)
+
+### New Features
+- Installment selector for card payments in supported countries
+- Payment method filtering via `allowedMethods` parameter
+
+### Improvements
+- Improved UIKit Auto Layout support for dynamic checkout heights
+- Added `YunoTheme` struct for programmatic appearance customization
+
+### Bug Fixes
+- Fixed crash on iPad when presenting 3DS challenge in split view
+- Resolved intermittent timeout during SDK initialization on cellular networks
+
+---
+
+## Requirements
+
+| Version | iOS | Xcode | Swift | Architecture |
+|---------|-----|-------|-------|-------------|
+| 3.1.0 | 16+ | 15+ | 5.9+ | arm64 |
+| 3.0.0 | 16+ | 15+ | 5.9+ | arm64 |
+| 2.x | 13+ | 14+ | 5.7+ | arm64, x86_64 |
+
+## Distribution
+
+| Method | Supported Versions |
+|--------|-------------------|
+| Swift Package Manager | All |
+| CocoaPods | All |
+| Carthage | v2.x only (dropped in v3.0) |

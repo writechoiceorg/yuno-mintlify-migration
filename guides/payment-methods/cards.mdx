@@ -1,0 +1,426 @@
+---
+title: "Card Payments"
+description: "Integrate credit and debit card payments with tokenization and 3DS"
+---
+
+## Overview
+
+Card payments are the most widely used payment method on Yuno, supporting Visa, Mastercard, Amex, and local card brands across all supported countries. This guide covers the full card payment lifecycle, from tokenization through authorization, capture, and recurring payments.
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/brasil-card-processing-chain.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/brasil-card-processing-chain.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## Card Payment Flow
+
+A typical card payment follows these steps:
+
+1. **Tokenize** the card using the Yuno SDK (client-side) to obtain a one-time token
+2. **Create a payment** using the token via the API (server-side)
+3. **Handle 3DS** if a challenge is triggered (automatic via SDK)
+4. **Receive confirmation** via synchronous response and webhook
+
+<Warning>
+Sending raw card numbers via the API requires PCI DSS Level 1 compliance. Use the Yuno SDK tokenization flow to keep your integration out of PCI scope.
+</Warning>
+
+## Tokenization
+
+### One-Time Tokens (SDK)
+
+The Yuno Web or Mobile SDK collects card details in a secure iframe and returns a one-time token. This token is valid for a single payment and expires after 10 minutes.
+
+```javascript
+// Client-side: Initialize Yuno SDK and tokenize
+const yuno = await Yuno.initialize({
+  publicApiKey: 'your-public-api-key',
+  countryCode: 'US',
+});
+
+const token = await yuno.createToken({
+  cardNumber: '4111111111111111',
+  expirationMonth: '12',
+  expirationYear: '2028',
+  securityCode: '123',
+  holderName: 'JOHN SMITH',
+});
+// Use token.token in the server-side payment request
+```
+
+### Vaulted Tokens (Returning Customers)
+
+To save a card for future use, include `vaulted_token: true` and a `customer_id` in the payment request. The response returns a `vaulted_token_id` that can be used for subsequent payments without re-entering card details.
+
+```json
+{
+  "payment_method": {
+    "type": "CARD",
+    "token": "one-time-token",
+    "vaulted_token": true
+  },
+  "customer_id": "cust_abc123"
+}
+```
+
+For subsequent payments, use the vaulted token directly:
+
+```json
+{
+  "payment_method": {
+    "type": "CARD",
+    "vaulted_token_id": "vt_xyz789"
+  }
+}
+```
+
+## Creating a Card Payment
+
+<CodeGroup>
+```javascript Node.js
+const response = await fetch('https://api-sandbox.y.uno/v1/payments', {
+  method: 'POST',
+  headers: {
+    'public-api-key': process.env.YUNO_PUBLIC_KEY,
+    'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+    'account-code': process.env.YUNO_ACCOUNT_CODE,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    checkout_session: 'session-id',
+    payment_method: {
+      type: 'CARD',
+      token: 'one-time-token-from-sdk',
+    },
+    amount: { currency: 'USD', value: 50.00 },
+    country: 'US',
+    customer: {
+      email: 'customer@example.com',
+      first_name: 'John',
+      last_name: 'Smith',
+    },
+    description: 'Order #123',
+  }),
+});
+const payment = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api-sandbox.y.uno/v1/payments',
+    headers={
+        'public-api-key': YUNO_PUBLIC_KEY,
+        'private-secret-key': YUNO_PRIVATE_KEY,
+        'account-code': YUNO_ACCOUNT_CODE,
+        'Content-Type': 'application/json',
+    },
+    json={
+        'checkout_session': 'session-id',
+        'payment_method': {
+            'type': 'CARD',
+            'token': 'one-time-token-from-sdk',
+        },
+        'amount': {'currency': 'USD', 'value': 50.00},
+        'country': 'US',
+        'customer': {
+            'email': 'customer@example.com',
+            'first_name': 'John',
+            'last_name': 'Smith',
+        },
+        'description': 'Order #123',
+    },
+)
+payment = response.json()
+```
+
+```go Go
+payload := map[string]interface{}{
+    "checkout_session": "session-id",
+    "payment_method": map[string]interface{}{
+        "type":  "CARD",
+        "token": "one-time-token-from-sdk",
+    },
+    "amount":  map[string]interface{}{"currency": "USD", "value": 50.00},
+    "country": "US",
+    "customer": map[string]interface{}{
+        "email":      "customer@example.com",
+        "first_name": "John",
+        "last_name":  "Smith",
+    },
+    "description": "Order #123",
+}
+
+body, _ := json.Marshal(payload)
+req, _ := http.NewRequest("POST",
+    "https://api-sandbox.y.uno/v1/payments",
+    bytes.NewBuffer(body),
+)
+
+req.Header.Set("public-api-key", os.Getenv("YUNO_PUBLIC_KEY"))
+req.Header.Set("private-secret-key", os.Getenv("YUNO_PRIVATE_KEY"))
+req.Header.Set("account-code", os.Getenv("YUNO_ACCOUNT_CODE"))
+req.Header.Set("Content-Type", "application/json")
+
+resp, err := http.DefaultClient.Do(req)
+```
+</CodeGroup>
+
+### Card Payment (Europe)
+
+```javascript Node.js
+const response = await fetch('https://api-sandbox.y.uno/v1/payments', {
+  method: 'POST',
+  headers: {
+    'public-api-key': process.env.YUNO_PUBLIC_KEY,
+    'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+    'account-code': process.env.YUNO_ACCOUNT_CODE,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    checkout_session: 'session-id',
+    payment_method: {
+      type: 'CARD',
+      token: 'one-time-token-from-sdk',
+    },
+    amount: { currency: 'EUR', value: 50.00 },
+    country: 'DE',
+    customer: {
+      email: 'customer@example.com',
+      first_name: 'Hans',
+      last_name: 'Mueller',
+      billing_address: {
+        address_line_1: 'Friedrichstrasse 100',
+        city: 'Berlin',
+        country: 'DE',
+        zip_code: '10117',
+      },
+    },
+    description: 'Order #456',
+  }),
+});
+const payment = await response.json();
+```
+
+<Note>
+In Europe, 3DS authentication is mandatory under PSD2/SCA regulations. Yuno handles this automatically when the issuer requires it.
+</Note>
+
+## 3DS Authentication
+
+Yuno handles 3D Secure (3DS) automatically when required by the card issuer or configured by the merchant.
+
+### How It Works
+
+1. **Frictionless flow**: The issuer authenticates the cardholder without interaction. The payment proceeds automatically and the response includes `three_d_secure.status = "AUTHENTICATED"`.
+
+2. **Challenge flow**: The issuer requires cardholder verification (OTP, biometric, or password). The Yuno SDK renders the challenge UI automatically. After the cardholder completes the challenge, the payment continues.
+
+### 3DS Response Fields
+
+```json
+{
+  "payment_method": {
+    "three_d_secure": {
+      "version": "2.2.0",
+      "status": "AUTHENTICATED",
+      "eci": "05",
+      "cavv": "AAABBBCCCDDDeeeFFFF"
+    }
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `version` | 3DS protocol version (2.1.0 or 2.2.0) |
+| `status` | `AUTHENTICATED`, `ATTEMPTED`, `FAILED`, `REJECTED` |
+| `eci` | Electronic Commerce Indicator |
+| `cavv` | Cardholder Authentication Verification Value |
+
+<Note>
+3DS is mandatory in certain markets (e.g., Europe under PSD2). Yuno applies 3DS rules based on your merchant configuration and the issuer's requirements. Configure 3DS preferences in **Dashboard > Settings > Security**.
+</Note>
+
+## Card Brand Detection and Routing
+
+Yuno automatically detects the card brand from the BIN (first 6-8 digits) and routes the transaction to the optimal provider based on your routing rules.
+
+| BIN Range | Brand |
+|-----------|-------|
+| 4xxxxx | Visa |
+| 51-55xxxx, 2221-2720 | Mastercard |
+| 34xxxx, 37xxxx | American Express |
+| 6011, 644-649, 65xxxx | Discover |
+| 3528-3589 | JCB |
+| 62xxxx | UnionPay |
+| 300-305, 36xxxx, 38xxxx | Diners Club |
+| 636368, 438935, 504175 | Elo (Brazil) |
+| 606282 | Hipercard (Brazil) |
+| 60xxxx, 65xxxx, 81xxxx, 82xxxx | RuPay (India) |
+| 4xxxxx, 5xxxxx (FR-issued) | Cartes Bancaires (France) |
+| 2200-2204 | Mir (Russia) |
+| 9792 | Troy (Turkey) |
+| 6054, 6062 | Naranja (Argentina) |
+| 603493 | Cabal (Argentina) |
+| 5895, 6042, 6043 | Redcompra (Chile) |
+
+Configure provider routing rules in **Dashboard > Routing** to prioritize providers by card brand, country, or amount.
+
+## Authorization vs. Capture
+
+By default, card payments are authorized and captured in a single step. For two-step flows (hold funds, then capture later), set `capture: false`:
+
+```json
+{
+  "payment_method": { "type": "CARD", "token": "token-id" },
+  "amount": { "currency": "USD", "value": 100.00 },
+  "capture": false
+}
+```
+
+- **Authorize**: Validates the card and holds funds. Payment status is `AUTHORIZED`.
+- **Capture**: Settles the held funds. Use `POST /v1/payments/{id}/capture`.
+- **Void**: Release held funds without capturing. Use `POST /v1/payments/{id}/cancel`.
+
+<Note>
+Authorizations typically expire after 7 days (varies by issuer). Capture before expiration to avoid auth reversals. See the [Capture and Cancel guide](/guides/direct-api/capture-and-cancel) for details.
+</Note>
+
+## AVS and CVV Verification
+
+Address Verification Service (AVS) and CVV verification provide additional fraud signals:
+
+| Check | Result Codes | Description |
+|-------|-------------|-------------|
+| AVS | `MATCH`, `PARTIAL`, `NO_MATCH`, `NOT_SUPPORTED` | Compares billing address with issuer records |
+| CVV | `MATCH`, `NO_MATCH`, `NOT_PROCESSED` | Validates the card security code |
+
+AVS and CVV results are returned in the payment response under `payment_method.verification`:
+
+```json
+{
+  "payment_method": {
+    "verification": {
+      "avs_result": "MATCH",
+      "cvv_result": "MATCH"
+    }
+  }
+}
+```
+
+## Customer-Initiated vs. Merchant-Initiated Transactions
+
+Card networks distinguish between Customer-Initiated Transactions (CIT) and Merchant-Initiated Transactions (MIT). Correctly flagging these improves approval rates and ensures compliance.
+
+### CIT (Customer-Initiated)
+The cardholder actively authorizes the payment — e.g., entering card details at checkout or clicking "Pay Now" with a saved card. CITs typically have higher approval rates because the issuer can verify the cardholder is present.
+
+### MIT (Merchant-Initiated)
+The merchant charges a stored card without the cardholder being present — e.g., recurring billing, subscription renewals, or delayed charges. MITs require:
+- A prior CIT that established the stored credential agreement
+- The `network_transaction_id` from the initial CIT
+- Proper `stored_credential` flags in the API request
+
+<Warning>
+Incorrectly flagging an MIT as a CIT (or vice versa) can result in higher decline rates, compliance violations, and potential fines from card networks. Always use the `stored_credential` object to flag transaction types correctly.
+</Warning>
+
+## Recurring Card Payments
+
+For subscriptions and recurring billing, use stored credentials with the appropriate transaction type. See [Stored Credentials](/features/stored-credentials) for the full framework.
+
+The initial payment (cardholder-initiated):
+
+```json
+{
+  "payment_method": {
+    "type": "CARD",
+    "token": "one-time-token",
+    "vaulted_token": true
+  },
+  "stored_credential": {
+    "type": "RECURRING",
+    "initiator": "CARDHOLDER"
+  },
+  "customer_id": "cust_abc123"
+}
+```
+
+Subsequent payments (merchant-initiated):
+
+```json
+{
+  "payment_method": {
+    "type": "CARD",
+    "vaulted_token_id": "vt_xyz789"
+  },
+  "stored_credential": {
+    "type": "RECURRING",
+    "initiator": "MERCHANT",
+    "network_transaction_id": "ntid-from-initial-payment"
+  }
+}
+```
+
+<Tip>
+**Always store the `network_transaction_id`** returned in the initial CIT payment response. This identifier enables: (1) higher approval rates on subsequent MIT charges, (2) the ability to switch payment providers without re-enrolling the card, and (3) compliance with Visa and Mastercard stored credential mandates.
+</Tip>
+
+<Warning>
+Card networks (Visa, Mastercard) mandate that merchants pass stored credential indicators for all recurring and merchant-initiated transactions. Non-compliance may result in higher decline rates or penalties.
+</Warning>
+
+## Card Response Handling
+
+### Success
+A successful card payment returns status `SUCCEEDED` (auto-capture) or `AUTHORIZED` (manual capture):
+
+```json
+{
+  "id": "pay_abc123",
+  "status": "SUCCEEDED",
+  "payment_method": {
+    "type": "CARD",
+    "brand": "VISA",
+    "last_four": "1111",
+    "verification": { "avs_result": "MATCH", "cvv_result": "MATCH" },
+    "three_d_secure": { "version": "2.2.0", "status": "AUTHENTICATED", "eci": "05" }
+  }
+}
+```
+
+### Common Decline Reasons
+
+| Decline Code | Meaning | Retryable? | Suggested Action |
+|---|---|---|---|
+| `INSUFFICIENT_FUNDS` | Card has insufficient balance | Yes (soft decline) | Ask customer to use another card or try later |
+| `DO_NOT_HONOR` | Issuer declined without specific reason | Maybe | Retry once; if repeated, ask customer to contact issuer |
+| `EXPIRED_CARD` | Card has expired | No (hard decline) | Ask customer to update card details |
+| `STOLEN_CARD` | Card reported stolen | No (hard decline) | Do not retry; flag for review |
+| `INVALID_CVV` | CVV mismatch | No | Ask customer to re-enter card details |
+| `3DS_AUTHENTICATION_FAILED` | Cardholder failed 3DS challenge | No | Ask customer to retry or use another card |
+
+### 3DS Challenge Response
+When 3DS requires a challenge, the initial response includes redirect information. The Yuno SDK handles this automatically, but for Direct API integrations:
+
+```json
+{
+  "id": "pay_abc123",
+  "status": "PENDING",
+  "payment_method": {
+    "three_d_secure": {
+      "status": "CHALLENGE_REQUIRED",
+      "redirect_url": "https://acs.issuer.com/challenge/..."
+    }
+  }
+}
+```
+
+Redirect the customer to `redirect_url`. After completing the challenge, the payment status updates via [webhook](/guides/webhooks/setup).

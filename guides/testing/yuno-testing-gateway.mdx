@@ -1,0 +1,100 @@
+---
+title: "Yuno Testing Gateway"
+description: "Built-in testing gateway to simulate payment outcomes without external provider credentials"
+---
+
+## Overview
+
+The Yuno Testing Gateway is a built-in simulated provider that allows you to test the full payment flow without configuring real provider credentials. It supports cards, PIX, bank transfers, and other payment methods in a controlled sandbox environment.
+
+<Note>
+The Testing Gateway is available by default in all sandbox accounts. No additional configuration is required to start using it.
+</Note>
+
+## Supported Payment Methods
+
+| Payment Method | Testing Gateway Support | Simulated Behaviors |
+|---------------|------------------------|---------------------|
+| Credit/Debit Cards | Yes | Approve, decline, 3DS, timeout |
+| PIX | Yes | QR code generation, instant confirmation |
+| Bank Transfer | Yes | Redirect simulation, pending status |
+| OXXO | Yes | Voucher generation |
+| PSE | Yes | Bank selection, redirect flow |
+
+## How It Works
+
+<Steps>
+  <Step title="Enable the Testing Gateway">
+    Navigate to **Dashboard > Connections** in your sandbox environment. The Yuno Testing Gateway should appear as an available provider. If not enabled, toggle it on.
+  </Step>
+
+  <Step title="Set routing rules (optional)">
+    By default, sandbox routes all transactions through the Testing Gateway. To test specific routing scenarios, configure rules in **Dashboard > Routing Rules**.
+  </Step>
+
+  <Step title="Send test transactions">
+    Use [test cards](/guides/testing/test-cards) and the standard API flow. The Testing Gateway processes the transaction and returns simulated responses.
+
+    ```javascript
+    const payment = await fetch('https://api-sandbox.y.uno/v1/payments', {
+      method: 'POST',
+      headers: { /* sandbox auth headers */ },
+      body: JSON.stringify({
+        checkout_session: 'session-id',
+        payment_method: { type: 'CARD', token: 'test-token' },
+        amount: { currency: 'BRL', value: 50.00 },
+        country: 'BR',
+      }),
+    });
+    ```
+  </Step>
+
+  <Step title="Verify results">
+    Check the payment status in the API response or in **Dashboard > Payments**. The Testing Gateway provides realistic response structures matching real provider formats.
+  </Step>
+</Steps>
+
+## Simulating Specific Outcomes
+
+The Testing Gateway determines the outcome based on the test card number used:
+
+| Test Card | Simulated Outcome |
+|-----------|-------------------|
+| `4111111111111111` | Approved |
+| `4000000000000002` | Declined (generic) |
+| `4000000000009995` | Declined (insufficient funds) |
+| `4000000000003220` | 3DS challenge required |
+
+For non-card methods (PIX, bank transfer), the Testing Gateway always returns a successful pending status with simulated payment details (QR codes, redirect URLs).
+
+## Testing Webhooks
+
+The Testing Gateway triggers webhook events just like a real provider:
+
+| Event | When Triggered |
+|-------|---------------|
+| `payment.created` | Payment submitted |
+| `payment.succeeded` | Payment approved |
+| `payment.failed` | Payment declined |
+| `payment.pending` | Async payment awaiting confirmation |
+| `refund.succeeded` | Refund processed |
+
+<Warning>
+Some webhook event types may return 404 in sandbox. This is a known sandbox limitation. See [Webhook Setup](/guides/webhooks/setup) for details.
+</Warning>
+
+## Limitations
+
+- The Testing Gateway is only available in sandbox environments
+- Response times are instant (does not simulate real provider latency)
+- Settlement and reconciliation flows are not simulated
+- Provider-specific error codes are generic simulations
+
+## Transitioning to Real Providers
+
+When moving to production:
+
+1. Configure real provider credentials in **Dashboard > Connections**
+2. Update routing rules to point to production providers
+3. Switch API keys and base URL to production
+4. The Testing Gateway is not available in production

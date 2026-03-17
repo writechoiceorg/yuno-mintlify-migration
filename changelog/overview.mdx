@@ -1,0 +1,82 @@
+---
+title: "Changelog"
+description: "Latest updates to the Yuno API, SDKs, and platform"
+---
+
+## Overview
+
+Stay up to date with the latest changes across the Yuno ecosystem. Each component maintains its own changelog for detailed release notes.
+
+## Component Changelogs
+
+<CardGroup cols={2}>
+  <Card title="API Changelog" icon="server" href="/changelog/api">
+    REST API version history, new endpoints, breaking changes, and deprecations.
+  </Card>
+  <Card title="Web SDK" icon="globe" href="/changelog/web-sdk">
+    Release notes for `@yuno-payments/sdk-web` including new features, bug fixes, and migration guides.
+  </Card>
+  <Card title="Android SDK" icon="android" href="/changelog/android-sdk">
+    Release notes for the Yuno Android SDK.
+  </Card>
+  <Card title="iOS SDK" icon="apple" href="/changelog/ios-sdk">
+    Release notes for the Yuno iOS SDK.
+  </Card>
+  <Card title="Flutter SDK" icon="mobile" href="/changelog/flutter-sdk">
+    Release notes for the Yuno Flutter SDK.
+  </Card>
+</CardGroup>
+
+## Recent Highlights
+
+### February 2026
+
+| Component | Version | Change |
+|-----------|---------|--------|
+| API | v1.18.0 | Added partial capture support for additional providers |
+| Web SDK | 2.5.0 | New Secure Fields styling API |
+| Android SDK | 3.2.0 | Improved 3DS challenge handling |
+| iOS SDK | 3.1.0 | SwiftUI support for Secure Fields |
+| Flutter SDK | 2.3.0 | Added enrollment widget |
+
+### January 2026
+
+| Component | Version | Change |
+|-----------|---------|--------|
+| API | v1.17.0 | MCP server endpoint GA release |
+| Web SDK | 2.4.0 | Dark mode support, performance improvements |
+| Platform | -- | Aida AI agent general availability |
+| Dashboard | -- | New Checkout Builder with dark mode preview |
+
+### December 2025
+
+| Component | Version | Change |
+|-----------|---------|--------|
+| API | v1.16.0 | Webhook retry improvements, new event types |
+| Web SDK | 2.3.0 | Bug fixes for 3DS challenge rendering |
+| Android SDK | 3.1.0 | Target SDK 34 support |
+| iOS SDK | 3.0.0 | Major version: Swift concurrency, iOS 16+ |
+
+## Versioning Policy
+
+Yuno follows semantic versioning (SemVer) for all SDKs:
+
+| Version Part | Meaning | Example |
+|-------------|---------|---------|
+| **Major** (X.0.0) | Breaking changes requiring migration | 2.0.0 -> 3.0.0 |
+| **Minor** (0.X.0) | New features, backward compatible | 2.4.0 -> 2.5.0 |
+| **Patch** (0.0.X) | Bug fixes, no new features | 2.5.0 -> 2.5.1 |
+
+<Note>
+The REST API is versioned via the URL path (`/v1/`). Breaking changes result in a new API version. Non-breaking additions (new fields, endpoints) are added to the current version.
+</Note>
+
+## Deprecation Policy
+
+- **SDKs:** Deprecated versions are supported for 6 months after the next major release
+- **API endpoints:** Deprecated endpoints remain functional for 12 months with deprecation warnings in response headers
+- **Dashboard features:** Deprecated features show in-app migration notices
+
+<Warning>
+Subscribe to the Yuno changelog RSS feed or enable email notifications in **Dashboard > Settings > Notifications** to receive automatic updates about new releases and deprecations.
+</Warning>

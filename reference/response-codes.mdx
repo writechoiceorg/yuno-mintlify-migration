@@ -1,0 +1,174 @@
+---
+title: "Response Codes"
+description: "Merchant Advisory Codes, provider response codes, and decline reason mapping"
+---
+
+## Overview
+
+When a payment is processed through Yuno, the response may include codes from multiple layers: Yuno's own error codes, Merchant Advisory Codes (MACs), and raw provider/network response codes. This reference maps these codes to help you understand decline reasons and determine the correct retry strategy.
+
+## Merchant Advisory Codes (MAC)
+
+Merchant Advisory Codes provide standardized guidance on how to handle declined transactions. These codes indicate whether a transaction should be retried and, if so, when.
+
+| MAC | Description | Recommended Action | Retryable |
+|-----|-------------|-------------------|-----------|
+| `01` | New account information available | Request updated card details from customer via account updater or direct input | No |
+| `02` | Try again later / Cannot approve at this time | Retry the transaction after a brief delay | Yes |
+| `03` | Do not retry / Do not honor | Do not retry; request alternative payment method | No |
+| `04` | Token requirements not fulfilled | Verify tokenization setup and ensure token data is complete | No |
+| `21` | Payment cancelled | Customer or issuer cancelled the payment; do not retry | No |
+| `24` | Retry after 1 hour | Wait at least 1 hour before retrying | Yes |
+| `25` | Retry after 24 hours | Wait at least 24 hours before retrying | Yes |
+| `26` | Retry after 2 days | Wait at least 2 days before retrying | Yes |
+| `27` | Retry after 4 days | Wait at least 4 days before retrying | Yes |
+| `28` | Retry after 6 days | Wait at least 6 days before retrying | Yes |
+| `29` | Retry after 8 days | Wait at least 8 days before retrying | Yes |
+| `30` | Retry after 10 days | Wait at least 10 days before retrying | Yes |
+
+<Note>
+MACs are returned in the `merchant_advisory_code` field of the payment response when available. Not all providers return MACs for every decline.
+</Note>
+
+## Soft vs Hard Declines
+
+Understanding the difference between soft and hard declines is critical for implementing correct retry logic.
+
+### Soft Declines (Retriable)
+
+Temporary conditions that may resolve on retry. Implement exponential backoff with the MAC-recommended delay.
+
+| Condition | Typical Response Code | Retry Strategy |
+|-----------|----------------------|----------------|
+| Insufficient funds | `51` | Retry after delay; customer may add funds |
+| Issuer temporarily unavailable | `91` | Retry with exponential backoff |
+| Processing error | `06` | Retry immediately or after brief delay |
+| Exceeds withdrawal limit | `61` | Retry after 24 hours or next billing cycle |
+| System malfunction | `96` | Retry with exponential backoff |
+| Issuer not available | `91` | Retry after brief delay |
+
+### Hard Declines (Do Not Retry)
+
+Permanent conditions that will not resolve on retry. Request an alternative payment method from the customer.
+
+| Condition | Typical Response Code | Action |
+|-----------|----------------------|--------|
+| Invalid card number | `14` | Request correct card details |
+| Expired card | `54` | Request updated card |
+| Stolen card | `43` | Do not retry; flag for review |
+| Lost card | `41` | Do not retry; flag for review |
+| Card not activated | `78` | Customer must contact issuer |
+| Do not honor | `05` | Request alternative payment method |
+| Restricted card | `62` | Request alternative payment method |
+
+<Warning>
+Retrying hard declines wastes processing resources, degrades your approval rate metrics, and may trigger fraud monitoring by card networks. Always check the decline category before implementing retry logic.
+</Warning>
+
+## Visa Response Codes
+
+| Code | Description | Category | Retryable |
+|------|-------------|----------|-----------|
+| `00` | Approved | Success | N/A |
+| `01` | Refer to card issuer | Soft decline | Yes |
+| `02` | Refer to card issuer, special condition | Soft decline | Yes |
+| `03` | Invalid merchant | Hard decline | No |
+| `04` | Pick up card | Hard decline | No |
+| `05` | Do not honor | Hard decline | No |
+| `06` | Error | Soft decline | Yes |
+| `07` | Pick up card, special condition | Hard decline | No |
+| `12` | Invalid transaction | Hard decline | No |
+| `13` | Invalid amount | Hard decline | No |
+| `14` | Invalid card number | Hard decline | No |
+| `15` | No such issuer | Hard decline | No |
+| `19` | Re-enter transaction | Soft decline | Yes |
+| `21` | No action taken | Soft decline | Yes |
+| `25` | Unable to locate record | Hard decline | No |
+| `28` | File temporarily unavailable | Soft decline | Yes |
+| `41` | Lost card, pick up | Hard decline | No |
+| `43` | Stolen card, pick up | Hard decline | No |
+| `51` | Insufficient funds | Soft decline | Yes |
+| `54` | Expired card | Hard decline | No |
+| `55` | Incorrect PIN | Soft decline | Yes (with correct PIN) |
+| `57` | Transaction not permitted to cardholder | Hard decline | No |
+| `58` | Transaction not permitted to terminal | Hard decline | No |
+| `59` | Suspected fraud | Hard decline | No |
+| `61` | Exceeds withdrawal amount limit | Soft decline | Yes (lower amount or later) |
+| `62` | Restricted card | Hard decline | No |
+| `63` | Security violation | Hard decline | No |
+| `65` | Exceeds withdrawal frequency limit | Soft decline | Yes (later) |
+| `75` | Allowable number of PIN tries exceeded | Hard decline | No |
+| `76` | Invalid "to" account | Hard decline | No |
+| `78` | Blocked, first use (card not activated) | Hard decline | No |
+| `85` | No reason to decline (AVS/CVV check) | Success | N/A |
+| `91` | Issuer or switch inoperative | Soft decline | Yes |
+| `96` | System malfunction | Soft decline | Yes |
+| `N7` | CVV2 value mismatch | Soft decline | Yes (with correct CVV) |
+| `R0` | Stop recurring payment | Hard decline | No |
+| `R1` | Stop recurring payment | Hard decline | No |
+| `Q1` | Card authentication failed | Hard decline | No |
+
+## Mastercard Response Codes
+
+| Code | Description | Category | Retryable |
+|------|-------------|----------|-----------|
+| `00` | Approved | Success | N/A |
+| `01` | Refer to card issuer | Soft decline | Yes |
+| `03` | Invalid merchant | Hard decline | No |
+| `04` | Capture card | Hard decline | No |
+| `05` | Do not honor | Hard decline | No |
+| `08` | Honor with ID | Soft decline | Yes |
+| `12` | Invalid transaction | Hard decline | No |
+| `13` | Invalid amount | Hard decline | No |
+| `14` | Invalid card number (PAN) | Hard decline | No |
+| `15` | Invalid issuer | Hard decline | No |
+| `30` | Format error | Hard decline | No |
+| `41` | Lost card | Hard decline | No |
+| `43` | Stolen card | Hard decline | No |
+| `51` | Insufficient funds / over credit limit | Soft decline | Yes |
+| `54` | Expired card | Hard decline | No |
+| `55` | Invalid PIN | Soft decline | Yes (with correct PIN) |
+| `57` | Transaction not permitted | Hard decline | No |
+| `58` | Transaction not permitted to acquirer/terminal | Hard decline | No |
+| `61` | Exceeds withdrawal amount limit | Soft decline | Yes (later) |
+| `62` | Restricted card | Hard decline | No |
+| `63` | Security violation | Hard decline | No |
+| `65` | Activity count limit exceeded | Soft decline | Yes (later) |
+| `70` | Contact card issuer | Soft decline | Yes |
+| `71` | PIN not changed | Hard decline | No |
+| `75` | Allowable number of PIN tries exceeded | Hard decline | No |
+| `76` | Unsolicited reversal | Hard decline | No |
+| `77` | Previous message not found | Soft decline | Yes |
+| `78` | Blocked (first use, not activated) | Hard decline | No |
+| `84` | Invalid authorization life cycle | Hard decline | No |
+| `85` | Not declined (AVS only) | Success | N/A |
+| `86` | Cannot verify PIN | Soft decline | Yes |
+| `91` | Issuer unavailable | Soft decline | Yes |
+| `92` | Destination not found | Soft decline | Yes |
+| `96` | System error | Soft decline | Yes |
+
+## Provider Response Code Mapping
+
+Yuno normalizes provider-specific response codes into a standardized `decline_reason` field. This allows you to implement consistent decline handling regardless of which provider processes the transaction.
+
+| Yuno Decline Reason | Description | Typical Provider Codes |
+|---------------------|-------------|------------------------|
+| `INSUFFICIENT_FUNDS` | Customer has insufficient funds | Visa/MC `51` |
+| `INVALID_CARD` | Card number is invalid | Visa/MC `14` |
+| `EXPIRED_CARD` | Card has expired | Visa/MC `54` |
+| `STOLEN_CARD` | Card reported stolen | Visa `43`, MC `43` |
+| `LOST_CARD` | Card reported lost | Visa `41`, MC `41` |
+| `DO_NOT_HONOR` | Issuer declined without specific reason | Visa/MC `05` |
+| `FRAUD_SUSPECTED` | Fraud suspected by issuer or risk engine | Visa `59` |
+| `RESTRICTED_CARD` | Card has restrictions preventing use | Visa/MC `62` |
+| `EXCEEDS_LIMIT` | Transaction exceeds amount or frequency limit | Visa `61`/`65` |
+| `INVALID_CVV` | CVV verification failed | Visa `N7` |
+| `ISSUER_UNAVAILABLE` | Issuer system temporarily unavailable | Visa/MC `91` |
+| `PROCESSING_ERROR` | Generic processing error | Visa/MC `06`/`96` |
+| `NOT_PERMITTED` | Transaction type not permitted | Visa/MC `57`/`58` |
+| `AUTHENTICATION_FAILED` | 3DS or PIN authentication failed | Visa `Q1` |
+| `STOP_RECURRING` | Customer requested stop of recurring payments | Visa `R0`/`R1` |
+
+<Note>
+The normalized `decline_reason` is available in the payment response under `transaction.decline_reason`. Use this field instead of raw provider codes for consistent handling across providers.
+</Note>

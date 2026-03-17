@@ -1,0 +1,98 @@
+---
+title: "PCI Compliance"
+description: "Understand PCI DSS requirements for your Yuno integration and how Yuno reduces your compliance scope."
+---
+
+
+## Overview
+
+The Payment Card Industry Data Security Standard (PCI DSS) is a set of security requirements that all organizations handling credit card data must follow. Yuno is a **PCI DSS Level 1 certified** service provider, the highest level of certification. Depending on your integration method, Yuno can significantly reduce or eliminate your PCI compliance burden.
+
+## PCI Scope by Integration Method
+
+| Integration Method | Your PCI Level | Card Data Touches Your Servers | Scope |
+|-------------------|---------------|-------------------------------|-------|
+| **Full Checkout SDK** | SAQ A | No | Minimal |
+| **Lite Checkout SDK** | SAQ A | No | Minimal |
+| **Secure Fields** | SAQ A-EP | No (iframe-based) | Reduced |
+| **Direct API (tokenized)** | SAQ A-EP | No (tokens only) | Reduced |
+| **Direct API (raw PAN)** | SAQ D / Level 1 | Yes | Full |
+
+<Warning>
+  If you handle raw card numbers (PANs) via the Direct API without using Yuno's tokenization, your organization must be **PCI DSS Level 1 compliant**. This requires annual on-site audits and quarterly network scans. Most merchants should use the SDK or tokenization to avoid this requirement.
+</Warning>
+
+## SDK Integration (Recommended)
+
+When using Yuno's Checkout SDK (Full or Lite), card data is captured directly by Yuno's PCI-compliant infrastructure. Your servers never see or handle raw card numbers.
+
+```javascript
+// Card data captured by Yuno's secure iframe
+const checkout = yuno.checkout({
+  countryCode: "BR",
+  currency: "BRL",
+  amount: "200.00",
+  checkoutSession: "session_abc123"
+});
+
+// Mount renders Yuno's secure payment form
+checkout.mount("#checkout-container");
+
+// Your server receives only a token, never raw card data
+```
+
+<Info>
+  With the SDK integration, Yuno provides a hosted payment form that captures card details in a PCI-compliant iframe. Your frontend and backend only interact with tokenized payment references.
+</Info>
+
+## Tokenization
+
+Yuno's tokenization converts sensitive card data into non-sensitive tokens:
+
+| Data Type | Example | Stored by Yuno | Exposed to Merchant |
+|-----------|---------|----------------|---------------------|
+| Full PAN | 4242424242424242 | Encrypted in vault | Never |
+| Token | tok_card_abc123 | Reference mapping | Yes (safe to store) |
+| Last 4 digits | 4242 | For display | Yes |
+| Expiry | 12/2028 | Encrypted | No |
+| CVV | 123 | Never stored | Never |
+
+## SAQ Types Explained
+
+| SAQ Type | Description | Typical Merchant |
+|----------|-------------|-----------------|
+| **SAQ A** | All cardholder data handled by third party | SDK integration merchants |
+| **SAQ A-EP** | E-commerce with partial outsourcing | Secure Fields / tokenized API |
+| **SAQ D** | Full assessment for direct card handling | Direct API with raw PANs |
+
+## Compliance Requirements by Level
+
+| Merchant Level | Annual Transactions | Requirements |
+|---------------|--------------------|--------------|
+| Level 1 | > 6 million | Annual on-site audit (QSA), quarterly scans |
+| Level 2 | 1-6 million | Annual SAQ, quarterly scans |
+| Level 3 | 20,000-1 million | Annual SAQ, quarterly scans |
+| Level 4 | < 20,000 | Annual SAQ (recommended) |
+
+## Best Practices
+
+- **Use the SDK**: The easiest path to minimal PCI scope.
+- **Never log card data**: Ensure your application logs do not capture card numbers, CVVs, or sensitive authentication data.
+- **Use HTTPS everywhere**: All pages that include Yuno's SDK or handle payment data must use TLS 1.2+.
+- **Restrict access**: Limit access to payment systems and data to authorized personnel only.
+- **Regular assessments**: Complete your applicable SAQ annually, even for SAQ A merchants.
+
+<Note>
+  Yuno's PCI DSS Level 1 certification is audited annually. You can request Yuno's Attestation of Compliance (AOC) through your account manager for your own compliance documentation.
+</Note>
+
+## Data Storage Rules
+
+| Data | Can Merchant Store? | Notes |
+|------|--------------------|-|
+| Yuno payment tokens | Yes | Safe, non-sensitive |
+| Last 4 digits | Yes | For customer reference |
+| Card brand | Yes | For display purposes |
+| Full PAN | No (unless Level 1) | Use tokenization instead |
+| CVV/CVC | Never | Prohibited by PCI DSS |
+| Magnetic stripe data | Never | Prohibited by PCI DSS |

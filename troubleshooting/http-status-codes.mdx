@@ -1,0 +1,90 @@
+---
+title: "HTTP Status Codes"
+description: "Quick reference for HTTP status codes returned by the Yuno API"
+---
+
+## Overview
+
+The Yuno API uses standard HTTP status codes to indicate the success or failure of requests. This guide provides a quick reference for interpreting each status code.
+
+## Success Codes
+
+| Code | Status | Description | Common Endpoints |
+|------|--------|-------------|-----------------|
+| **200** | OK | Request succeeded, resource returned | GET endpoints, payment status |
+| **201** | Created | Resource created successfully | POST /payments, POST /checkout/sessions |
+
+## Client Error Codes
+
+| Code | Status | Description | Typical Cause | Action |
+|------|--------|-------------|---------------|--------|
+| **400** | Bad Request | Invalid request payload | Missing fields, wrong types, malformed JSON | Validate payload against [API docs](https://docs.y.uno/reference/api-reference-overview). See [Error Codes](/troubleshooting/error-codes) |
+| **401** | Unauthorized | Authentication failed | Invalid or missing API keys | Verify `public-api-key` and `private-secret-key` in Dashboard > Settings |
+| **403** | Forbidden | Action not permitted | Payment method not enabled, country not configured | Check Dashboard > Connections and merchant enablements |
+| **404** | Not Found | Resource not found | Invalid ID, expired session, wrong endpoint | Verify resource ID and endpoint URL |
+| **409** | Conflict | State conflict | Duplicate capture, invalid state transition | Check current resource state before action |
+| **429** | Too Many Requests | Rate limit exceeded | Too many API calls in time window | Implement exponential backoff. Check `Retry-After` header |
+
+## Server Error Codes
+
+| Code | Status | Description | Typical Cause | Action |
+|------|--------|-------------|---------------|--------|
+| **500** | Internal Server Error | Server-side failure | Yuno or provider error | Retry with backoff. If persistent, contact support with `x-request-id` |
+| **502** | Bad Gateway | Upstream error | Provider communication failure | Retry. Check provider status |
+| **503** | Service Unavailable | Service temporarily down | Maintenance or overload | Retry after delay. Check Yuno status page |
+| **504** | Gateway Timeout | Upstream timeout | Provider response timeout | Retry. Consider async payment flow |
+
+## Response Headers
+
+Every Yuno API response includes useful headers:
+
+| Header | Description |
+|--------|-------------|
+| `x-request-id` | Unique request identifier for debugging and support |
+| `x-ratelimit-limit` | Maximum requests allowed in the time window |
+| `x-ratelimit-remaining` | Remaining requests in the current window |
+| `x-ratelimit-reset` | Timestamp when the rate limit resets |
+| `Retry-After` | Seconds to wait before retrying (on 429) |
+
+## Error Handling Best Practices
+
+<Steps>
+  <Step title="Check the status code">
+    Use the HTTP status code for initial categorization: 2xx = success, 4xx = client error, 5xx = server error.
+  </Step>
+
+  <Step title="Parse the error object">
+    For 4xx errors, read the `error.code` and `error.message` fields for specific diagnostics.
+
+    ```javascript
+    if (!response.ok) {
+      const error = await response.json();
+      console.error(`Error ${response.status}: ${error.error.code} - ${error.error.message}`);
+    }
+    ```
+  </Step>
+
+  <Step title="Implement retry logic">
+    For 429 and 5xx errors, implement exponential backoff:
+
+    ```javascript
+    async function apiCallWithRetry(url, options, maxRetries = 3) {
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        const response = await fetch(url, options);
+        if (response.ok) return response.json();
+        if (response.status === 429 || response.status >= 500) {
+          const delay = Math.pow(2, attempt) * 1000;
+          await new Promise(r => setTimeout(r, delay));
+          continue;
+        }
+        throw new Error(`API error: ${response.status}`);
+      }
+      throw new Error('Max retries exceeded');
+    }
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+Never retry 400 or 401 errors without fixing the underlying issue. Retrying malformed requests wastes rate limit quota.
+</Warning>

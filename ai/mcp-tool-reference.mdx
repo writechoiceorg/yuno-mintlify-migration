@@ -1,0 +1,622 @@
+---
+title: "MCP Tool Reference"
+description: "Formal specifications for all Yuno MCP tools including schemas, dependencies, and error handling"
+---
+
+## Overview
+
+This reference documents every MCP tool exposed by the Yuno MCP server. Each tool maps to a Yuno API endpoint and follows the [Model Context Protocol](https://modelcontextprotocol.io) specification.
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/tool-dependency-graph.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/state-and-architecture/tool-dependency-graph.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+<Note>
+MCP tools are designed for sandbox use during development and debugging. All tool calls count against your standard API rate limits.
+</Note>
+
+---
+
+## Tool Summary
+
+| Tool | Operation | API Endpoint | Method |
+|------|-----------|-------------|--------|
+| `create_checkout_session` | Start a payment flow | `/v1/checkout/sessions` | POST |
+| `create_payment` | Process a payment | `/v1/payments` | POST |
+| `get_payment` | Retrieve payment details | `/v1/payments/{id}` | GET |
+| `list_payments` | List recent payments | `/v1/payments` | GET |
+| `capture_payment` | Capture authorized payment | `/v1/payments/{id}/capture` | POST |
+| `cancel_payment` | Cancel a payment | `/v1/payments/{id}/cancel` | POST |
+| `create_refund` | Refund a payment | `/v1/payments/{id}/refund` | POST |
+| `get_payment_methods` | List available methods | `/v1/checkout/sessions/{id}` | GET |
+| `validate_payload` | Pre-flight validation | Client-side | N/A |
+| `create_customer` | Create customer record | `/v1/customers` | POST |
+| `get_customer` | Retrieve customer | `/v1/customers/{id}` | GET |
+| `create_recipient` | Create payout recipient | `/v1/recipients` | POST |
+| `create_payout` | Send funds to recipient | `/v1/payouts` | POST |
+
+---
+
+## Tool Dependency Matrix
+
+Some tools require outputs from other tools. This matrix shows prerequisites.
+
+| Tool | Requires | Provides |
+|------|----------|----------|
+| `create_checkout_session` | None | `checkout_session` (UUID) |
+| `create_payment` | `checkout_session` | `payment_id` (UUID) |
+| `get_payment` | `payment_id` | Payment status, details |
+| `list_payments` | None | Array of payment objects |
+| `capture_payment` | `payment_id` (status: AUTHORIZED) | Updated payment |
+| `cancel_payment` | `payment_id` (status: AUTHORIZED/PENDING) | Updated payment |
+| `create_refund` | `payment_id` (status: SUCCEEDED) | Updated payment |
+| `get_payment_methods` | `checkout_session` | Available payment methods |
+| `validate_payload` | None | Validation result |
+| `create_customer` | None | `customer_id` (UUID) |
+| `get_customer` | `customer_id` | Customer details |
+| `create_recipient` | None | `recipient_id` (UUID) |
+| `create_payout` | `recipient_id` | `payout_id` (UUID) |
+
+### Calling Order for Common Flows
+
+**Standard payment:** `create_checkout_session` -> `create_payment` -> `get_payment`
+
+**Auth + capture:** `create_checkout_session` -> `create_payment` -> `capture_payment`
+
+**Refund:** `get_payment` (verify status) -> `create_refund`
+
+**Payout:** `create_recipient` -> `create_payout`
+
+---
+
+## Tool Specifications
+
+### create_checkout_session
+
+Creates a new checkout session to initialize a payment flow.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["amount", "country", "merchant_order_id"],
+  "properties": {
+    "amount": {
+      "type": "object",
+      "required": ["currency", "value"],
+      "properties": {
+        "currency": { "type": "string", "description": "ISO 4217 code (e.g., USD, BRL, COP, MXN)" },
+        "value": { "type": "number", "description": "Amount in major currency units" }
+      }
+    },
+    "country": { "type": "string", "pattern": "^[A-Z]{2}$", "description": "ISO 3166-1 alpha-2" },
+    "merchant_order_id": { "type": "string", "description": "Your unique order reference" },
+    "payment_description": { "type": "string" },
+    "customer_id": { "type": "string", "format": "uuid" },
+    "workflow": { "type": "string", "enum": ["SDK_CHECKOUT", "SDK_LITE", "DIRECT"] }
+  }
+}
+```
+
+**Output Schema:**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "checkout_session": { "type": "string", "format": "uuid" },
+    "amount": { "$ref": "Amount" },
+    "country": { "type": "string" },
+    "merchant_order_id": { "type": "string" },
+    "status": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "payment_methods": { "type": "array" }
+  }
+}
+```
+
+**Rate limit:** 100 requests per 60 seconds
+
+**Idempotency:** Not idempotent. Each call creates a new session. Use unique `merchant_order_id` values.
+
+**Error codes:**
+
+| Code | HTTP | Description | Action |
+|------|------|-------------|--------|
+| `INVALID_REQUEST` | 400 | Missing or malformed fields | Fix payload |
+| `UNAUTHORIZED` | 401 | Invalid API credentials | Check API keys |
+| `RATE_LIMITED` | 429 | Rate limit exceeded | Retry with backoff |
+| `INTERNAL_ERROR` | 500 | Server error | Retry with backoff |
+
+---
+
+### create_payment
+
+Creates a payment against an existing checkout session.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["checkout_session", "payment_method", "amount", "country"],
+  "properties": {
+    "checkout_session": { "type": "string", "format": "uuid" },
+    "payment_method": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": ["CARD", "PIX", "BOLETO", "PSE", "SPEI", "OXXO", "BNPL", "GOOGLE_PAY", "APPLE_PAY"] },
+        "token": { "type": "string", "description": "Tokenized card payment method" },
+        "vaulted_token": { "type": "string", "description": "Stored payment method for returning customers" }
+      }
+    },
+    "amount": { "$ref": "Amount" },
+    "country": { "type": "string", "pattern": "^[A-Z]{2}$" },
+    "customer": {
+      "type": "object",
+      "properties": {
+        "document": { "$ref": "CustomerDocument" },
+        "email": { "type": "string", "format": "email" },
+        "first_name": { "type": "string" },
+        "last_name": { "type": "string" },
+        "phone": { "type": "string" }
+      }
+    },
+    "description": { "type": "string" },
+    "installments": { "type": "integer", "minimum": 1 }
+  }
+}
+```
+
+**Output Schema:**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "checkout_session": { "type": "string", "format": "uuid" },
+    "status": { "type": "string", "enum": ["SUCCEEDED", "PENDING", "DECLINED", "REJECTED", "AUTHORIZED"] },
+    "amount": { "$ref": "Amount" },
+    "country": { "type": "string" },
+    "payment_method": { "type": "object" },
+    "provider": { "type": "object" },
+    "merchant_order_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}
+```
+
+**Rate limit:** 100 requests per 60 seconds
+
+**Idempotency:** One payment per checkout session. Submitting a second payment to the same session returns an error.
+
+**Parameter validation rules:**
+- `checkout_session` must reference an ACTIVE session
+- `amount` must match the session amount
+- `country` must match the session country
+- PIX payments in BR require `customer.document` (CPF or CNPJ)
+- CARD payments require either `token` or `vaulted_token`
+- `installments` only applies to CARD payments
+
+**Error codes:**
+
+| Code | HTTP | Description | Action |
+|------|------|-------------|--------|
+| `INVALID_FIELD` | 400 | Required field missing or malformed | Add/fix the field |
+| `SESSION_EXPIRED` | 400 | Checkout session is no longer active | Create new session |
+| `PAYMENT_METHOD_NOT_AVAILABLE` | 403 | Method not enabled for merchant | Enable in Dashboard |
+| `PROVIDER_DECLINED` | 400 | Provider rejected the transaction | Check decline reason |
+| `RATE_LIMITED` | 429 | Rate limit exceeded | Retry with backoff |
+
+---
+
+### get_payment
+
+Retrieves payment details by ID. Use for polling payment status.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["payment_id"],
+  "properties": {
+    "payment_id": { "type": "string", "format": "uuid" }
+  }
+}
+```
+
+**Output Schema:** Same as `create_payment` output.
+
+**Rate limit:** Standard API limits
+
+**Idempotency:** Safe to call repeatedly (GET request).
+
+**Error codes:**
+
+| Code | HTTP | Description | Action |
+|------|------|-------------|--------|
+| `NOT_FOUND` | 404 | Payment ID does not exist | Verify the payment_id |
+
+---
+
+### list_payments
+
+Returns a paginated list of payments.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "limit": { "type": "integer", "default": 20, "maximum": 100 },
+    "starting_after": { "type": "string", "description": "Payment ID cursor for forward pagination" },
+    "ending_before": { "type": "string", "description": "Payment ID cursor for backward pagination" }
+  }
+}
+```
+
+**Output Schema:**
+
+```json
+{
+  "type": "array",
+  "items": { "$ref": "Payment" }
+}
+```
+
+**Rate limit:** 100 requests per 60 seconds
+
+**Idempotency:** Safe to call repeatedly (GET request).
+
+---
+
+### capture_payment
+
+Captures a previously authorized payment. Only valid for payments in `AUTHORIZED` status.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["payment_id"],
+  "properties": {
+    "payment_id": { "type": "string", "format": "uuid" },
+    "amount": {
+      "type": "object",
+      "properties": {
+        "currency": { "type": "string" },
+        "value": { "type": "number", "description": "Capture amount. Must be <= authorized amount." }
+      }
+    }
+  }
+}
+```
+
+**Output Schema:** Same as `create_payment` output (status changes to `SUCCEEDED`).
+
+**Parameter validation rules:**
+- Payment must be in `AUTHORIZED` status
+- Capture amount must not exceed authorized amount
+- Partial capture is supported (amount < authorized amount)
+
+**Error codes:**
+
+| Code | HTTP | Description | Action |
+|------|------|-------------|--------|
+| `INVALID_STATE` | 400 | Payment not in AUTHORIZED status | Verify payment status first |
+| `AMOUNT_EXCEEDED` | 400 | Capture amount > authorized | Reduce capture amount |
+
+---
+
+### cancel_payment
+
+Cancels a pending or authorized payment.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["payment_id"],
+  "properties": {
+    "payment_id": { "type": "string", "format": "uuid" }
+  }
+}
+```
+
+**Output Schema:** Same as `create_payment` output (status changes to `CANCELLED`).
+
+**Error codes:**
+
+| Code | HTTP | Description | Action |
+|------|------|-------------|--------|
+| `INVALID_STATE` | 400 | Payment cannot be cancelled in current state | Use refund instead for SUCCEEDED payments |
+
+---
+
+### create_refund
+
+Refunds a completed payment. Supports full and partial refunds.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["payment_id"],
+  "properties": {
+    "payment_id": { "type": "string", "format": "uuid" },
+    "amount": {
+      "type": "object",
+      "description": "Omit for full refund",
+      "properties": {
+        "currency": { "type": "string" },
+        "value": { "type": "number" }
+      }
+    },
+    "reason": { "type": "string" }
+  }
+}
+```
+
+**Output Schema:** Same as `create_payment` output (status changes to `REFUNDED` or `PARTIALLY_REFUNDED`).
+
+**Parameter validation rules:**
+- Payment must be in `SUCCEEDED` or `PARTIALLY_REFUNDED` status
+- Refund amount must not exceed remaining refundable balance
+- Omitting `amount` triggers a full refund
+
+**Error codes:**
+
+| Code | HTTP | Description | Action |
+|------|------|-------------|--------|
+| `INVALID_STATE` | 400 | Payment not refundable | Verify payment status |
+| `AMOUNT_EXCEEDED` | 400 | Refund exceeds remaining balance | Reduce refund amount |
+
+---
+
+### validate_payload
+
+Client-side validation tool that checks a payment payload against Yuno's schema without making an API call.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["payload", "operation"],
+  "properties": {
+    "payload": { "type": "object", "description": "The request body to validate" },
+    "operation": {
+      "type": "string",
+      "enum": ["createCheckoutSession", "createPayment", "createRefund", "createPayout"],
+      "description": "The operation this payload is intended for"
+    }
+  }
+}
+```
+
+**Output Schema:**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "valid": { "type": "boolean" },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": { "type": "string" },
+          "message": { "type": "string" },
+          "expected": { "type": "string" }
+        }
+      }
+    }
+  }
+}
+```
+
+**Rate limit:** No API call made; unlimited.
+
+**Idempotency:** Stateless; always safe to call.
+
+---
+
+### create_customer
+
+Creates a customer record for use in checkout sessions.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["email"],
+  "properties": {
+    "email": { "type": "string", "format": "email" },
+    "first_name": { "type": "string" },
+    "last_name": { "type": "string" },
+    "phone": { "type": "string" },
+    "document": { "$ref": "CustomerDocument" },
+    "merchant_customer_id": { "type": "string" }
+  }
+}
+```
+
+**Output Schema:**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "email": { "type": "string" },
+    "first_name": { "type": "string" },
+    "last_name": { "type": "string" },
+    "phone": { "type": "string" },
+    "document": { "$ref": "CustomerDocument" },
+    "merchant_customer_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}
+```
+
+**Error codes:**
+
+| Code | HTTP | Description | Action |
+|------|------|-------------|--------|
+| `INVALID_REQUEST` | 400 | Invalid email or document format | Fix field format |
+| `DUPLICATE` | 400 | Customer with same email exists | Use existing customer |
+
+---
+
+### create_recipient
+
+Creates a payout recipient with bank account details.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["merchant_recipient_id", "country"],
+  "properties": {
+    "merchant_recipient_id": { "type": "string" },
+    "country": { "type": "string", "pattern": "^[A-Z]{2}$" },
+    "name": { "type": "string" },
+    "email": { "type": "string", "format": "email" },
+    "document": { "$ref": "CustomerDocument" },
+    "bank_account": {
+      "type": "object",
+      "properties": {
+        "bank_code": { "type": "string" },
+        "account_number": { "type": "string" },
+        "account_type": { "type": "string", "enum": ["CHECKING", "SAVINGS"] }
+      }
+    }
+  }
+}
+```
+
+**Output Schema:**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "merchant_recipient_id": { "type": "string" },
+    "country": { "type": "string" },
+    "name": { "type": "string" },
+    "bank_account": { "type": "object" },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}
+```
+
+---
+
+### create_payout
+
+Sends funds to a previously created recipient.
+
+**Input Schema:**
+
+```json
+{
+  "type": "object",
+  "required": ["amount", "country", "recipient_id"],
+  "properties": {
+    "amount": { "$ref": "Amount" },
+    "country": { "type": "string", "pattern": "^[A-Z]{2}$" },
+    "recipient_id": { "type": "string", "format": "uuid" },
+    "description": { "type": "string" },
+    "merchant_reference": { "type": "string" },
+    "purpose": { "type": "string" }
+  }
+}
+```
+
+**Output Schema:**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "status": { "type": "string", "enum": ["PENDING", "SUCCEEDED", "FAILED", "CANCELLED"] },
+    "amount": { "$ref": "Amount" },
+    "recipient_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}
+```
+
+---
+
+## Multi-Step Examples
+
+### Example: Complete Payment Flow
+
+```
+Step 1: Agent calls create_checkout_session
+  Input:  { amount: { currency: "USD", value: 99.90 }, country: "US", merchant_order_id: "order-123" }
+  Output: { checkout_session: "sess_abc123", status: "ACTIVE", payment_methods: [...] }
+
+Step 2: Agent calls create_payment
+  Input:  { checkout_session: "sess_abc123", payment_method: { type: "CARD", token: "tok_test_abc" }, amount: { currency: "USD", value: 99.90 }, country: "US", customer: { email: "jane.smith@example.com", first_name: "Jane", last_name: "Smith" } }
+  Output: { id: "pay_def456", status: "SUCCEEDED" }
+
+Step 3: Agent calls get_payment (polling)
+  Input:  { payment_id: "pay_def456" }
+  Output: { id: "pay_def456", status: "SUCCEEDED" }
+```
+
+### Example: Validate then Create
+
+```
+Step 1: Agent calls validate_payload
+  Input:  { payload: { amount: { currency: "USD" }, country: "US" }, operation: "createCheckoutSession" }
+  Output: { valid: false, errors: [{ field: "amount.value", message: "Required field missing" }, { field: "merchant_order_id", message: "Required field missing" }] }
+
+Step 2: Agent fixes payload and calls create_checkout_session
+  Input:  { amount: { currency: "USD", value: 50.00 }, country: "US", merchant_order_id: "order-456" }
+  Output: { checkout_session: "sess_ghi789", status: "ACTIVE" }
+```
+
+---
+
+## Rate Limiting
+
+All MCP tools that make API calls share the same rate limits as direct API access.
+
+| Endpoint Group | Limit | Window | Scope |
+|---------------|-------|--------|-------|
+| Checkout Sessions (create) | 100 | 60 seconds | Per API key |
+| Payments (create) | 100 | 60 seconds | Per API key |
+| Payments (list) | 100 | 60 seconds | Per API key |
+| All other endpoints | Standard | Standard | Per API key |
+
+When rate limited (HTTP 429), implement exponential backoff:
+
+```
+Retry 1: wait 1 second
+Retry 2: wait 2 seconds
+Retry 3: wait 4 seconds
+Maximum retries: 3
+```

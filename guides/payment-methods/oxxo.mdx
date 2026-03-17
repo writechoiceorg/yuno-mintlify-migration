@@ -1,0 +1,210 @@
+---
+title: "OXXO"
+description: "Accept OXXO cash voucher payments in Mexico"
+---
+
+## Overview
+
+OXXO is Mexico's largest convenience store chain with over 20,000 locations nationwide. OXXO cash payments allow customers to pay for online purchases by presenting a voucher with a barcode or reference number at any OXXO store. This method is essential for reaching Mexican consumers who prefer cash or do not have bank accounts.
+
+Key characteristics:
+- **Cash-based**: Customers pay with cash at physical OXXO locations
+- **Wide coverage**: Over 20,000 OXXO stores across Mexico
+- **No chargebacks**: Cash payments cannot be disputed
+- **Asynchronous**: Payment happens after voucher generation
+
+## Requirements
+
+| Field | Value | Description |
+|-------|-------|-------------|
+| `country` | `MX` | Mexico only |
+| `amount.currency` | `MXN` | Mexican Peso only |
+| `customer.email` | Valid email | Used to send voucher details |
+
+<Note>
+OXXO has a maximum payment amount per transaction (typically MXN $10,000). Check with your provider for exact limits.
+</Note>
+
+## Creating an OXXO Payment
+
+<CodeGroup>
+```javascript Node.js
+const response = await fetch('https://api-sandbox.y.uno/v1/payments', {
+  method: 'POST',
+  headers: {
+    'public-api-key': process.env.YUNO_PUBLIC_KEY,
+    'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+    'account-code': process.env.YUNO_ACCOUNT_CODE,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    checkout_session: 'session-id',
+    payment_method: { type: 'OXXO' },
+    amount: { currency: 'MXN', value: 500.00 },
+    country: 'MX',
+    customer: {
+      email: 'cliente@example.com',
+      first_name: 'Carlos',
+      last_name: 'Garcia',
+    },
+    description: 'Orden #321',
+  }),
+});
+const payment = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api-sandbox.y.uno/v1/payments',
+    headers={
+        'public-api-key': YUNO_PUBLIC_KEY,
+        'private-secret-key': YUNO_PRIVATE_KEY,
+        'account-code': YUNO_ACCOUNT_CODE,
+        'Content-Type': 'application/json',
+    },
+    json={
+        'checkout_session': 'session-id',
+        'payment_method': {'type': 'OXXO'},
+        'amount': {'currency': 'MXN', 'value': 500.00},
+        'country': 'MX',
+        'customer': {
+            'email': 'cliente@example.com',
+            'first_name': 'Carlos',
+            'last_name': 'Garcia',
+        },
+        'description': 'Orden #321',
+    },
+)
+payment = response.json()
+```
+</CodeGroup>
+
+## Handling the Response
+
+A successful OXXO payment creation returns status `PENDING` with voucher details:
+
+```json
+{
+  "id": "pay_oxxo_abc123",
+  "status": "PENDING",
+  "amount": { "currency": "MXN", "value": 500.00 },
+  "payment_method": {
+    "type": "OXXO",
+    "oxxo": {
+      "voucher_url": "https://provider.com/voucher/abc123.pdf",
+      "reference": "1234567890123456",
+      "barcode": "1234567890123456",
+      "expiration_date": "2026-03-04T23:59:59Z"
+    }
+  },
+  "created_at": "2026-03-01T10:00:00Z"
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `oxxo.voucher_url` | URL to the printable voucher PDF |
+| `oxxo.reference` | Reference number for the store cashier |
+| `oxxo.barcode` | Barcode for scanning at the store |
+| `oxxo.expiration_date` | Voucher expiration date and time |
+
+## Customer Experience at OXXO
+
+The customer flow after receiving the voucher:
+
+1. Customer visits any OXXO store in Mexico
+2. Shows the printed voucher or reference number to the cashier
+3. The cashier scans the barcode or enters the reference number
+4. Customer pays the exact amount in cash
+5. Customer receives a receipt confirming payment
+
+<Note>
+Instruct customers to pay the exact amount shown on the voucher. OXXO does not process partial payments for a single voucher.
+</Note>
+
+## Expiration Handling
+
+OXXO vouchers typically expire within 24-72 hours (configurable by provider). After expiration:
+
+- The voucher reference becomes invalid
+- The payment status transitions to `EXPIRED`
+- A `payment.expired` webhook is sent
+- OXXO stores will not accept the expired voucher
+
+<Warning>
+Do not fulfill orders until you receive a `payment.succeeded` webhook. Voucher creation does not guarantee the customer will pay.
+</Warning>
+
+## Settlement Timeline
+
+| Stage | Timeline |
+|-------|----------|
+| Voucher created | Instant |
+| Customer pays at OXXO | 0-72 hours (depends on customer) |
+| Payment confirmed by provider | Same day or next business day |
+| Funds settle to merchant | 1-3 business days after confirmation |
+
+## Webhook Events
+
+| Event | Description | When |
+|-------|-------------|------|
+| `payment.pending` | Voucher generated | Payment created, voucher available |
+| `payment.succeeded` | Customer paid at OXXO | Provider confirmed cash payment |
+| `payment.expired` | Voucher expired | Expiration date passed without payment |
+
+```json
+{
+  "event": "payment.succeeded",
+  "data": {
+    "id": "pay_oxxo_abc123",
+    "status": "SUCCEEDED",
+    "amount": { "currency": "MXN", "value": 500.00 },
+    "payment_method": { "type": "OXXO" },
+    "paid_at": "2026-03-02T15:45:00Z"
+  }
+}
+```
+
+## Common Issues
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| 400: `email is required` | Missing customer email | Add `customer.email` to the request |
+| 400: `invalid currency` | Currency is not MXN | Set `amount.currency` to `MXN` |
+| 400: `amount exceeds limit` | Amount above OXXO maximum | Reduce amount or split into multiple payments |
+| Customer reports "invalid reference" at store | Voucher expired or already used | Check payment status; create a new payment if expired |
+
+## Response Handling
+
+### Synchronous Response
+OXXO payments return `PENDING` status with a voucher reference:
+
+```json
+{
+  "id": "pay_abc123",
+  "status": "PENDING",
+  "payment_method": {
+    "type": "OXXO",
+    "voucher": {
+      "reference": "1234567890123456",
+      "barcode": "base64-encoded-barcode",
+      "expiration": "2026-03-12T23:59:59Z"
+    }
+  }
+}
+```
+
+Display the voucher reference and barcode to the customer. They must present this at any OXXO store to complete payment.
+
+### Webhook Events
+
+| Event | Status | Action |
+|-------|--------|--------|
+| `payment.succeeded` | `SUCCEEDED` | Customer paid at OXXO — fulfill the order |
+| `payment.expired` | `EXPIRED` | Voucher expired (typically 24-72 hours) — notify customer |
+
+<Warning>
+OXXO payments can take 1-3 business days to reconcile after the customer pays. Do not ship physical goods until you receive the `payment.succeeded` webhook.
+</Warning>

@@ -1,0 +1,73 @@
+---
+title: "Get Onboarding"
+description: "Retrieve details of a specific onboarding process for a recipient."
+api: "GET https://api-sandbox.y.uno/v1/recipients/{recipient_id}/onboardings/{onboarding_id}"
+---
+
+Retrieves the details of a specific onboarding process, including its current status, provider information, documentation, and withdrawal methods.
+
+## Path Parameters
+
+<ParamField path="recipient_id" type="string" required>
+  The unique identifier of the recipient.
+</ParamField>
+
+<ParamField path="onboarding_id" type="string" required>
+  The unique identifier of the onboarding process.
+</ParamField>
+
+## Response Fields
+
+<ResponseField name="id" type="string">
+  Unique onboarding identifier.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Associated account identifier.
+</ResponseField>
+
+<ResponseField name="merchant_recipient_id" type="string">
+  Merchant-defined recipient identifier.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Onboarding type: `PREVIOUSLY_ONBOARDED` or `ONBOARD_ONTO_THE_PROVIDER`.
+</ResponseField>
+
+<ResponseField name="workflow" type="string">
+  Workflow type: `HOSTED_BY_PROVIDER` or `DIRECT`.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current onboarding status. See [Onboarding Statuses](/api-reference/recipients/onboarding-statuses) for all values.
+</ResponseField>
+
+<ResponseField name="provider" type="object">
+  Provider details including `id`, `connection_id`, `recipient_id`, and `recipient_type`.
+</ResponseField>
+
+<ResponseField name="documentation" type="array">
+  Array of uploaded documents with file details.
+</ResponseField>
+
+<ResponseField name="withdrawal_methods" type="array">
+  Bank account information configured for payouts.
+</ResponseField>
+
+<ResponseField name="legal_representatives" type="array">
+  Organization owners or beneficial owners, if applicable.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 creation timestamp.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 last update timestamp.
+</ResponseField>
+
+## Related Pages
+
+- [Onboarding Statuses](/api-reference/recipients/onboarding-statuses) — Status lifecycle reference
+- [Create Onboarding](/api-reference/recipients/create-onboarding) — Start a new onboarding
+- [Update Onboarding](/api-reference/recipients/update-onboarding) — Modify an existing onboarding

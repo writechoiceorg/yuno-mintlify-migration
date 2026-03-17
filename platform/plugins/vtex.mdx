@@ -1,0 +1,124 @@
+---
+title: "VTEX Plugin"
+description: "Integrate Yuno with VTEX e-commerce platform for seamless payment processing"
+---
+
+## Overview
+
+The Yuno VTEX Plugin connects your VTEX e-commerce store to Yuno's payment orchestration platform. Once installed, Yuno handles payment processing, provider routing, and checkout rendering within your VTEX storefront.
+
+<Note>
+The VTEX plugin supports VTEX IO and Legacy CMS stores. Verify your VTEX version before installation.
+</Note>
+
+## Prerequisites
+
+- An active Yuno account with API credentials
+- A VTEX store with admin access
+- At least one payment provider configured in [Yuno Dashboard > Connections](/platform/dashboard/connections)
+
+## Installation
+
+<Steps>
+  <Step title="Install the Yuno app in VTEX">
+    In your VTEX Admin, navigate to **Apps > App Store** and search for "Yuno Payments." Click **Install**.
+
+    Alternatively, install via the VTEX CLI:
+
+    ```bash
+    vtex install yuno.payments@latest
+    ```
+  </Step>
+
+  <Step title="Configure Yuno credentials">
+    After installation, go to **VTEX Admin > Payments > Settings > Gateway Affiliations**.
+
+    Click **+** to add a new affiliation and select **Yuno**. Enter your credentials:
+
+    | Field | Value |
+    |-------|-------|
+    | **Public API Key** | Your Yuno `public-api-key` |
+    | **Private Secret Key** | Your Yuno `private-secret-key` |
+    | **Account Code** | Your Yuno `account-code` |
+    | **Environment** | Sandbox or Production |
+  </Step>
+
+  <Step title="Configure payment conditions">
+    In **VTEX Admin > Payments > Settings > Payment Conditions**, create conditions for each payment method:
+
+    1. Click **+** to add a new condition
+    2. Select the payment method (e.g., Visa, Mastercard, PIX)
+    3. Choose **Yuno** as the gateway affiliation
+    4. Set any additional rules (installments, min/max amount)
+    5. Activate the condition
+
+    <Warning>
+    Each payment method must have a corresponding payment condition in VTEX. If a method is enabled in Yuno but not configured in VTEX, it will not appear at checkout.
+    </Warning>
+  </Step>
+
+  <Step title="Configure checkout (optional)">
+    For custom checkout rendering, configure the Yuno checkout widget in your VTEX storefront:
+
+    ```json
+    {
+      "yuno-checkout": {
+        "props": {
+          "country": "BR",
+          "language": "pt",
+          "theme": {
+            "primary": "#0066FF"
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Test the integration">
+    Place a test order in your VTEX store using [test cards](/guides/testing/test-cards). Verify:
+
+    - Payment appears in both VTEX and Yuno Dashboard
+    - Order status updates correctly
+    - Webhooks are received by VTEX
+  </Step>
+</Steps>
+
+## Supported Features
+
+| Feature | Support |
+|---------|---------|
+| Credit/Debit Cards | Yes |
+| PIX | Yes |
+| Bank Transfers | Yes |
+| Installments | Yes (provider-dependent) |
+| Refunds | Yes (from VTEX Admin or Yuno Dashboard) |
+| Partial Refunds | Yes |
+| 3DS Authentication | Yes |
+| Anti-fraud Integration | Yes (via Yuno risk conditions) |
+
+## Troubleshooting
+
+<Accordion title="Payment methods not showing at checkout">
+Verify: 1) The method is enabled in Yuno Dashboard > Connections, 2) A payment condition exists in VTEX for that method, 3) The payment condition is active and linked to the Yuno affiliation.
+</Accordion>
+
+<Accordion title="Orders stuck in 'Pending' status">
+Check webhook configuration. VTEX requires webhooks to update order status. Verify the webhook URL is correctly configured in Yuno Dashboard > Settings > Webhooks.
+</Accordion>
+
+<Accordion title="Credential errors">
+Ensure you are using the correct environment credentials. Sandbox keys do not work in production and vice versa. Re-enter credentials in the VTEX gateway affiliation settings.
+</Accordion>
+
+## Updating the Plugin
+
+Update to the latest version via VTEX Admin or CLI:
+
+```bash
+vtex update yuno.payments
+```
+
+<Note>
+Review release notes before updating. Major version updates may require reconfiguration of payment conditions.
+</Note>

@@ -5,28 +5,36 @@
    ============================================ */
 
 /* ============================================
+   Color system
+   ============================================ */
+
+:root {
+  --primary: #3E4FE0 !important;
+  --primary-hover: #2D3BB8 !important;
+  --primary-light: rgba(62, 79, 224, 0.08) !important;
+  --rounded-xl: 2px;
+  --rounded-2xl: 2px;
+  --rounded-lg: 2px;
+  --rounded-md: 2px;
+}
+
+/* ============================================
    Text contrast — Light mode
    ============================================ */
 
 body {
-  color: #282a30;
+  color: #282A30;
 }
 
-p,
-li,
-td {
-  color: #282a30;
+p, li, td {
+  color: #282A30;
 }
 
-h1,
-h2,
-h3,
-h4 {
-  color: #282a30 !important;
+h1, h2, h3, h4 {
+  color: #282A30 !important;
 }
 
-.text-gray-500,
-.text-gray-600 {
+.text-gray-500, .text-gray-600 {
   color: #5c5e66 !important;
 }
 
@@ -61,26 +69,27 @@ html.dark .text-gray-600 {
 pre,
 [data-component-part="code-block-root"] {
   background-color: transparent !important;
+  border: 1px solid #E2E5EB !important;
   border-radius: 6px !important;
 }
 
 html.dark .code-block,
 html.dark pre,
 html.dark [data-component-part="code-block-root"] {
-  border-color: #3a3c44 !important;
+  border-color: #3A3C44 !important;
 }
 
 [data-component-part="code-block-header"],
 .code-block > div:first-child {
   background-color: transparent !important;
-  border-bottom: 1px solid #e2e5eb !important;
+  border-bottom: 1px solid #E2E5EB !important;
   border-radius: 6px 6px 0 0 !important;
   color: #5c5e66 !important;
 }
 
 html.dark [data-component-part="code-block-header"],
 html.dark .code-block > div:first-child {
-  border-bottom-color: #3a3c44 !important;
+  border-bottom-color: #3A3C44 !important;
   color: #9899a3 !important;
 }
 
@@ -92,7 +101,7 @@ html.dark .code-block > div:first-child {
 
 .code-block button[aria-label="Copy"]:hover,
 [data-testid="copy-code-button"]:hover {
-  color: #e8eaf5 !important;
+  color: #E8EAF5 !important;
 }
 
 /* Line numbers */
@@ -103,17 +112,17 @@ span[class*="line"]::before,
 
 /* Inline code — light mode */
 code:not(pre code) {
-  background-color: #e8eaf5 !important;
-  color: #282a30 !important;
+  background-color: #E8EAF5 !important;
+  color: #282A30 !important;
   padding: 2px 6px !important;
-  border: 1px solid #d0d3e3 !important;
+  border: 1px solid #D0D3E3 !important;
   font-size: 13px !important;
 }
 
 /* Inline code — dark mode */
 html.dark code:not(pre code) {
   background-color: rgba(62, 79, 224, 0.12) !important;
-  color: #b8bdde !important;
+  color: #B8BDDE !important;
   border: 1px solid rgba(62, 79, 224, 0.2) !important;
 }
 
@@ -122,7 +131,7 @@ html.dark code:not(pre code) {
    ============================================ */
 
 table th {
-  color: #282a30 !important;
+  color: #282A30 !important;
   font-weight: 500 !important;
 }
 
@@ -139,11 +148,11 @@ html.dark table td {
    ============================================ */
 
 .param-head .text-primary {
-  color: #3e4fe0 !important;
+  color: #3E4FE0 !important;
 }
 
 html.dark .param-head .text-primary {
-  color: #7a8aef !important;
+  color: #7A8AEF !important;
 }
 
 html.dark .param-head {
@@ -155,15 +164,15 @@ html.dark .param-head {
    ============================================ */
 
 a {
-  color: #3e4fe0;
+  color: #3E4FE0;
 }
 
 html.dark a {
-  color: #7a8aef;
+  color: #7A8AEF;
 }
 
 html.dark a:hover {
-  color: #9eabf5 !important;
+  color: #9EABF5 !important;
 }
 
 /* ============================================
@@ -175,7 +184,7 @@ html.dark a:hover {
   font-weight: 400;
   font-size: 15px;
   line-height: 24px;
-  color: #282a30;
+  color: #282A30;
 }
 
 html.dark #sidebar-title {
@@ -184,7 +193,7 @@ html.dark #sidebar-title {
 
 #sidebar a[class*="bg-primary/10"],
 #sidebar button[class*="bg-primary/10"] {
-  background: #e8eaf5;
+  background: #E8EAF5;
 }
 
 #sidebar a:hover,
@@ -216,36 +225,14 @@ html.dark #sidebar button:hover {
    ============================================ */
 
 body {
-  font-family:
-    "DM Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    sans-serif !important;
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
   font-size: 15px;
   line-height: 24px;
   font-weight: 400;
 }
 
-body,
-p,
-li,
-td,
-th,
-span,
-div,
-a,
-label,
-input,
-button,
-select,
-textarea {
-  font-family:
-    "DM Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    sans-serif !important;
+body, p, li, td, th, span, div, a, label, input, button, select, textarea {
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
 }
 
 .mdx-content {
@@ -262,18 +249,8 @@ textarea {
    Typography — headings
    ============================================ */
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family:
-    "DM Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    sans-serif !important;
+h1, h2, h3, h4, h5, h6 {
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
   font-weight: 400 !important;
 }
 
@@ -306,14 +283,7 @@ h3 span {
    Code — font
    ============================================ */
 
-code,
-pre,
-pre *,
-code *,
-.mono,
-[class*="font-mono"],
-kbd,
-samp {
+code, pre, pre *, code *, .mono, [class*="font-mono"], kbd, samp {
   font-family: "Fira Code", monospace !important;
 }
 
@@ -325,8 +295,8 @@ span[class*="line"] * {
 }
 
 .code-block,
-.code-block:has([data-component-part="code-block-header"]),
-:not(.code-block) > [data-component-part="code-block-root"] {
+.code-block:has([data-component-part=code-block-header]),
+:not(.code-block) > [data-component-part=code-block-root] {
   --code-padding-right: 48px;
 }
 
@@ -334,9 +304,7 @@ span[class*="line"] * {
    Border-radius — sharp corners
    ============================================ */
 
-*:not(a):not(.code-block):not(pre):not([data-component-part="code-block-root"]):not(
-    [data-component-part="code-block-header"]
-  ) {
+*:not(a):not(.code-block):not(pre):not([data-component-part="code-block-root"]):not([data-component-part="code-block-header"]) {
   border-radius: 2px !important;
 }
 
@@ -369,26 +337,7 @@ span[class*="line"] * {
 .method-badge.post,
 .tag.post,
 .http-method.post {
-  background-color: #3e4fe0 !important;
+  background-color: #3E4FE0 !important;
   color: white !important;
-  border-color: #2d3bb8 !important;
-}
-
-.card.block {
-  border-radius: 0 !important;
-}
-
-.company_card_wrapper .card > div {
-  padding: 18px 20px;
-}
-
-.card h2 {
-  margin: 0 !important;
-  margin-top: 10px;
-  font-size: 16px !important;
-}
-
-.company_card_wrapper h2 {
-  font-size: 16px !important;
-  margin: 0 !important;
+  border-color: #2D3BB8 !important;
 }

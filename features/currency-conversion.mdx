@@ -1,0 +1,119 @@
+---
+title: "Currency Conversion"
+description: "Convert between currencies at real-time exchange rates for cross-border payment processing."
+---
+
+
+## Overview
+
+Yuno's Currency Conversion feature allows you to process payments in one currency and settle in another, or provide real-time exchange rate quotes to customers. This is essential for cross-border commerce where the customer's preferred currency differs from your settlement currency.
+
+## How It Works
+
+1. You request an exchange rate quote for a currency pair.
+2. Yuno returns the current rate with a validity window.
+3. You present the converted amount to the customer.
+4. The payment is processed using the quoted rate.
+5. Settlement occurs in your configured settlement currency.
+
+## Getting an Exchange Rate Quote
+
+<CodeGroup>
+```bash cURL
+curl --request GET \
+  --url "https://api.y.uno/v1/currency/convert?from=USD&to=EUR&amount=100.00" \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+```json Response
+{
+  "from_currency": "USD",
+  "to_currency": "EUR",
+  "from_amount": 100.00,
+  "to_amount": 92.15,
+  "exchange_rate": 0.9215,
+  "rate_id": "rate_abc123",
+  "valid_until": "2026-02-28T15:30:00Z"
+}
+```
+</CodeGroup>
+
+<Warning>
+  The Currency Conversion endpoint may return a **404 error in sandbox environments**. This feature requires specific enablement on your merchant account. Contact Yuno support to enable currency conversion for your account.
+</Warning>
+
+## Using a Rate in a Payment
+
+Lock in a quoted rate by including the `rate_id` in your payment request:
+
+```json
+POST /v1/payments
+{
+  "amount": {
+    "value": 100.00,
+    "currency": "USD"
+  },
+  "settlement_currency": "EUR",
+  "currency_conversion": {
+    "rate_id": "rate_abc123"
+  },
+  "country": "DE",
+  "payment_method": {
+    "type": "CARD",
+    "token": "tok_card_xyz"
+  }
+}
+```
+
+<Info>
+  The `rate_id` locks the exchange rate for the duration of its validity window (typically 5-15 minutes). If the rate expires before the payment is submitted, a new quote must be requested.
+</Info>
+
+## Supported Currency Pairs
+
+Currency conversion supports major currency pairs across global and regional markets:
+
+| From | To | Common Use Case |
+|------|-----|-----------------|
+| USD | EUR | US merchants selling in Europe |
+| EUR | USD | European merchants settling in USD |
+| USD | BRL | US merchants selling in Brazil |
+| USD | MXN | US merchants selling in Mexico |
+| GBP | EUR | UK merchants selling in the EU |
+| EUR | BRL | European merchants in Brazil |
+| USD | COP | US merchants in Colombia |
+
+<Note>
+  The full list of supported currency pairs depends on your payment provider configuration. Query the `/v1/currency/pairs` endpoint for available pairs on your account.
+</Note>
+
+## Conversion Types
+
+| Type | Description | When to Use |
+|------|-------------|-------------|
+| **Dynamic Currency Conversion (DCC)** | Customer pays in their home currency | International cardholders |
+| **Multi-Currency Pricing** | Display prices in local currency | Regional storefronts |
+| **Settlement Conversion** | Process locally, settle in home currency | Cross-border merchants |
+
+## Rate Transparency
+
+When offering currency conversion to customers, display the exchange rate and both amounts clearly:
+
+```
+Product price: $100.00 USD
+Exchange rate: 1 USD = 0.9215 EUR
+You pay: €92.15 EUR
+```
+
+<Warning>
+  Regulatory requirements in some markets (e.g., EU) mandate that customers be shown the exchange rate markup and given the option to pay in the original currency. Ensure compliance with local regulations when implementing DCC.
+</Warning>
+
+## Best Practices
+
+- **Cache rate quotes**: Request a rate quote and use it within the validity window to avoid rate fluctuations.
+- **Handle rate expiration**: Implement logic to request a new quote if the `rate_id` expires before payment submission.
+- **Show transparency**: Always display both the original and converted amounts to the customer.
+- **Test with production credentials**: Currency conversion may not be fully available in sandbox. Use production test mode when possible.
+- **Monitor FX margins**: Track effective exchange rates against market rates to optimize cost.

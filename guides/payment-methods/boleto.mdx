@@ -1,0 +1,223 @@
+---
+title: "Boleto Bancario"
+description: "Accept Boleto payments in Brazil"
+---
+
+## Overview
+
+Boleto Bancario is a widely used payment method in Brazil that generates a bank slip (boleto) with a barcode. Customers can pay the boleto at bank branches, ATMs, online banking portals, or authorized payment agents. It is especially important for reaching unbanked and underbanked populations who may not have credit cards.
+
+Key characteristics:
+- **Asynchronous**: Payment is not instant; customers pay after receiving the boleto
+- **Wide reach**: Accepted at any bank in Brazil
+- **No chargebacks**: Boleto payments cannot be disputed like card transactions
+- **Settlement delay**: Typically 1-3 business days after the customer pays
+
+## Requirements
+
+| Field | Value | Description |
+|-------|-------|-------------|
+| `country` | `BR` | Brazil only |
+| `amount.currency` | `BRL` | Brazilian Real only |
+| `customer.document.document_type` | `CPF` or `CNPJ` | Tax identification |
+| `customer.document.document_number` | 11 digits (CPF) or 14 digits (CNPJ) | Digits only |
+| `customer.email` | Valid email | Used to send boleto PDF |
+
+## Creating a Boleto Payment
+
+<CodeGroup>
+```javascript Node.js
+const response = await fetch('https://api-sandbox.y.uno/v1/payments', {
+  method: 'POST',
+  headers: {
+    'public-api-key': process.env.YUNO_PUBLIC_KEY,
+    'private-secret-key': process.env.YUNO_PRIVATE_KEY,
+    'account-code': process.env.YUNO_ACCOUNT_CODE,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    checkout_session: 'session-id',
+    payment_method: { type: 'BOLETO' },
+    amount: { currency: 'BRL', value: 250.00 },
+    country: 'BR',
+    customer: {
+      email: 'cliente@example.com',
+      first_name: 'Maria',
+      last_name: 'Silva',
+      document: {
+        document_type: 'CPF',
+        document_number: '12345678901',
+      },
+    },
+    description: 'Pedido #789',
+  }),
+});
+const payment = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api-sandbox.y.uno/v1/payments',
+    headers={
+        'public-api-key': YUNO_PUBLIC_KEY,
+        'private-secret-key': YUNO_PRIVATE_KEY,
+        'account-code': YUNO_ACCOUNT_CODE,
+        'Content-Type': 'application/json',
+    },
+    json={
+        'checkout_session': 'session-id',
+        'payment_method': {'type': 'BOLETO'},
+        'amount': {'currency': 'BRL', 'value': 250.00},
+        'country': 'BR',
+        'customer': {
+            'email': 'cliente@example.com',
+            'first_name': 'Maria',
+            'last_name': 'Silva',
+            'document': {
+                'document_type': 'CPF',
+                'document_number': '12345678901',
+            },
+        },
+        'description': 'Pedido #789',
+    },
+)
+payment = response.json()
+```
+</CodeGroup>
+
+## Handling the Response
+
+A successful Boleto creation returns status `PENDING` with boleto details:
+
+```json
+{
+  "id": "pay_boleto_abc123",
+  "status": "PENDING",
+  "amount": { "currency": "BRL", "value": 250.00 },
+  "payment_method": {
+    "type": "BOLETO",
+    "boleto": {
+      "url": "https://provider.com/boleto/abc123.pdf",
+      "barcode": "23793.38128 60000.000003 00000.000406 1 84340000025000",
+      "digitable_line": "23793381286000000000300000004061843400002500",
+      "due_date": "2026-03-04"
+    }
+  },
+  "created_at": "2026-03-01T10:00:00Z"
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `boleto.url` | URL to the boleto PDF for printing or display |
+| `boleto.barcode` | Barcode string for scanning |
+| `boleto.digitable_line` | Typeable line for manual entry in online banking |
+| `boleto.due_date` | Payment due date |
+
+## Displaying the Boleto
+
+Provide multiple ways for the customer to access the boleto:
+
+1. **PDF link**: Direct the customer to the `boleto.url` to view and print the bank slip
+2. **Barcode**: Display the barcode for scanning at bank branches or ATMs
+3. **Digitable line**: Show the numeric code for manual entry in online banking apps
+
+```html
+<a href="{payment.payment_method.boleto.url}" target="_blank">
+  Download Boleto PDF
+</a>
+<p>Or enter this code in your bank app:</p>
+<code>{payment.payment_method.boleto.digitable_line}</code>
+```
+
+<Note>
+Send the boleto URL to the customer via email as a backup. Customers may not complete payment immediately and will need access to the boleto later.
+</Note>
+
+## Expiration and Late Payment
+
+Boletos have a due date, typically 3-5 business days from creation. After the due date:
+
+- Some banks accept late payments with additional fees (juros and multa)
+- Behavior varies by provider and bank
+- If the boleto is not paid, the payment status transitions to `EXPIRED`
+
+<Warning>
+Do not fulfill orders until you receive a `payment.succeeded` webhook. Boleto creation does not guarantee payment.
+</Warning>
+
+## Settlement Timeline
+
+| Stage | Timeline |
+|-------|----------|
+| Boleto created | Instant |
+| Customer pays | 0-5 business days (depends on customer) |
+| Bank confirms payment | 1-2 business days after payment |
+| Funds settle to merchant | 1-3 business days after confirmation |
+
+Total time from creation to settlement can range from 2-10 business days.
+
+## Webhook Events
+
+| Event | Description | When |
+|-------|-------------|------|
+| `payment.pending` | Boleto generated | Payment created, boleto available |
+| `payment.succeeded` | Payment confirmed | Bank confirmed customer payment |
+| `payment.expired` | Boleto expired | Due date passed without payment |
+
+```json
+{
+  "event": "payment.succeeded",
+  "data": {
+    "id": "pay_boleto_abc123",
+    "status": "SUCCEEDED",
+    "amount": { "currency": "BRL", "value": 250.00 },
+    "payment_method": { "type": "BOLETO" },
+    "paid_at": "2026-03-03T14:30:00Z"
+  }
+}
+```
+
+## Common Issues
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| 400: `customer.document is required` | Missing CPF/CNPJ | Add `customer.document` with valid tax ID |
+| 400: `invalid currency` | Currency is not BRL | Set `amount.currency` to `BRL` |
+| Boleto not received by customer | Email delivery issue | Provide the boleto URL directly in your checkout flow |
+| Payment not confirmed after due date | Customer did not pay | Create a new payment; do not reuse expired boletos |
+
+## Response Handling
+
+### Synchronous Response
+Boleto payments return `PENDING` status with a ticket URL:
+
+```json
+{
+  "id": "pay_abc123",
+  "status": "PENDING",
+  "payment_method": {
+    "type": "BOLETO",
+    "boleto": {
+      "url": "https://provider.com/boleto/123456",
+      "barcode": "23793.38128 60000.000003 00000.000400 1 84340000010000",
+      "expiration": "2026-03-15T23:59:59Z"
+    }
+  }
+}
+```
+
+Provide the customer with the boleto URL (printable PDF) or the barcode line for bank app payment.
+
+### Webhook Events
+
+| Event | Status | Action |
+|-------|--------|--------|
+| `payment.succeeded` | `SUCCEEDED` | Customer paid — fulfill the order |
+| `payment.expired` | `EXPIRED` | Boleto expired (typically 3-7 days) — notify customer |
+
+<Note>
+Boleto settlement can take 1-3 business days after the customer pays. Use webhooks for definitive payment confirmation.
+</Note>

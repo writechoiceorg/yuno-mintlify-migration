@@ -1,0 +1,159 @@
+---
+title: "SCA Exemptions"
+description: "Request exemptions from Strong Customer Authentication for low-risk, low-value, or trusted transactions."
+---
+
+
+## Overview
+
+Strong Customer Authentication (SCA) is a regulatory requirement under the EU's PSD2 directive that mandates multi-factor authentication for electronic payments. While SCA improves security, it adds friction to the checkout process. SCA exemptions allow you to request that certain eligible transactions bypass the full authentication challenge, improving conversion rates while remaining compliant.
+
+Yuno supports requesting SCA exemptions through the 3DS authentication flow. The issuing bank makes the final decision on whether to grant the exemption.
+
+## Exemption Categories
+
+| Exemption | Criteria | Max Amount | Use Case |
+|-----------|----------|------------|----------|
+| **Low Value** | Transaction below threshold | EUR 30 (cumulative limit: EUR 100 or 5 transactions) | Small purchases |
+| **Low Risk (TRA)** | Merchant's fraud rate below threshold | EUR 500 (varies by fraud rate) | Trusted merchants with low fraud |
+| **Trusted Beneficiary** | Customer whitelisted the merchant | No limit | Returning customers |
+| **Recurring (Fixed)** | Same amount, same payee, recurring | No limit (after initial SCA) | Subscriptions |
+| **Merchant Initiated** | Transaction initiated by merchant, not customer | No limit (after initial SCA) | Scheduled charges, top-ups |
+| **Corporate Cards** | B2B payments with corporate cards | No limit | Business purchases |
+
+<Info>
+  SCA exemptions are **requests**, not guarantees. The issuing bank has the final authority to grant or deny an exemption. If denied, the transaction will proceed with full 3DS authentication.
+</Info>
+
+## Requesting an Exemption
+
+Include the `sca_exemption` field in your payment request:
+
+<CodeGroup>
+```json Low Value Exemption
+{
+  "amount": { "value": 25.00, "currency": "EUR" },
+  "country": "DE",
+  "payment_method": {
+    "type": "CARD",
+    "token": "tok_card_abc123"
+  },
+  "three_d_secure": {
+    "enabled": true,
+    "sca_exemption": {
+      "type": "LOW_VALUE"
+    }
+  }
+}
+```
+
+```json Transaction Risk Analysis (TRA)
+{
+  "amount": { "value": 250.00, "currency": "EUR" },
+  "country": "FR",
+  "payment_method": {
+    "type": "CARD",
+    "token": "tok_card_abc123"
+  },
+  "three_d_secure": {
+    "enabled": true,
+    "sca_exemption": {
+      "type": "TRANSACTION_RISK_ANALYSIS"
+    }
+  }
+}
+```
+
+```json Trusted Beneficiary
+{
+  "amount": { "value": 500.00, "currency": "EUR" },
+  "country": "ES",
+  "payment_method": {
+    "type": "CARD",
+    "token": "tok_card_abc123"
+  },
+  "three_d_secure": {
+    "enabled": true,
+    "sca_exemption": {
+      "type": "TRUSTED_BENEFICIARY"
+    }
+  }
+}
+```
+</CodeGroup>
+
+## TRA Fraud Rate Thresholds
+
+Transaction Risk Analysis (TRA) exemptions are available based on your fraud rate:
+
+| Merchant Fraud Rate | Max Exemption Amount |
+|---------------------|---------------------|
+| Below 0.13% | EUR 100 |
+| Below 0.06% | EUR 250 |
+| Below 0.01% | EUR 500 |
+
+<Warning>
+  TRA exemptions require Yuno or your acquirer to calculate and maintain fraud rate metrics. If your fraud rate exceeds the threshold, TRA exemptions for that amount tier will be denied. Monitor your fraud rate in the Yuno Dashboard.
+</Warning>
+
+## Exemption Flow
+
+```
+Payment Request (with exemption)
+    │
+    ├── Sent to issuer via 3DS
+    │     │
+    │     ├── Exemption GRANTED ──> Frictionless approval
+    │     │
+    │     └── Exemption DENIED ──> Challenge required
+    │                                  │
+    │                                  └── Customer authenticates
+    │
+    └── Payment processed
+```
+
+## Response Handling
+
+The 3DS response indicates whether the exemption was applied:
+
+```json
+{
+  "three_d_secure": {
+    "status": "AUTHENTICATED",
+    "version": "2.2",
+    "sca_exemption": {
+      "type": "LOW_VALUE",
+      "applied": true
+    },
+    "eci": "05"
+  }
+}
+```
+
+## Recurring Payment Exemptions
+
+For subscriptions and recurring payments, SCA is required only for the initial transaction. Subsequent charges can use the `RECURRING_FIXED` exemption:
+
+```json
+{
+  "three_d_secure": {
+    "enabled": true,
+    "sca_exemption": {
+      "type": "RECURRING_FIXED",
+      "initial_transaction_id": "pay_initial_abc123"
+    }
+  }
+}
+```
+
+<Note>
+  The initial subscription payment must be fully authenticated with SCA. Reference the initial transaction ID in subsequent recurring charges to qualify for the exemption.
+</Note>
+
+## Best Practices
+
+- **Start with low-risk exemptions**: Low value and TRA are the most commonly granted.
+- **Always handle denial gracefully**: If an exemption is denied, fall back to full 3DS authentication seamlessly.
+- **Monitor fraud rates**: Keep your fraud rate well below TRA thresholds to maintain eligibility.
+- **Use for returning customers**: Trusted beneficiary exemptions improve UX for loyal customers.
+- **Combine with risk scoring**: Only request exemptions for transactions your fraud engine considers low-risk.

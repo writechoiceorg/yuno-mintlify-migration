@@ -1,0 +1,169 @@
+---
+title: "Create a Subscription"
+description: "Set up recurring billing by enrolling a payment method and creating a subscription with Yuno's API."
+---
+
+
+## Overview
+
+Creating a subscription involves two steps: enrolling a customer's payment method for recurring use, and then creating the subscription with your desired billing configuration. This guide walks through both steps with complete API examples.
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/subscription-creation-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/subscription-creation-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+## Step 1: Enroll a Payment Method
+
+Before creating a subscription, you need a reusable payment method token. Use the enrollment flow to securely capture and tokenize the customer's payment details.
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/customers/{customer_id}/payment-methods \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "type": "CARD",
+    "vaulted_token": "tok_card_abc123",
+    "country": "US"
+  }'
+```
+
+```json Response
+{
+  "id": "pm_enrolled_xyz789",
+  "type": "CARD",
+  "status": "ACTIVE",
+  "card": {
+    "last_four": "4242",
+    "brand": "VISA",
+    "expiry_month": 12,
+    "expiry_year": 2028
+  },
+  "customer_id": "cust_abc123"
+}
+```
+</CodeGroup>
+
+<Info>
+  When using Yuno's Checkout SDK, the enrollment flow is handled automatically. The SDK returns a `vaulted_token` that you can use for subscription creation.
+</Info>
+
+## Step 2: Create the Subscription
+
+With an enrolled payment method, create a subscription specifying the billing amount, interval, and duration.
+
+<CodeGroup>
+```bash cURL
+curl --request POST \
+  --url https://api.y.uno/v1/subscriptions \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{
+    "customer_id": "cust_abc123",
+    "payment_method_id": "pm_enrolled_xyz789",
+    "amount": {
+      "value": 29.99,
+      "currency": "USD"
+    },
+    "country": "US",
+    "interval": "MONTHLY",
+    "interval_count": 1,
+    "start_date": "2026-03-01T00:00:00Z",
+    "description": "Premium Plan - Monthly",
+    "metadata": {
+      "plan": "premium",
+      "tier": "monthly"
+    }
+  }'
+```
+
+```json Response
+{
+  "id": "sub_premium_001",
+  "status": "CREATED",
+  "customer_id": "cust_abc123",
+  "payment_method_id": "pm_enrolled_xyz789",
+  "amount": {
+    "value": 29.99,
+    "currency": "USD"
+  },
+  "interval": "MONTHLY",
+  "interval_count": 1,
+  "start_date": "2026-03-01T00:00:00Z",
+  "next_billing_date": "2026-03-01T00:00:00Z",
+  "created_at": "2026-02-28T15:30:00Z"
+}
+```
+</CodeGroup>
+
+## Billing Intervals
+
+| Interval | `interval` Value | `interval_count` Example | Billing Frequency |
+|----------|-----------------|-------------------------|-------------------|
+| Daily | `DAILY` | 1 | Every day |
+| Weekly | `WEEKLY` | 1 | Every 7 days |
+| Bi-weekly | `WEEKLY` | 2 | Every 14 days |
+| Monthly | `MONTHLY` | 1 | Every month |
+| Quarterly | `MONTHLY` | 3 | Every 3 months |
+| Annual | `YEARLY` | 1 | Every year |
+
+## Managing Subscriptions
+
+### Pause a Subscription
+
+```bash
+curl --request POST \
+  --url https://api.y.uno/v1/subscriptions/sub_premium_001/pause \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+### Resume a Subscription
+
+```bash
+curl --request POST \
+  --url https://api.y.uno/v1/subscriptions/sub_premium_001/resume \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE'
+```
+
+### Cancel a Subscription
+
+```bash
+curl --request POST \
+  --url https://api.y.uno/v1/subscriptions/sub_premium_001/cancel \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --header 'X-Account-Code: YOUR_ACCOUNT_CODE' \
+  --data '{ "reason": "Customer requested cancellation" }'
+```
+
+<Warning>
+  Cancellation is irreversible. Once cancelled, a new subscription must be created if the customer wishes to re-subscribe.
+</Warning>
+
+## Update Payment Method
+
+If a customer's card expires or they want to switch payment methods:
+
+```bash
+curl --request PATCH \
+  --url https://api.y.uno/v1/subscriptions/sub_premium_001 \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: YOUR_API_KEY' \
+  --data '{
+    "payment_method_id": "pm_new_card_456"
+  }'
+```
+
+<Note>
+  Proactively prompt customers to update their payment method before card expiration to avoid payment failures and involuntary churn.
+</Note>

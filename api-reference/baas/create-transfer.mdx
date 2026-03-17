@@ -1,0 +1,137 @@
+---
+title: "Initiate Transfer"
+description: "Send funds between BaaS entities"
+api: "POST https://api-sandbox.y.uno/v1/baas/transfers"
+---
+
+## Headers
+
+<ParamField header="x-idempotency-key" type="string" required>
+  Unique UUID to ensure the request is processed only once.
+</ParamField>
+
+## Body
+
+<ParamField body="account_id" type="string" required>
+  Merchant's Yuno account identifier (UUID).
+</ParamField>
+
+<ParamField body="source_entity_id" type="string" required>
+  Entity ID initiating the transfer.
+</ParamField>
+
+<ParamField body="destination_entity_id" type="string" required>
+  Entity ID receiving the transfer.
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  Transfer amount.
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  ISO 4217 currency code.
+</ParamField>
+
+<ParamField body="payment_rail" type="string">
+  Payment rail to use. Options depend on region. See [Payment rails by region](/features/baas/overview#payment-rails-by-region).
+</ParamField>
+
+<ParamField body="reference" type="string">
+  Merchant reference for reconciliation.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Transfer description.
+</ParamField>
+
+<ParamField body="metadata" type="object">
+  Additional custom data.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">
+  Transfer identifier.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Associated Yuno account.
+</ResponseField>
+
+<ResponseField name="source_entity_id" type="string">
+  Origin entity.
+</ResponseField>
+
+<ResponseField name="destination_entity_id" type="string">
+  Recipient entity.
+</ResponseField>
+
+<ResponseField name="amount" type="number">
+  Transferred amount.
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  Currency code.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current transfer status. See [Transfer statuses](/features/baas/overview#transfer-statuses).
+</ResponseField>
+
+<ResponseField name="payment_rail" type="string">
+  Payment rail used.
+</ResponseField>
+
+<ResponseField name="reference" type="string">
+  Merchant reference.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 timestamp.
+</ResponseField>
+
+<RequestExample>
+```json
+{
+  "account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "source_entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "destination_entity_id": "ent_770e8400-e29b-41d4-a716-446655440001",
+  "amount": 250.00,
+  "currency": "USD",
+  "payment_rail": "ACH_SAME_DAY",
+  "reference": "invoice_2026_001",
+  "description": "Payment for services rendered"
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": "xfer_880e8400-e29b-41d4-a716-446655440000",
+  "account_id": "550e8400-e29b-41d4-a716-446655440000",
+  "source_entity_id": "ent_660e8400-e29b-41d4-a716-446655440000",
+  "destination_entity_id": "ent_770e8400-e29b-41d4-a716-446655440001",
+  "amount": 250.00,
+  "currency": "USD",
+  "status": "PENDING",
+  "payment_rail": "ACH_SAME_DAY",
+  "reference": "invoice_2026_001",
+  "description": "Payment for services rendered",
+  "created_at": "2026-02-01T16:00:00Z",
+  "updated_at": "2026-02-01T16:00:00Z"
+}
+```
+
+```json 400 Bad Request
+{
+  "code": "INSUFFICIENT_FUNDS",
+  "messages": ["Source account has insufficient funds"],
+  "http_code": 400
+}
+```
+</ResponseExample>

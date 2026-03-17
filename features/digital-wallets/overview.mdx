@@ -1,0 +1,85 @@
+---
+title: "Digital Wallets"
+description: "Accept payments through Apple Pay, Google Pay, Click to Pay, and NuPay for faster, more secure checkout experiences."
+---
+
+
+## Overview
+
+Digital wallets provide a streamlined checkout experience by allowing customers to pay using stored payment credentials. Through Yuno, you can integrate multiple digital wallet options with a single API, reducing checkout friction and increasing conversion rates.
+
+Digital wallets offer several advantages over traditional card entry:
+
+- **Faster checkout**: Customers authenticate with biometrics or device PIN instead of typing card details.
+- **Higher security**: Wallets use tokenized credentials, reducing PCI scope and fraud risk.
+- **Better conversion**: Fewer form fields and faster completion lead to lower cart abandonment.
+- **Cross-device support**: Wallets work across web, mobile, and in-app contexts.
+
+## Supported Wallets
+
+<CardGroup cols={2}>
+  <Card title="Apple Pay" icon="apple" href="/features/digital-wallets/apple-pay">
+    Accept payments from iPhone, iPad, Mac, and Apple Watch users via Safari and iOS apps. Available in 70+ countries.
+  </Card>
+  <Card title="Google Pay" icon="google" href="/features/digital-wallets/google-pay">
+    Accept payments from Android devices and Chrome browsers. One-tap checkout for billions of Google accounts.
+  </Card>
+  <Card title="Click to Pay" icon="credit-card" href="/features/digital-wallets/click-to-pay">
+    Visa and Mastercard's one-click checkout for returning cardholders. No app required, works across devices.
+  </Card>
+  <Card title="NuPay" icon="building-columns" href="/features/digital-wallets/nupay">
+    Accept payments from Brazilian Nubank customers directly from their Nubank app balance or credit line.
+  </Card>
+</CardGroup>
+
+## Supported Countries
+
+| Wallet | Key Markets | Notes |
+|--------|------------|-------|
+| Apple Pay | US, BR, MX, CO, CL, AR, PE, and 60+ more | Requires domain verification |
+| Google Pay | US, BR, MX, CO, CL, AR, and 40+ more | Requires Google merchant ID |
+| Click to Pay | US, BR, MX, CO | Visa and Mastercard networks |
+| NuPay | BR | Nubank customers only |
+
+<Info>
+  Country availability depends on your payment provider configuration. Verify supported countries in your Yuno Dashboard under **Settings > Payment Methods**.
+</Info>
+
+## Integration Approaches
+
+### Full Checkout SDK
+
+The simplest integration path. Yuno's Full Checkout SDK automatically renders available digital wallet buttons based on the customer's device and browser capabilities.
+
+```javascript
+const checkout = yuno.checkout({
+  countryCode: "BR",
+  currency: "BRL",
+  amount: "100.00",
+  // Digital wallet buttons render automatically
+});
+```
+
+### Lite Checkout SDK
+
+Use the Lite Checkout for more control over the UI while still leveraging Yuno's wallet integrations. You handle the button placement and styling.
+
+### Direct API
+
+For full control, integrate each wallet directly via Yuno's Payments API. This approach requires handling wallet-specific authentication flows and token management.
+
+<Note>
+  When using the Full or Lite Checkout SDK, wallet availability is automatically detected based on the customer's device. For Direct API integrations, you must implement device detection logic yourself.
+</Note>
+
+## Security Benefits
+
+All digital wallet transactions use tokenized card credentials, meaning the actual card number is never transmitted. This provides:
+
+- **Reduced PCI scope**: No raw card data touches your servers.
+- **Dynamic cryptograms**: Each transaction uses a unique cryptogram, preventing replay attacks.
+- **Biometric authentication**: Device-level verification adds a strong authentication layer.
+
+## Next Steps
+
+Select a wallet to view detailed integration instructions and prerequisites.

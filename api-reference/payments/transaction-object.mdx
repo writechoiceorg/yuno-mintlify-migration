@@ -1,0 +1,194 @@
+---
+title: "The Transaction Object"
+description: "Represents a single processing attempt within a payment, capturing provider interaction details."
+---
+
+The Transaction object represents a single processing attempt within a [Payment](/api-reference/payments/object). A payment may contain multiple transactions when Yuno's routing engine retries with alternative providers after a decline, or when follow-up actions like captures, refunds, and chargebacks occur.
+
+<Info>
+  **One payment, many transactions** — A card payment that is authorized, then captured, then partially refunded will have three transactions: `AUTHORIZE`, `CAPTURE`, and `REFUND`. If the first provider declined the authorization, there may be an additional `AUTHORIZE` transaction from the fallback provider.
+</Info>
+
+## Object Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier of the transaction (UUID).
+
+  Example: `txn_f47ac10b-58cc-4372-a567-0e02b2c3d479`
+</ResponseField>
+
+<ResponseField name="payment_id" type="string">
+  The parent payment identifier. Links to the [Payment Object](/api-reference/payments/object).
+
+  Example: `8546df3a-b83e-4bb5-a4b3-57aa6385924f`
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  The transaction type, indicating the action performed against the provider.
+
+  Values: `PURCHASE`, `AUTHORIZE`, `CAPTURE`, `CANCEL`, `REFUND`, `VERIFY`, `CHARGEBACK`, `FRAUD_SCREENING`, `SALE`
+
+  - `PURCHASE` — Single-step payment (charge + capture in one call).
+  - `AUTHORIZE` — Places a hold on funds without capturing.
+  - `CAPTURE` — Captures a previously authorized amount.
+  - `CANCEL` — Voids an authorization before capture.
+  - `REFUND` — Returns funds to the customer after capture.
+  - `VERIFY` — Zero-value card verification (e.g., for enrollment).
+  - `CHARGEBACK` — Dispute initiated by the cardholder's bank.
+  - `FRAUD_SCREENING` — Fraud analysis performed before processing.
+  - `SALE` — Combined authorization and capture in a single step (provider-specific).
+
+  Example: `PURCHASE`
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The transaction outcome status.
+
+  Values: `CREATED`, `SUCCEEDED`, `PENDING`, `DECLINED`, `REJECTED`, `FAILED`, `CANCELLED`, `EXPIRED`, `ERROR`, `WON`, `LOST`
+
+  - `CREATED` — Transaction initiated, awaiting provider response.
+  - `SUCCEEDED` — Provider approved the transaction.
+  - `PENDING` — Awaiting asynchronous confirmation (common for PIX, Boleto).
+  - `DECLINED` — Provider declined (soft decline, retryable).
+  - `REJECTED` — Provider rejected (hard decline, do not retry).
+  - `FAILED` — Processing error on the provider side.
+  - `CANCELLED` — Voided before completion.
+  - `EXPIRED` — Timed out waiting for customer action or provider response.
+  - `ERROR` — Unexpected system error.
+  - `WON` — Chargeback dispute resolved in merchant's favor.
+  - `LOST` — Chargeback dispute resolved in cardholder's favor.
+
+  Example: `SUCCEEDED`
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  Name of the provider that processed this transaction.
+
+  Example: `ADYEN`
+</ResponseField>
+
+<ResponseField name="provider_transaction_id" type="string">
+  The provider's own transaction reference, used for cross-referencing on the provider's dashboard.
+
+  Example: `8835562831897070`
+</ResponseField>
+
+<ResponseField name="response_code" type="string">
+  Yuno-normalized response code from the provider. See [Response Codes](/reference/response-codes) for the full mapping.
+
+  Example: `00`
+</ResponseField>
+
+<ResponseField name="response_message" type="string">
+  Human-readable response message from the provider.
+
+  Example: `Approved`
+</ResponseField>
+
+<ResponseField name="amount" type="object">
+  The transaction amount. May differ from the payment amount in partial captures or partial refunds.
+  <Expandable title="amount">
+    <ResponseField name="value" type="number">
+      The transaction amount value.
+
+      Example: `100.50`
+    </ResponseField>
+    <ResponseField name="currency" type="string">
+      ISO 4217 currency code.
+
+      Example: `USD`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="three_ds" type="object">
+  3DS authentication details. Present only for card transactions that underwent 3D Secure verification. See [3D Secure](/security/3d-secure).
+  <Expandable title="three_ds">
+    <ResponseField name="version" type="string">
+      3DS protocol version used.
+
+      Values: `1.0`, `2.1`, `2.2`
+
+      Example: `2.2`
+    </ResponseField>
+    <ResponseField name="eci" type="string">
+      Electronic Commerce Indicator returned by the issuer. See [ECI Indicators](/reference/eci-indicators).
+
+      Example: `05`
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Authentication outcome.
+
+      Values: `AUTHENTICATED`, `ATTEMPTED`, `FAILED`, `REJECTED`, `UNAVAILABLE`
+
+      Example: `AUTHENTICATED`
+    </ResponseField>
+    <ResponseField name="flow" type="string">
+      Whether the cardholder was challenged or authentication was frictionless.
+
+      Values: `FRICTIONLESS`, `CHALLENGE`
+
+      Example: `FRICTIONLESS`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the transaction was created.
+
+  Example: `2026-03-01T14:31:01.000Z`
+</ResponseField>
+
+## Status by Transaction Type
+
+Not all statuses apply to every transaction type. The following matrix shows which statuses are valid for each type:
+
+| Status | PURCHASE | AUTHORIZE | CAPTURE | CANCEL | REFUND | VERIFY | CHARGEBACK | FRAUD_SCREENING | SALE |
+|--------|----------|-----------|---------|--------|--------|--------|------------|-----------------|------|
+| `CREATED` | Yes | Yes | Yes | Yes | Yes | Yes | -- | Yes | Yes |
+| `SUCCEEDED` | Yes | Yes | Yes | Yes | Yes | Yes | -- | Yes | Yes |
+| `PENDING` | Yes | Yes | -- | -- | Yes | -- | -- | Yes | Yes |
+| `DECLINED` | Yes | Yes | -- | -- | Yes | Yes | -- | Yes | Yes |
+| `REJECTED` | Yes | Yes | Yes | Yes | Yes | -- | -- | Yes | Yes |
+| `FAILED` | Yes | Yes | Yes | Yes | Yes | Yes | -- | Yes | Yes |
+| `CANCELLED` | Yes | Yes | -- | -- | -- | -- | -- | -- | Yes |
+| `EXPIRED` | Yes | Yes | -- | -- | -- | -- | -- | -- | Yes |
+| `ERROR` | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| `WON` | -- | -- | -- | -- | -- | -- | Yes | -- | -- |
+| `LOST` | -- | -- | -- | -- | -- | -- | Yes | -- | -- |
+
+<Note>
+  `WON` and `LOST` are exclusive to `CHARGEBACK` transactions and represent the final dispute outcome. All other transaction types use `SUCCEEDED` or `DECLINED`/`REJECTED` as terminal states.
+</Note>
+
+## Example
+
+```json
+{
+  "id": "txn_f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "payment_id": "8546df3a-b83e-4bb5-a4b3-57aa6385924f",
+  "type": "PURCHASE",
+  "status": "SUCCEEDED",
+  "provider": "ADYEN",
+  "provider_transaction_id": "8835562831897070",
+  "response_code": "00",
+  "response_message": "Approved",
+  "amount": {
+    "value": 100.50,
+    "currency": "USD"
+  },
+  "three_ds": {
+    "version": "2.2",
+    "eci": "05",
+    "status": "AUTHENTICATED",
+    "flow": "FRICTIONLESS"
+  },
+  "created_at": "2026-03-01T14:31:01.000Z"
+}
+```
+
+## Related Concepts
+
+- [Transactions](/core-concepts/transactions) — How transactions relate to payments and routing
+- [Payment Statuses](/reference/payment-statuses) — How transaction outcomes map to payment statuses
+- [Response Codes](/reference/response-codes) — Provider response code mapping and MAC codes

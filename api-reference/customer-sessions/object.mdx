@@ -1,0 +1,116 @@
+---
+title: "The Customer Session Object"
+description: "Represents a customer session used to manage payment method enrollment and one-click checkout."
+---
+
+The Customer Session object generates an `sdk_token` scoped to a specific customer, enabling client-side operations like payment method enrollment (vaulting), listing saved methods, and one-click checkout. Unlike a Checkout Session, a Customer Session does not involve a payment amount — it is purely for credential management.
+
+<Info>
+  **Enrollment flow** — To vault a payment method for future use, create a Customer Session first, then use the returned `sdk_token` to initialize the enrollment SDK on the client side. See [Enrollment Guide](/guides/enrollment).
+</Info>
+
+## Object Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier for this customer session (UUID).
+
+  Example: `cs_7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d`
+</ResponseField>
+
+<ResponseField name="customer_id" type="string">
+  The ID of the [Customer Object](/api-reference/customers/object) this session belongs to. The customer must exist before creating a session.
+
+  Example: `c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f`
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of the customer session.
+
+  Values: `ACTIVE`, `EXPIRED`
+
+  Example: `ACTIVE`
+</ResponseField>
+
+<ResponseField name="sdk_token" type="string">
+  Token used to initialize the Yuno SDK for enrollment flows on the client side. Returned only in the create response. Scoped to the customer and short-lived.
+
+  Example: `cstok_live_xyz789abc012def345ghi678`
+</ResponseField>
+
+<ResponseField name="expires_at" type="string">
+  ISO 8601 timestamp of when this session expires. After expiration, the `sdk_token` is no longer valid and a new session must be created.
+
+  Example: `2026-03-10T19:00:00.000Z`
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the customer session was created.
+
+  Example: `2026-03-10T18:00:00.000Z`
+</ResponseField>
+
+## Example
+
+```json
+{
+  "id": "cs_7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d",
+  "customer_id": "c9d0e1f2-3a4b-5c6d-7e8f-9a0b1c2d3e4f",
+  "status": "ACTIVE",
+  "sdk_token": "cstok_live_xyz789abc012def345ghi678",
+  "expires_at": "2026-03-10T19:00:00.000Z",
+  "created_at": "2026-03-10T18:00:00.000Z"
+}
+```
+
+## Session Lifecycle
+
+Customer sessions follow a simple lifecycle:
+
+| Status | Description |
+|--------|-------------|
+| `ACTIVE` | Session is valid. The `sdk_token` can be used to initialize the enrollment SDK. |
+| `EXPIRED` | Session has passed its `expires_at` time. Create a new session to continue. |
+
+<Warning>
+  Customer sessions are short-lived by design. Always create a fresh session immediately before rendering the enrollment UI. Do not cache or reuse `sdk_token` values across page loads.
+</Warning>
+
+## Checkout Session vs. Customer Session
+
+These two session types serve different purposes:
+
+| | Checkout Session | Customer Session |
+|---|---|---|
+| **Purpose** | Collect a payment | Enroll a payment method |
+| **Requires amount** | Yes | No |
+| **Creates a payment** | Yes | No |
+| **Vaults a method** | Only if `vault_on_success: true` | Always (that is the purpose) |
+| **SDK flow** | Checkout SDK | Enrollment SDK |
+| **Endpoint** | `POST /v1/checkout/sessions` | `POST /v1/customers/{id}/sessions` |
+
+## Common Integration Pattern
+
+A typical enrollment flow using Customer Sessions:
+
+1. **Create the customer** via `POST /v1/customers` if they do not already exist.
+2. **Create a Customer Session** via `POST /v1/customers/{customer_id}/sessions`.
+3. **Initialize the SDK** on the client side using the returned `sdk_token`.
+4. **Customer completes enrollment** — the SDK handles the card form, tokenization, and verification.
+5. **Receive webhook** confirming the payment method was enrolled.
+6. **Use the vaulted token** in future [Checkout Sessions](/api-reference/checkout-sessions/create) for one-click payments.
+
+<Info>
+  **Sandbox testing** — In sandbox, use Yuno's test card numbers to simulate enrollment. The session behaves identically to production, but no real card verification occurs.
+</Info>
+
+## Related Endpoints
+
+- [Create Customer Session](/api-reference/customer-sessions/create) — `POST /v1/customers/{customer_id}/sessions`
+
+## Related Concepts
+
+- [Enrollment Guide](/guides/enrollment) — Step-by-step guide to vaulting payment methods
+- [Customer Object](/api-reference/customers/object) — The customer record this session is scoped to
+- [Payment Method Object](/api-reference/payment-methods/object) — Payment methods enrolled through this session
+- [Checkout Session Object](/api-reference/checkout-sessions/object) — The session type used for collecting payments
+- [One-Click Checkout](/guides/one-click) — Using vaulted methods for returning customers

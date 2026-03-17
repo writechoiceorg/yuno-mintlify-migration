@@ -1,0 +1,192 @@
+---
+title: "Insights"
+description: "Analytics dashboard for payment volume, conversion rates, and fraud metrics"
+---
+
+## Overview
+
+The Insights section provides a comprehensive analytics dashboard for understanding your payment performance. Access it at **Dashboard > Insights** to view transaction trends, identify optimization opportunities, and monitor fraud indicators.
+
+Insights organizes data across four tabs: **Overview**, **Volume**, **Conversion Rate**, and **Fraud**.
+
+## Date Range and Filters
+
+All Insights tabs share a global filter bar at the top of the page:
+
+| Filter | Options | Description |
+|--------|---------|-------------|
+| **Date Range** | Preset (Today, 7d, 30d, 90d) or custom picker | Time period for all charts and metrics |
+| **Comparison** | Previous period, same period last month/year | Overlay comparison data on charts |
+| **Country** | Select one or more countries | Filter metrics by transaction country |
+| **Payment Method** | CARD, PIX, BANK_TRANSFER, etc. | Filter by payment method type |
+| **Provider** | Select one or more connections | Filter by processing provider |
+| **Currency** | ISO 4217 codes | Filter by transaction currency |
+
+<Note>
+Filters apply across all tabs. Switching tabs preserves your current filter selections.
+</Note>
+
+## Overview Tab
+
+The Overview tab provides a high-level snapshot of your payment performance:
+
+### Key Metrics
+
+| Metric | Description |
+|--------|-------------|
+| **Total Volume** | Sum of all transaction amounts in the selected period |
+| **Transaction Count** | Number of transactions processed |
+| **Approval Rate** | Percentage of transactions with status `SUCCEEDED` |
+| **Average Ticket** | Average transaction amount |
+
+### Summary Charts
+
+- **Volume over time:** Daily or hourly transaction amount, with comparison overlay
+- **Top payment methods:** Ranked by transaction count or volume
+- **Top countries:** Ranked by transaction count or volume
+- **Provider distribution:** Pie chart showing transaction share per provider
+
+## Volume Tab
+
+The Volume tab provides detailed breakdowns of transaction activity:
+
+### Transaction Count and Amount
+
+View transaction count and total amount as time-series charts. Toggle between daily, weekly, and monthly granularity.
+
+### Breakdowns
+
+| Breakdown | View |
+|-----------|------|
+| **By Payment Method** | Stacked bar chart showing volume per method over time |
+| **By Country** | Stacked bar chart showing volume per country over time |
+| **By Provider** | Stacked bar chart showing volume per provider over time |
+| **By Currency** | Table with totals per currency |
+| **By Status** | Distribution of transaction statuses (Succeeded, Failed, Pending, Cancelled) |
+
+### Data Table
+
+Below each chart, a sortable data table displays the underlying values. Click any column header to sort. Export the table using the **Export** button.
+
+## Conversion Rate Tab
+
+The Conversion Rate tab helps you understand and improve approval rates:
+
+### Approval Rate Trends
+
+A line chart showing approval rate over time, broken down by:
+
+- **Overall:** Aggregate approval rate across all transactions
+- **By Provider:** Compare approval rates across providers to identify underperformers
+- **By Payment Method:** Identify methods with lower-than-expected approval rates
+- **By Country:** Detect regional approval rate variations
+
+### Decline Reasons
+
+| Section | Details |
+|---------|---------|
+| **Top Decline Codes** | Ranked list of decline reason codes with count and percentage |
+| **Decline Trend** | Time series of decline volume, segmented by reason |
+| **Provider Comparison** | Side-by-side decline rates across providers for the same payment method |
+
+<Note>
+Decline reason codes come from the downstream provider. Different providers may return different codes for similar decline reasons. Refer to each provider's documentation for code definitions.
+</Note>
+
+### Provider Comparison
+
+A comparison table showing key metrics side by side for each provider:
+
+| Provider | Approval Rate | Avg Response Time | Error Rate | Volume Share |
+|----------|--------------|-------------------|------------|-------------|
+| Provider A | 85.2% | 1,200ms | 2.1% | 60% |
+| Provider B | 78.5% | 1,800ms | 4.3% | 40% |
+
+## Fraud Tab
+
+The Fraud tab surfaces risk indicators and chargeback data:
+
+### Key Fraud Metrics
+
+| Metric | Description | Healthy Range |
+|--------|-------------|---------------|
+| **Chargeback Rate** | Chargebacks as percentage of total transactions | < 1% |
+| **Fraud Alert Count** | Transactions flagged by risk conditions | Varies |
+| **Risk Score Distribution** | Histogram of transaction risk scores | Skewed low |
+
+### Chargeback Analysis
+
+- **Chargeback rate over time:** Track trends against card network thresholds
+- **Chargeback reasons:** Breakdown by reason code (fraud, not recognized, product issue)
+- **Chargeback by country:** Geographic distribution of chargebacks
+
+<Warning>
+Card networks impose chargeback rate thresholds. Exceeding 1% chargeback rate may result in monitoring programs or penalties. Use the Fraud tab to track your rate proactively.
+</Warning>
+
+### Merchant Advisory Codes (MAC)
+
+Merchant Advisory Codes are signals from card networks that indicate potential fraud patterns on your account:
+
+| MAC | Meaning | Recommended Action |
+|-----|---------|-------------------|
+| **Excessive fraud** | Fraud rate above network threshold | Review risk conditions, tighten fraud filters |
+| **High chargeback** | Chargeback rate approaching limits | Investigate chargeback reasons, improve dispute management |
+| **Unusual activity** | Transaction patterns deviate from baseline | Review recent transactions for anomalies |
+
+When a MAC is issued, it appears as a banner in the Fraud tab with the code, description, and recommended actions.
+
+### Risk Score Distribution
+
+A histogram showing how transaction risk scores are distributed. Use this to:
+
+- Calibrate your risk condition thresholds
+- Identify if your risk model is blocking too many legitimate transactions
+- Detect shifts in fraud patterns
+
+## Custom Charts
+
+Create custom visualizations by combining metrics and dimensions:
+
+1. Click **Create Chart** in any tab
+2. Select a metric (volume, count, approval rate, etc.)
+3. Choose a dimension (country, provider, payment method, date)
+4. Apply optional filters
+5. Select chart type (line, bar, pie, table)
+6. Click **Save to Dashboard** to pin the chart
+
+## Dashboard Personalization
+
+Customize your Insights layout:
+
+- **Drag and drop** widgets to rearrange the dashboard
+- **Resize** widgets by dragging the corner handle
+- **Hide** widgets you do not need (restore from **Customize** menu)
+- **Create multiple layouts** for different team roles (e.g., Finance vs. Engineering view)
+
+Personalization settings are saved per user account and persist across sessions.
+
+## Export and Scheduled Reports
+
+### Manual Export
+
+Click the **Export** button on any chart or data table to download:
+
+| Format | Use Case |
+|--------|----------|
+| **PDF** | Share formatted reports with stakeholders |
+| **CSV** | Import into spreadsheets or BI tools |
+
+### Scheduled Reports
+
+Set up automated report delivery under **Insights > Scheduled Reports**:
+
+1. Click **Create Scheduled Report**
+2. Select the metrics and filters to include
+3. Choose frequency: daily, weekly, or monthly
+4. Add recipient email addresses
+5. Select format (PDF or CSV)
+
+<Note>
+Scheduled reports use the timezone configured in **Settings > Account Preferences**. Adjust your timezone setting to ensure reports align with your business hours.
+</Note>

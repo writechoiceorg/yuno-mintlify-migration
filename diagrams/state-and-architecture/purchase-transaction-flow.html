@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno – Purchase Transaction Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e5e7eb; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+
+  .diagram {
+    position: relative;
+    width: 1540px;
+    height: 874px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .layer-svg {
+    position: absolute;
+    inset: 0;
+    width: 1540px;
+    height: 874px;
+    pointer-events: none;
+  }
+
+  .node {
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid;
+    border-radius: 6px;
+    box-shadow: -4px -4px 10px 0 #ffffff, 4px 4px 8px 0 rgba(0,0,0,0.10);
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a0a0a;
+    text-align: center;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+  }
+
+  .node.blue   { border-color: #2563eb; background: #ffffff; }
+  .node.red    { border-color: #dc2626; background: #fff1f2; }
+  .node.orange { border-color: #f97316; background: #fff7ed; }
+  .node.green  { border-color: #16a34a; background: #f0fdf4; }
+  .node.indigo { border-color: #6366f1; background: #eef2ff; }
+  .node.amber  { border-color: #b45309; background: #fef3c7; }
+
+  .title {
+    position: absolute;
+    left: 72px;
+    top: 68px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0a0a0a;
+  }
+</style>
+</head>
+<body>
+<div class="scroll-wrapper">
+<div class="diagram">
+
+<div class="title">Yuno – Purchase Transaction Flow</div>
+
+<!--
+  COORDINATE SYSTEM (Base 1)
+  bg_diagram: left=40, top=48, width=1460, height=778
+
+  Horizontal flow:
+    Purchase  : cx=200, cy=420 (vertical center)
+    CREATED   : cx=400, cy=420
+    PENDING   : cx=600, cy=420
+    Fan out to:
+      SUCCEEDED : cx=950, top=250 → cy=268
+      DECLINED  : cx=950, top=400 → cy=418
+      EXPIRED   : cx=950, top=500 → cy=518
+      CANCELLED : cx=950, top=600 → cy=618
+      ERROR     : cx=950, top=700 → cy=718
+-->
+
+<svg class="layer-svg" viewBox="0 0 1540 874" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.08)"/>
+    </filter>
+
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+      <path d="M0,0.5 L0,5.5 L6,3 z" fill="#94a3b8"/>
+    </marker>
+
+    <filter id="spark-glow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <clipPath id="diagram-clip">
+      <rect x="40" y="48" width="1460" height="778" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background card -->
+  <rect x="40" y="48" width="1460" height="778" rx="10"
+        fill="#ffffff" filter="url(#card-shadow)" opacity="0.6"/>
+
+  <!-- Dashed grid — vertical lines -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="190"  y1="48" x2="190"  y2="826"/>
+    <line x1="340"  y1="48" x2="340"  y2="826"/>
+    <line x1="490"  y1="48" x2="490"  y2="826"/>
+    <line x1="640"  y1="48" x2="640"  y2="826"/>
+    <line x1="790"  y1="48" x2="790"  y2="826"/>
+    <line x1="940"  y1="48" x2="940"  y2="826"/>
+    <line x1="1090" y1="48" x2="1090" y2="826"/>
+    <line x1="1240" y1="48" x2="1240" y2="826"/>
+    <line x1="1390" y1="48" x2="1390" y2="826"/>
+  </g>
+
+  <!-- Dashed grid — horizontal lines -->
+  <g opacity="0.45" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="5 6">
+    <line x1="40" y1="135" x2="1500" y2="135"/>
+    <line x1="40" y1="285" x2="1500" y2="285"/>
+    <line x1="40" y1="435" x2="1500" y2="435"/>
+    <line x1="40" y1="585" x2="1500" y2="585"/>
+    <line x1="40" y1="735" x2="1500" y2="735"/>
+  </g>
+
+  <!-- CONNECTOR PATHS -->
+
+  <!-- p0: Purchase → CREATED -->
+  <path id="p0" d="M 248,420 L 355,420"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p1: CREATED → PENDING -->
+  <path id="p1" d="M 448,420 L 555,420"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p2: PENDING → SUCCEEDED -->
+  <path id="p2" d="M 648,410 C 750,410 850,280 905,268"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p3: PENDING → DECLINED -->
+  <path id="p3" d="M 648,420 C 750,420 850,418 905,418"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p4: PENDING → EXPIRED -->
+  <path id="p4" d="M 648,430 C 750,430 850,510 905,518"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p5: PENDING → CANCELLED -->
+  <path id="p5" d="M 648,435 C 740,460 850,600 905,618"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- p6: PENDING → ERROR -->
+  <path id="p6" d="M 648,440 C 730,480 840,690 905,718"
+        stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+  <!-- ANIMATED SPARKS -->
+  <g clip-path="url(#diagram-clip)">
+
+    <!-- p0: Purchase → CREATED (blue) -->
+    <circle r="3.5" fill="#2563eb" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.2s" begin="0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p0"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p1: CREATED → PENDING (blue) -->
+    <circle r="3.5" fill="#2563eb" filter="url(#spark-glow)" opacity="0.9">
+      <animateMotion dur="1.2s" begin="0.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p1"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p2: → SUCCEEDED (green) -->
+    <circle r="3.5" fill="#16a34a" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2.0s" begin="0.8s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p2"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p3: → DECLINED (red) -->
+    <circle r="3.5" fill="#dc2626" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="1.8s" begin="1.2s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p4: → EXPIRED (orange) -->
+    <circle r="3.5" fill="#f97316" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2.2s" begin="1.6s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p4"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p5: → CANCELLED (red) -->
+    <circle r="3.5" fill="#dc2626" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2.4s" begin="2.0s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p5"/>
+      </animateMotion>
+    </circle>
+
+    <!-- p6: → ERROR (red) -->
+    <circle r="3.5" fill="#dc2626" filter="url(#spark-glow)" opacity="0.85">
+      <animateMotion dur="2.6s" begin="2.4s" repeatCount="indefinite" calcMode="linear">
+        <mpath href="#p6"/>
+      </animateMotion>
+    </circle>
+
+  </g>
+</svg>
+
+<!-- HTML NODES -->
+<div class="node blue" style="left:200px; top:402px;">Purchase</div>
+<div class="node blue" style="left:400px; top:402px;">CREATED</div>
+<div class="node amber" style="left:600px; top:402px;">PENDING</div>
+<div class="node green" style="left:950px; top:250px;">SUCCEEDED</div>
+<div class="node red" style="left:950px; top:400px;">DECLINED</div>
+<div class="node orange" style="left:950px; top:500px;">EXPIRED</div>
+<div class="node red" style="left:950px; top:600px;">CANCELLED</div>
+<div class="node red" style="left:950px; top:700px;">ERROR</div>
+
+</div>
+</div>
+</body>
+</html>

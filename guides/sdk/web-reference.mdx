@@ -1,0 +1,511 @@
+---
+title: "Web SDK Reference"
+description: "Complete parameter reference for the Yuno Web SDK"
+---
+
+## Installation
+
+Add the Yuno Web SDK to your page via script tag or npm.
+
+<Tabs>
+  <Tab title="Script Tag">
+    ```html
+    <script
+      src="https://sdk-web.y.uno/v1/static/js/main.min.js"
+      integrity="sha384-XXXX"
+      crossorigin="anonymous"
+    ></script>
+    ```
+
+    <Tip>
+    Use Subresource Integrity (SRI) by including the `integrity` attribute. Obtain the latest hash from the [Yuno GitHub repository](https://github.com/yuno-payments).
+    </Tip>
+  </Tab>
+  <Tab title="npm">
+    ```bash
+    npm install @yuno-payments/sdk-web
+    ```
+
+    ```javascript
+    import { Yuno } from '@yuno-payments/sdk-web';
+    ```
+  </Tab>
+</Tabs>
+
+## Initialization
+
+Initialize the SDK before mounting any checkout component. Pass your public API key as a string:
+
+```javascript
+const yuno = Yuno.initialize("YOUR_PUBLIC_API_KEY");
+```
+
+### Initialization Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `publicApiKey` | `string` | Yes | Your Yuno public API key from Dashboard > API Keys. Passed as the first positional argument (string, not object) |
+
+<Warning>
+The first argument must be a string (your public API key), not a configuration object. Passing an object will cause: `publicApiKey=[object Object] is not valid`. Never include your private secret key in client-side code.
+</Warning>
+
+## Seamless Checkout Configuration
+
+Start Seamless Checkout by passing a configuration object with all options.
+
+```javascript
+yuno.startSeamlessCheckout({
+  checkoutSession: "438413b7-4921-41e4-b8f3-28a5a0141638",
+  elementSelector: "#root",
+  countryCode: "CO",
+  language: "en",
+  showLoading: true,
+  issuersFormEnable: true,
+  showPaymentStatus: true,
+  renderMode: {
+    type: "modal",
+  },
+  card: {
+    type: "extends",
+    cardSaveEnable: false,
+  },
+  async yunoCreatePayment(oneTimeToken, tokenWithInformation) {
+    await createPayment({ oneTimeToken, checkoutSession });
+    yuno.continuePayment({ showPaymentStatus: true });
+  },
+  yunoPaymentMethodSelected(data) {
+    console.log("Selected:", data);
+  },
+  yunoPaymentResult(data) {
+    console.log("Result:", data);
+  },
+  yunoError(error) {
+    console.error("Error:", error);
+  },
+});
+```
+
+### Checkout Configuration Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `checkoutSession` | `string` | Yes | Checkout session ID from the Create Checkout Session API |
+| `elementSelector` | `string` | Yes | CSS selector for the container element (e.g., `"#root"`) |
+| `countryCode` | `string` | Yes | ISO 3166-1 alpha-2 country code |
+| `language` | `string` | No | UI language override: `"en"`, `"es"`, `"pt"` |
+| `showLoading` | `boolean` | No | Show loading indicator during SDK operations. Default: `true` |
+| `issuersFormEnable` | `boolean` | No | Display bank/issuer selection dropdown for methods that require it. Default: `false` |
+| `showPaymentStatus` | `boolean` | No | Show payment status screen after completion. Default: `true` |
+| `renderMode` | `object` | No | Controls how the checkout form renders. See [Render Modes](#render-modes) |
+| `card` | `object` | No | Card form configuration. See [Card Form Options](#card-form-options) |
+
+## Callbacks
+
+### yunoCreatePayment(oneTimeToken, tokenWithInformation)
+
+Called when the customer submits payment and Yuno generates a one-time token. Use this to create the payment on your server, then call `yuno.continuePayment()`.
+
+```javascript
+async yunoCreatePayment(oneTimeToken, tokenWithInformation) {
+  // oneTimeToken: string — single-use token for payment creation
+  // tokenWithInformation: object — token plus payment method metadata
+  const response = await fetch('/api/payments', {
+    method: 'POST',
+    body: JSON.stringify({ token: oneTimeToken, session: checkoutSession }),
+  });
+
+  if (response.ok) {
+    yuno.continuePayment({ showPaymentStatus: true });
+  }
+}
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `oneTimeToken` | `string` | Single-use token to pass to the Create Payment API |
+| `tokenWithInformation` | `object` | Token with additional metadata (payment method type, last four digits, brand) |
+
+### yunoPaymentResult(paymentResult)
+
+Called with the final payment outcome after the flow completes.
+
+```javascript
+yunoPaymentResult(data) {
+  // data.status: "SUCCEEDED" | "FAILED" | "PROCESSING" | "CANCELLED"
+  // data.paymentId: string
+  switch (data.status) {
+    case "SUCCEEDED":
+      window.location.href = `/confirmation?id=${data.paymentId}`;
+      break;
+    case "FAILED":
+      showError(data.errorMessage);
+      break;
+  }
+}
+```
+
+<Warning>
+Always verify the final payment status server-side via webhooks or the GET Payment API. Client-side callbacks should not be the sole source of truth.
+</Warning>
+
+### yunoPaymentMethodSelected(data)
+
+Fires when the user selects a payment method.
+
+```javascript
+yunoPaymentMethodSelected(data) {
+  // data.paymentMethodType: string (e.g., "CARD", "PIX", "PSE")
+  console.log("Selected method:", data.paymentMethodType);
+}
+```
+
+### yunoError(error)
+
+Called when the SDK encounters an error.
+
+```javascript
+yunoError(error) {
+  // error.message: string
+  // error.code: string
+  console.error("SDK error:", error.message);
+}
+```
+
+### onLoading(isLoading)
+
+Reports loading state changes during SDK operations.
+
+```javascript
+onLoading(isLoading) {
+  // isLoading: boolean
+  document.getElementById("spinner").style.display = isLoading ? "block" : "none";
+}
+```
+
+## Render Modes
+
+Control how the checkout form appears in the page.
+
+### Modal
+
+The checkout form opens in an overlay modal on top of your page.
+
+```javascript
+renderMode: {
+  type: "modal",
+}
+```
+
+### Element (Inline)
+
+The checkout form renders inline within a specified container.
+
+```javascript
+renderMode: {
+  type: "element",
+  elementSelector: "#checkout-container",
+}
+```
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `type` | `"modal"` \| `"element"` | Yes | Render mode |
+| `elementSelector` | `string` | Only for `"element"` | CSS selector for the inline container |
+
+## Card Form Options
+
+Configure the card payment form behavior and appearance.
+
+```javascript
+card: {
+  type: "extends",
+  cardSaveEnable: true,
+  styles: {
+    base: {
+      fontSize: "16px",
+      color: "#333",
+      fontFamily: "Inter, sans-serif",
+      "::placeholder": { color: "#9CA3AF" },
+    },
+    focus: {
+      borderColor: "#0066FF",
+    },
+    error: {
+      color: "#EF4444",
+      borderColor: "#EF4444",
+    },
+  },
+  texts: {
+    cardNumberLabel: "Card Number",
+    expiryLabel: "Expiry Date",
+    cvvLabel: "Security Code",
+  },
+  hideCardholderName: false,
+  isCreditCardProcessingOnly: false,
+  onChange(event) {
+    console.log("Field changed:", event);
+  },
+}
+```
+
+### Card Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `type` | `"extends"` \| `"card"` \| `"cardNumber"` \| `"cardExpiry"` \| `"cardCvv"` | `"extends"` | Card form type. `"extends"` renders the full card form. Individual types render standalone fields |
+| `cardSaveEnable` | `boolean` | `false` | Show a "Save card for future payments" checkbox |
+| `styles` | `object` | — | CSS customization object for card fields. Supports `base`, `focus`, `error`, `valid` states |
+| `texts` | `object` | — | Custom label overrides for card form fields |
+| `cardNumberPlaceholder` | `string` | `"Card number"` | Placeholder text for the card number field |
+| `expiryPlaceholder` | `string` | `"MM/YY"` | Placeholder text for the expiry field |
+| `cvvPlaceholder` | `string` | `"CVV"` | Placeholder text for the CVV field |
+| `hideCardholderName` | `boolean` | `false` | Hide the cardholder name field |
+| `isCreditCardProcessingOnly` | `boolean` | `false` | Show only credit cards, hiding debit card options |
+| `onChange(event)` | `function` | — | Callback fired when any card field value changes |
+
+### Card Field Types
+
+Use individual field types to render standalone, embeddable card inputs:
+
+| Type | Description |
+|------|-------------|
+| `"card"` | Complete card form (number, expiry, CVV, name) |
+| `"cardNumber"` | Card number field only |
+| `"cardExpiry"` | Expiry date field only |
+| `"cardCvv"` | CVV/CVC field only |
+| `"extends"` | Extended card form integrated into checkout |
+
+## Seamless Flow Methods
+
+### mountSeamlessCheckout
+
+Mount the checkout form for a specific payment method after the customer selects one.
+
+```javascript
+yuno.mountSeamlessCheckout({
+  paymentMethodType: "CARD",
+  vaultedToken: "vtk_abc123xyz", // optional, for saved payment methods
+});
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `paymentMethodType` | `string` | Yes | Payment method type (e.g., `"CARD"`, `"PIX"`, `"PSE"`) |
+| `vaultedToken` | `string` | No | Vaulted token for returning customers with saved payment methods |
+
+### startPayment
+
+Trigger the payment after the customer has filled in the form.
+
+```javascript
+yuno.startPayment();
+```
+
+### continuePayment
+
+Continue the payment flow after creating the payment on your server. Call this inside `yunoCreatePayment`.
+
+```javascript
+yuno.continuePayment({
+  showPaymentStatus: true,
+});
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `showPaymentStatus` | `boolean` | No | Show the payment status screen after completion |
+
+## External Buttons
+
+Mount Apple Pay and Google Pay buttons outside the main checkout form.
+
+### mountExternalButtons
+
+Render wallet payment buttons in specified containers.
+
+```javascript
+await yuno.mountExternalButtons([
+  { paymentMethodType: "APPLE_PAY", elementSelector: "#apple-pay-container" },
+  { paymentMethodType: "GOOGLE_PAY", elementSelector: "#google-pay-container" },
+]);
+```
+
+```html
+<div id="apple-pay-container"></div>
+<div id="google-pay-container"></div>
+```
+
+### unmountExternalButton
+
+Remove a specific external payment button.
+
+```javascript
+yuno.unmountExternalButton("APPLE_PAY");
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `type` | `string` | Yes | Payment method type to remove (`"APPLE_PAY"`, `"GOOGLE_PAY"`) |
+
+### unmountAllExternalButtons
+
+Remove all mounted external payment buttons.
+
+```javascript
+yuno.unmountAllExternalButtons();
+```
+
+## Enrollment
+
+Use the SDK to enroll (vault) payment methods for returning customers.
+
+### Enrollment Statuses
+
+| Status | Description |
+|--------|-------------|
+| `CREATED` | Enrollment session created |
+| `READY_TO_ENROLL` | Customer has submitted card details, ready to enroll |
+| `ENROLLED` | Card successfully enrolled and vaulted |
+| `ENROLL_FAILED` | Enrollment attempt failed |
+| `EXPIRED` | Enrollment session expired before completion |
+| `REJECTED` | Enrollment rejected by the provider |
+| `DECLINED` | Enrollment declined |
+| `UNENROLLED` | Previously enrolled card has been removed |
+
+See [Card Enrollment](/guides/sdk/enrollment) for the complete enrollment integration guide.
+
+## TypeScript Support
+
+The Yuno Web SDK includes TypeScript type definitions. Import types directly:
+
+```typescript
+import { Yuno } from '@yuno-payments/sdk-web';
+
+const yuno = Yuno.initialize("YOUR_PUBLIC_API_KEY");
+```
+
+Key type definitions:
+
+| Type | Description |
+|------|-------------|
+| `StartCheckoutArgs` | Configuration for `startCheckout()` (checkoutSession, countryCode, callbacks, etc.) |
+| `SeamlessCheckoutConfig` | Seamless checkout startup configuration |
+| `OneTimeToken` | One-time token with payment method metadata |
+| `CardOptions` | Card form configuration options |
+| `RenderMode` | Render mode configuration (`"modal"` or `"element"`) |
+
+## Subresource Integrity (SRI)
+
+When loading the SDK via script tag, use SRI to ensure the script has not been tampered with:
+
+```html
+<script
+  src="https://sdk-web.y.uno/v1/static/js/main.min.js"
+  integrity="sha384-{hash}"
+  crossorigin="anonymous"
+></script>
+```
+
+Obtain the current SRI hash from the [Yuno GitHub repository](https://github.com/yuno-payments). Update the hash whenever you upgrade the SDK version.
+
+## Complete Initialization Example
+
+A full example with all configuration options:
+
+```javascript
+const yuno = Yuno.initialize("YOUR_PUBLIC_API_KEY");
+
+yuno.startSeamlessCheckout({
+  checkoutSession: "session-uuid",
+  elementSelector: "#checkout",
+  countryCode: "CO",
+  language: "es",
+  showLoading: true,
+  issuersFormEnable: true,
+  showPaymentStatus: true,
+  renderMode: {
+    type: "element",
+    elementSelector: "#checkout-form",
+  },
+  card: {
+    type: "extends",
+    cardSaveEnable: true,
+    hideCardholderName: false,
+    isCreditCardProcessingOnly: false,
+    cardNumberPlaceholder: "Card number",
+    expiryPlaceholder: "MM/YY",
+    cvvPlaceholder: "CVV",
+    styles: {
+      base: {
+        fontSize: "16px",
+        color: "#333",
+        fontFamily: "Inter, sans-serif",
+        padding: "12px",
+        "::placeholder": { color: "#9CA3AF" },
+      },
+      focus: { borderColor: "#6200EE" },
+      error: { color: "#E53E3E", borderColor: "#E53E3E" },
+      valid: { borderColor: "#38A169" },
+    },
+    onChange(event) {
+      console.log("Field changed:", event);
+    },
+  },
+  async yunoCreatePayment(oneTimeToken, tokenWithInformation) {
+    const response = await fetch("/api/payments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: oneTimeToken }),
+    });
+    if (response.ok) {
+      yuno.continuePayment({ showPaymentStatus: true });
+    }
+  },
+  yunoPaymentMethodSelected(data) {
+    console.log("Selected:", data.paymentMethodType);
+  },
+  yunoPaymentResult(data) {
+    if (data.status === "SUCCEEDED") {
+      window.location.href = `/confirmation?id=${data.paymentId}`;
+    }
+  },
+  yunoError(error) {
+    console.error("SDK Error:", error.message);
+  },
+  onLoading(isLoading) {
+    document.getElementById("spinner").hidden = !isLoading;
+  },
+});
+
+// Mount external wallet buttons
+await yuno.mountExternalButtons([
+  { paymentMethodType: "APPLE_PAY", elementSelector: "#apple-pay" },
+  { paymentMethodType: "GOOGLE_PAY", elementSelector: "#google-pay" },
+]);
+
+// Mount checkout for a specific payment method
+yuno.mountSeamlessCheckout({
+  paymentMethodType: "CARD",
+});
+
+// Trigger payment
+yuno.startPayment();
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Full Checkout" icon="credit-card" href="/guides/sdk/full-checkout">
+    Pre-built UI with zero payment method management.
+  </Card>
+  <Card title="Seamless Checkout" icon="wand-magic-sparkles" href="/guides/sdk/seamless-checkout">
+    Control payment method selection with SDK convenience.
+  </Card>
+  <Card title="Customization" icon="palette" href="/guides/sdk/customization">
+    Theme and style your checkout.
+  </Card>
+  <Card title="Card Enrollment" icon="vault" href="/guides/sdk/enrollment">
+    Vault cards for returning customers.
+  </Card>
+</CardGroup>

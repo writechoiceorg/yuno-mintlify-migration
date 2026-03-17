@@ -1,0 +1,136 @@
+---
+title: "Seamless Checkout"
+description: "Combine SDK convenience with full control over payment method selection"
+---
+
+Seamless Checkout lets Yuno handle the checkout flow while you manage payment method selection. It creates payments in a single flow — from token generation to payment creation — with minimal code.
+
+<a href="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/seamless-checkout-flow.html" target="_blank" style={{ display: 'block', cursor: 'zoom-in', textDecoration: 'none' }}>
+<div style={{ position: 'relative', width: '100%', paddingBottom: '56.75%', overflow: 'hidden', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+  <iframe
+    src="https://caio-yuno.github.io/yuno-diagrams/diagrams/sequence-flows/seamless-checkout-flow.html"
+    style={{ position: 'absolute', top: 0, left: 0, width: '1540px', height: '874px', border: 'none', transform: 'scale(0.455)', transformOrigin: 'top left' }}
+    loading="lazy"
+  />
+</div>
+</a>
+
+<Info>
+**Recommended by Yuno** for the smoothest SDK integration experience. Seamless is the only integration that creates payments seamlessly in one flow.
+</Info>
+
+<Tip>
+**Using React or Vue?** Check out the [React Components](/guides/sdk/react-components) or [Vue Components](/guides/sdk/vue-components) for framework-specific wrappers.
+</Tip>
+
+## How it works
+
+1. You display available payment methods to the customer
+2. When the customer selects a method, mount the Seamless Checkout form
+3. Yuno renders the payment form, handles tokenization, and calls your `yunoCreatePayment` callback
+4. You create the payment server-side, then call `yuno.continuePayment()` to complete the flow
+
+## Integration steps
+
+### 1. Create a checkout session
+
+Create a checkout session from your server using the [Create Checkout Session](/api-reference/checkout-sessions/create) endpoint.
+
+### 2. Initialize the SDK
+
+```javascript
+const yuno = Yuno.initialize("YOUR_PUBLIC_API_KEY");
+```
+
+### 3. Start Seamless Checkout
+
+```javascript
+yuno.startSeamlessCheckout({
+  checkoutSession: "your-checkout-session-id",
+  elementSelector: "#root",
+  countryCode: "US",
+  language: "en-US",
+  showLoading: true,
+  issuersFormEnable: true,
+  showPaymentStatus: true,
+  renderMode: {
+    type: "modal",
+  },
+  card: {
+    type: "extends",
+    cardSaveEnable: false,
+  },
+  async yunoCreatePayment(oneTimeToken, tokenWithInformation) {
+    await createPayment({ oneTimeToken, checkoutSession });
+    yuno.continuePayment({ showPaymentStatus: true });
+  },
+  yunoPaymentMethodSelected(data) {
+    console.log("Payment method selected:", data);
+  },
+  yunoPaymentResult(data) {
+    console.log("Payment result:", data);
+  },
+  yunoError(error) {
+    console.error("An error occurred:", error);
+  },
+});
+```
+
+### 4. Mount the checkout for a payment method
+
+When the customer selects a payment method, mount the form:
+
+```javascript
+yuno.mountSeamlessCheckout({
+  paymentMethodType: PAYMENT_METHOD_TYPE,
+  vaultedToken: VAULTED_TOKEN, // optional, for saved payment methods
+});
+```
+
+### 5. Trigger the payment
+
+```javascript
+yuno.startPayment();
+```
+
+## External buttons
+
+Mount Apple Pay and Google Pay buttons outside the checkout form:
+
+```javascript
+await yuno.mountExternalButtons([
+  { paymentMethodType: "APPLE_PAY", elementSelector: "#apple-pay" },
+  { paymentMethodType: "GOOGLE_PAY", elementSelector: "#google-pay" },
+]);
+```
+
+Remove buttons when no longer needed:
+
+```javascript
+yuno.unmountExternalButton(); // Remove one
+yuno.unmountAllExternalButtons(); // Remove all
+```
+
+## Callbacks
+
+| Callback | Description |
+|----------|-------------|
+| `yunoCreatePayment(oneTimeToken, tokenWithInformation)` | Called when token is generated. Create payment server-side, then call `yuno.continuePayment()` |
+| `yunoPaymentMethodSelected(data)` | Fires when the user selects a payment method |
+| `yunoPaymentResult(data)` | Returns the final payment result |
+| `yunoError(error, data)` | Error handler |
+
+## Card vaulting
+
+To automatically save cards on successful payment, set `vault_on_success: true` when creating the checkout session.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Full Checkout" icon="credit-card" href="/guides/sdk/full-checkout">
+    Pre-built UI with zero payment method management.
+  </Card>
+  <Card title="Customization" icon="palette" href="/guides/sdk/customization">
+    Theme and style your checkout.
+  </Card>
+</CardGroup>

@@ -1,0 +1,139 @@
+---
+title: "The Payment Link Object"
+description: "Represents a shareable payment link that allows customers to pay without a custom integration."
+---
+
+The Payment Link object represents a shareable URL that opens a Yuno-hosted checkout page. Payment links are ideal for invoice collection, social commerce, email billing, and scenarios where you need to collect a payment without building a custom checkout integration.
+
+<Info>
+  **No-code payments** — Payment links use Yuno's hosted checkout UI. The customer clicks the link, selects a payment method, and completes the transaction. No SDK integration is required on your side.
+</Info>
+
+## Object Fields
+
+<ResponseField name="id" type="string">
+  The unique identifier for this payment link (UUID).
+
+  Example: `pl_6e7f8a9b-0c1d-2e3f-4a5b-6c7d8e9f0a1b`
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  The shareable payment link URL. Send this to your customer via email, SMS, WhatsApp, or any channel.
+
+  Example: `https://pay.y.uno/pl_6e7f8a9b-0c1d-2e3f-4a5b-6c7d8e9f0a1b`
+</ResponseField>
+
+<ResponseField name="amount" type="object">
+  The payment amount details.
+  <Expandable title="amount">
+    <ResponseField name="value" type="number">
+      The payment amount value.
+
+      Example: `499.90`
+    </ResponseField>
+    <ResponseField name="currency" type="string">
+      ISO 4217 currency code.
+
+      Example: `USD`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  The country where the payment takes place. ISO 3166-1 alpha-2 code. Determines which payment methods are displayed.
+
+  Example: `US`
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of the payment link.
+
+  Values: `ACTIVE`, `EXPIRED`, `COMPLETED`, `CANCELLED`
+
+  Example: `ACTIVE`
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Customer-facing description displayed on the hosted checkout page.
+
+  Example: `Invoice #2026-042 — Web Development Services`
+</ResponseField>
+
+<ResponseField name="merchant_order_id" type="string">
+  Your internal order or invoice identifier, used for reconciliation.
+
+  Example: `inv-2026-042`
+</ResponseField>
+
+<ResponseField name="one_time_use" type="boolean">
+  When `true`, the link can only be used for a single successful payment. When `false`, the link remains active and can accept multiple payments until it expires or is cancelled.
+
+  Example: `true`
+</ResponseField>
+
+<ResponseField name="vault_on_success" type="boolean">
+  When `true`, the customer's payment method is automatically enrolled (vaulted) after a successful payment. Requires a `customer_id` to be associated with the link.
+
+  Example: `false`
+</ResponseField>
+
+<ResponseField name="expires_at" type="string">
+  ISO 8601 timestamp of when the payment link expires. After this time, the link returns an expiration message to the customer.
+
+  Example: `2026-03-17T23:59:59.000Z`
+</ResponseField>
+
+<ResponseField name="payment_id" type="string">
+  The ID of the [Payment Object](/api-reference/payments/object) created when a customer completes payment through this link. `null` until a payment is made.
+
+  Example: `8546df3a-b83e-4bb5-a4b3-57aa6385924f`
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the payment link was created.
+
+  Example: `2026-03-10T14:00:00.000Z`
+</ResponseField>
+
+## Example
+
+```json
+{
+  "id": "pl_6e7f8a9b-0c1d-2e3f-4a5b-6c7d8e9f0a1b",
+  "url": "https://pay.y.uno/pl_6e7f8a9b-0c1d-2e3f-4a5b-6c7d8e9f0a1b",
+  "amount": {
+    "value": 499.90,
+    "currency": "USD"
+  },
+  "country": "US",
+  "status": "ACTIVE",
+  "description": "Invoice #2026-042 — Web Development Services",
+  "merchant_order_id": "inv-2026-042",
+  "one_time_use": true,
+  "vault_on_success": false,
+  "expires_at": "2026-03-17T23:59:59.000Z",
+  "payment_id": null,
+  "created_at": "2026-03-10T14:00:00.000Z"
+}
+```
+
+## Status Lifecycle
+
+| Status | Description |
+|--------|-------------|
+| `ACTIVE` | Link is live and accepting payments. |
+| `COMPLETED` | A successful payment has been made through this link. For `one_time_use` links, the link is no longer usable. |
+| `EXPIRED` | The link has passed its `expires_at` time without a completed payment. |
+| `CANCELLED` | The link was manually cancelled via the API. |
+
+## Related Endpoints
+
+- [Create Payment Link](/api-reference/payment-links/create) — `POST /v1/payment-links`
+- [Get Payment Link](/api-reference/payment-links/get) — `GET /v1/payment-links/{payment_link_id}`
+- [Cancel Payment Link](/api-reference/payment-links/cancel) — `POST /v1/payment-links/{payment_link_id}/cancel`
+
+## Related Concepts
+
+- [Payment Object](/api-reference/payments/object) — The payment created when a customer uses the link
+- [Hosted Checkout](/guides/hosted-checkout) — How Yuno's hosted checkout page works
+- [Webhooks](/guides/webhooks) — Receive notifications when a payment link is completed

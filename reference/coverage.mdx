@@ -1,0 +1,465 @@
+---
+title: "Provider Coverage & Comparison Matrix"
+description: "Comprehensive provider comparison for evaluating payment processors available through Yuno's orchestration platform"
+---
+
+## Overview
+
+Selecting the right payment providers is one of the most impactful decisions in your orchestration setup. This reference helps merchants and Solutions Engineers evaluate providers across geography, payment method coverage, feature support, cost structure, and reliability.
+
+Use this matrix to:
+- **Compare providers** side by side before configuring your routing rules
+- **Identify coverage gaps** that require adding a secondary or tertiary provider
+- **Estimate costs** and plan your multi-provider architecture
+- **Plan onboarding timelines** for new market launches
+
+<Note>
+Coverage depends on your configured providers. Enable providers in [Dashboard > Connections](/platform/dashboard/connections) to activate payment methods for specific countries.
+</Note>
+
+<Warning>
+Exact pricing, SLA terms, and feature availability depend on individual merchant agreements negotiated directly with each provider. The figures in this document represent typical market ranges and should be used for planning purposes only. Always confirm terms with your provider and Yuno account manager.
+</Warning>
+
+---
+
+## Provider Catalog
+
+### Global Gateways
+
+<Tabs>
+  <Tab title="Adyen">
+    **Adyen** is a global payments platform with direct acquiring licenses in multiple regions.
+
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | 30+ countries including AR, BR, CL, CO, MX, PE, US, EU |
+    | **Payment methods** | Cards (Visa, Mastercard, Amex), PIX, Boleto, OXXO, SPEI, bank transfers, wallets |
+    | **Key features** | 3DS2, network tokens, Apple Pay, Google Pay, tokenization, recurring, split payments, RevenueProtect fraud tools |
+    | **Settlement currencies** | USD, EUR, BRL, MXN, COP, ARS, CLP, PEN, and 20+ others |
+    | **Onboarding time** | 2--4 weeks (KYC dependent) |
+    | **Best for** | High-volume merchants needing single-provider global coverage with advanced fraud tools |
+  </Tab>
+  <Tab title="Stripe">
+    **Stripe** offers developer-friendly APIs with strong card processing capabilities.
+
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | 25+ countries including BR, MX, US, EU (limited LATAM local acquiring) |
+    | **Payment methods** | Cards (Visa, Mastercard, Amex), Boleto, OXXO, bank redirects, wallets |
+    | **Key features** | 3DS2, tokenization, Apple Pay, Google Pay, recurring (Billing), Stripe Connect for marketplaces, Radar fraud tools |
+    | **Settlement currencies** | USD, EUR, BRL, MXN, GBP, and 15+ others |
+    | **Onboarding time** | 1--3 days (self-serve); 1--2 weeks (enterprise) |
+    | **Best for** | Developers and SaaS platforms needing fast integration with strong documentation |
+  </Tab>
+  <Tab title="dLocal">
+    **dLocal** specializes in emerging markets with a single-API approach to LATAM, Africa, and Asia.
+
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | 40+ emerging markets including AR, BO, BR, CL, CO, CR, EC, MX, PA, PE, PY, UY |
+    | **Payment methods** | Cards, PIX, Boleto, OXXO, SPEI, PSE, Efecty, PagoEfectivo, Khipu, Rapipago, bank transfers |
+    | **Key features** | 3DS2, tokenization, recurring, cross-border payouts, currency conversion, installments |
+    | **Settlement currencies** | USD, EUR (settles in hard currency from local methods) |
+    | **Onboarding time** | 2--4 weeks |
+    | **Best for** | Cross-border merchants selling into LATAM without local entities |
+  </Tab>
+  <Tab title="Checkout.com">
+    **Checkout.com** provides a modular payment stack with strong card processing performance.
+
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | 20+ countries including BR, MX, US, EU |
+    | **Payment methods** | Cards (Visa, Mastercard, Amex), PIX, Boleto, OXXO, wallets, bank transfers |
+    | **Key features** | 3DS2, network tokens, Apple Pay, Google Pay, tokenization, recurring, Fraud Detection Pro |
+    | **Settlement currencies** | USD, EUR, GBP, BRL, MXN, and 15+ others |
+    | **Onboarding time** | 1--3 weeks |
+    | **Best for** | Enterprise merchants needing high-performance card processing with flexible payouts |
+  </Tab>
+</Tabs>
+
+### Regional Providers — Brazil
+
+<Tabs>
+  <Tab title="PagSeguro">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | BR |
+    | **Payment methods** | Cards (Visa, MC, Amex, Elo, Hipercard), PIX, Boleto |
+    | **Key features** | Tokenization, installments (up to 12x), recurring, fraud screening |
+    | **Settlement currencies** | BRL |
+    | **Onboarding time** | 3--7 business days |
+  </Tab>
+  <Tab title="Cielo">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | BR |
+    | **Payment methods** | Cards (Visa, MC, Amex, Elo, Hipercard, Diners), PIX, Boleto |
+    | **Key features** | 3DS2, tokenization, installments (up to 12x), recurring, zero-auth validation |
+    | **Settlement currencies** | BRL |
+    | **Onboarding time** | 5--10 business days |
+  </Tab>
+  <Tab title="Rede">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | BR |
+    | **Payment methods** | Cards (Visa, MC, Amex, Elo, Hipercard), PIX |
+    | **Key features** | 3DS2, tokenization, installments (up to 12x), e-Rede integration |
+    | **Settlement currencies** | BRL |
+    | **Onboarding time** | 5--10 business days |
+  </Tab>
+  <Tab title="Stone">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | BR |
+    | **Payment methods** | Cards (Visa, MC, Elo, Hipercard), PIX, Boleto |
+    | **Key features** | Tokenization, installments, transparent checkout, split payments |
+    | **Settlement currencies** | BRL |
+    | **Onboarding time** | 3--7 business days |
+  </Tab>
+  <Tab title="Mercado Pago BR">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | BR |
+    | **Payment methods** | Cards (Visa, MC, Amex, Elo, Hipercard), PIX, Boleto, Mercado Credito |
+    | **Key features** | Tokenization, installments (up to 12x), recurring, split payments, wallet payments |
+    | **Settlement currencies** | BRL |
+    | **Onboarding time** | 1--5 business days |
+  </Tab>
+</Tabs>
+
+### Regional Providers — Mexico
+
+<Tabs>
+  <Tab title="Conekta">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | MX |
+    | **Payment methods** | Cards (Visa, MC, Amex, Carnet), OXXO, SPEI |
+    | **Key features** | 3DS, tokenization, installments (MSI up to 12x), recurring, marketplace splits |
+    | **Settlement currencies** | MXN |
+    | **Onboarding time** | 3--7 business days |
+  </Tab>
+  <Tab title="OpenPay">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | MX, CO |
+    | **Payment methods** | Cards (Visa, MC, Amex), OXXO, SPEI, bank transfers |
+    | **Key features** | Tokenization, installments, recurring, fraud prevention tools |
+    | **Settlement currencies** | MXN, COP |
+    | **Onboarding time** | 5--10 business days |
+  </Tab>
+  <Tab title="Mercado Pago MX">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | MX |
+    | **Payment methods** | Cards (Visa, MC, Amex, Carnet), OXXO, SPEI, Mercado Credito |
+    | **Key features** | Tokenization, installments (MSI), wallet, split payments |
+    | **Settlement currencies** | MXN |
+    | **Onboarding time** | 1--5 business days |
+  </Tab>
+</Tabs>
+
+### Regional Providers — Colombia, Argentina, Chile, Peru
+
+<Tabs>
+  <Tab title="PayU (CO)">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | CO, MX, AR, BR, CL, PE, PA |
+    | **Payment methods** | Cards (Visa, MC, Amex, Codensa), PSE, Efecty, Baloto, bank transfers |
+    | **Key features** | Tokenization, installments, recurring, antifraud module |
+    | **Settlement currencies** | COP, MXN, ARS, BRL, CLP, PEN, USD |
+    | **Onboarding time** | 5--15 business days |
+  </Tab>
+  <Tab title="Kushki">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | CO, MX, CL, PE, EC |
+    | **Payment methods** | Cards (Visa, MC, Amex, Diners), PSE, bank transfers, cash vouchers |
+    | **Key features** | 3DS2, tokenization, installments, recurring, payouts |
+    | **Settlement currencies** | COP, MXN, CLP, PEN, USD |
+    | **Onboarding time** | 5--10 business days |
+  </Tab>
+  <Tab title="Prisma / Decidir (AR)">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | AR |
+    | **Payment methods** | Cards (Visa, MC, Amex, Naranja, Cabal), Rapipago, Pago Facil, Transferencia 3.0 |
+    | **Key features** | Tokenization, installments (Ahora 3/6/12/18), recurring, Cybersource fraud tools |
+    | **Settlement currencies** | ARS |
+    | **Onboarding time** | 5--15 business days |
+  </Tab>
+  <Tab title="Mercado Pago (AR/CL/PE/CO)">
+    | Attribute | Details |
+    |-----------|---------|
+    | **Countries** | AR, CL, PE, CO, UY |
+    | **Payment methods** | Cards, cash (Rapipago, Pago Facil), bank transfers, wallet, Mercado Credito |
+    | **Key features** | Tokenization, installments, wallet payments, split payments |
+    | **Settlement currencies** | ARS, CLP, PEN, COP, UYU |
+    | **Onboarding time** | 1--5 business days |
+  </Tab>
+</Tabs>
+
+---
+
+## Provider Comparison Matrix
+
+The following table compares payment method support across all major providers available through Yuno.
+
+| Provider | Countries | Cards | PIX | Boleto | OXXO | PSE | Bank Transfer | 3DS | Tokenization | Installments | Recurring | Settlement Speed |
+|----------|-----------|-------|-----|--------|------|-----|---------------|-----|--------------|--------------|-----------|------------------|
+| **Adyen** | 30+ | Yes | Yes | Yes | Yes | Yes | Yes | 3DS2 | Yes | Yes | Yes | D+1 to D+3 |
+| **Stripe** | 25+ | Yes | No | Yes | Yes | No | Yes | 3DS2 | Yes | Limited | Yes | D+2 to D+7 |
+| **dLocal** | 40+ | Yes | Yes | Yes | Yes | Yes | Yes | 3DS2 | Yes | Yes | Yes | D+3 to D+15 |
+| **Checkout.com** | 20+ | Yes | Yes | Yes | Yes | No | Yes | 3DS2 | Yes | Limited | Yes | D+1 to D+3 |
+| **PagSeguro** | BR | Yes | Yes | Yes | No | No | No | Limited | Yes | Yes | Yes | D+1 to D+14 |
+| **Cielo** | BR | Yes | Yes | Yes | No | No | No | 3DS2 | Yes | Yes | Yes | D+1 to D+30 |
+| **Rede** | BR | Yes | Yes | No | No | No | No | 3DS2 | Yes | Yes | Limited | D+1 to D+30 |
+| **Stone** | BR | Yes | Yes | Yes | No | No | No | Limited | Yes | Yes | Limited | D+1 to D+30 |
+| **Mercado Pago** | AR, BR, MX, CL, CO, PE, UY | Yes | Yes | Yes | No | No | Yes | Limited | Yes | Yes | Yes | D+1 to D+14 |
+| **Conekta** | MX | Yes | No | No | Yes | No | Yes | 3DS | Yes | Yes | Yes | D+2 to D+5 |
+| **OpenPay** | MX, CO | Yes | No | No | Yes | No | Yes | Limited | Yes | Yes | Yes | D+2 to D+7 |
+| **PayU** | CO, MX, AR, BR, CL, PE, PA | Yes | No | Yes | No | Yes | Yes | Limited | Yes | Yes | Yes | D+3 to D+10 |
+| **Kushki** | CO, MX, CL, PE, EC | Yes | No | No | No | Yes | Yes | 3DS2 | Yes | Yes | Yes | D+2 to D+7 |
+| **Prisma/Decidir** | AR | Yes | No | No | No | No | Yes | Limited | Yes | Yes | Yes | D+2 to D+10 |
+
+<Info>
+**Settlement speed** ranges depend on payment method (cards vs. cash vouchers), installment plans, and negotiated terms. PIX settlements in Brazil are typically D+0 to D+1 regardless of provider.
+</Info>
+
+---
+
+## Feature Support Matrix
+
+Advanced feature availability across providers. "Partial" indicates the feature is available with restrictions or limited to certain payment methods.
+
+| Provider | Network Tokens | Apple Pay | Google Pay | Split Payments | Payouts | Currency Conversion | Fraud Tools |
+|----------|---------------|-----------|------------|----------------|---------|---------------------|-------------|
+| **Adyen** | Yes | Yes | Yes | Yes | Yes | Yes | RevenueProtect (built-in) |
+| **Stripe** | Yes | Yes | Yes | Yes (Connect) | Yes | Yes | Radar (built-in) |
+| **dLocal** | No | Partial | Partial | No | Yes | Yes (core feature) | Basic rules |
+| **Checkout.com** | Yes | Yes | Yes | Partial | Yes | Yes | Fraud Detection Pro |
+| **PagSeguro** | No | No | No | Partial | No | No | Basic screening |
+| **Cielo** | No | No | No | No | No | No | Basic rules |
+| **Rede** | No | No | No | No | No | No | Basic rules |
+| **Stone** | No | No | No | Yes | No | No | Basic screening |
+| **Mercado Pago** | No | No | No | Yes | Yes | No | Built-in ML scoring |
+| **Conekta** | No | No | Partial | Yes | No | No | Basic antifraud |
+| **OpenPay** | No | No | No | No | No | No | Basic rules |
+| **PayU** | No | No | No | Partial | Partial | Partial | Antifraud module |
+| **Kushki** | No | No | No | Partial | Yes | Partial | Basic rules |
+| **Prisma/Decidir** | No | No | No | No | No | No | Cybersource integration |
+
+---
+
+## Cost Benchmarks
+
+<Warning>
+The fee ranges below are **industry estimates** based on publicly available information and typical merchant agreements as of early 2026. Your actual rates will depend on volume, risk profile, industry, and direct negotiations. Always confirm pricing with your provider and Yuno account manager before making architectural decisions.
+</Warning>
+
+### Fee Structure by Provider Type
+
+| Provider Type | Per-Transaction Fee | Percentage Fee | Cross-Border Surcharge | Monthly Minimum |
+|---------------|---------------------|----------------|------------------------|-----------------|
+| **Global gateway** (Adyen, Stripe, Checkout.com) | $0.10 -- $0.30 USD | 2.4% -- 3.5% | +0.5% -- 1.5% | $0 -- $500 |
+| **Cross-border specialist** (dLocal) | $0.15 -- $0.40 USD | 3.0% -- 5.0% | Included in rate | $0 -- $250 |
+| **Local acquirer (Brazil)** (Cielo, Rede, Stone, PagSeguro) | R$0.10 -- R$0.50 | 1.5% -- 3.2% | N/A (domestic only) | Varies |
+| **Local acquirer (Mexico)** (Conekta, OpenPay) | MXN $1.50 -- $4.00 | 2.5% -- 3.6% | N/A (domestic only) | Varies |
+| **Regional multi-country** (PayU, Kushki, Mercado Pago) | $0.10 -- $0.35 USD | 2.5% -- 4.5% | +0.3% -- 1.0% | $0 -- $200 |
+
+### Cost by Payment Method
+
+| Payment Method | Typical Provider Fee | Chargeback Fee | Refund Fee |
+|----------------|---------------------|----------------|------------|
+| **Credit card (domestic)** | 1.5% -- 3.5% + fixed | $10 -- $25 USD | $0 -- $0.25 |
+| **Debit card** | 0.8% -- 2.0% + fixed | $10 -- $25 USD | $0 -- $0.25 |
+| **PIX** | 0.5% -- 1.2% (flat in some cases) | N/A | $0 |
+| **Boleto** | R$1.50 -- R$5.00 flat | N/A | N/A |
+| **OXXO** | MXN $5.00 -- $12.00 flat | N/A | N/A |
+| **PSE** | COP $800 -- $3,000 flat | N/A | N/A |
+| **Bank transfer** | 0.3% -- 1.0% or flat | N/A | Varies |
+
+### Effective Cost per Approved Transaction
+
+When comparing providers, consider the **effective cost** rather than the listed rate. Use this formula:
+
+```
+Effective Cost = (Total Fees Paid) / (Total Approved Transactions)
+```
+
+A provider with a lower listed rate but a 75% approval rate will cost more per successful transaction than a provider with a slightly higher rate and a 92% approval rate. For detailed routing optimization strategies, see [Multi-Provider Orchestration](/guides/multi-provider-orchestration).
+
+<Tip>
+Local acquirers typically achieve 5--15% higher approval rates for domestic transactions compared to cross-border global gateways. Factor this into your cost-per-approved-transaction calculations.
+</Tip>
+
+---
+
+## Provider Selection Guide
+
+### By Geography
+
+Use this table to identify recommended providers for each country based on coverage depth.
+
+| Country | Primary Recommendation | Secondary Recommendation | Global Fallback |
+|---------|----------------------|--------------------------|-----------------|
+| **Brazil** | Cielo, Stone, or PagSeguro | Mercado Pago | Adyen or dLocal |
+| **Mexico** | Conekta or OpenPay | Mercado Pago MX | Adyen or Stripe |
+| **Colombia** | PayU | Kushki or Mercado Pago CO | Adyen or dLocal |
+| **Argentina** | Prisma/Decidir | Mercado Pago AR | dLocal |
+| **Chile** | Kushki | Mercado Pago CL | dLocal or Adyen |
+| **Peru** | Kushki | Mercado Pago PE | dLocal or Adyen |
+| **Ecuador** | Kushki | dLocal | Adyen |
+| **Multi-country LATAM** | dLocal | Mercado Pago | Adyen |
+| **US + LATAM** | Stripe or Adyen | dLocal (LATAM) | Checkout.com |
+
+### By Payment Method
+
+| Payment Method | Best Provider(s) | Reasoning |
+|----------------|-------------------|-----------|
+| **Cards (Brazil)** | Cielo, Rede, Stone | Highest domestic approval rates, local BIN routing |
+| **Cards (Mexico)** | Conekta, Adyen | Strong MSI (installment) support, local acquiring |
+| **PIX** | PagSeguro, Cielo, Adyen | Direct PIX integration, fastest settlement |
+| **Boleto** | PagSeguro, Cielo, dLocal | Native boleto generation, reconciliation tools |
+| **OXXO** | Conekta, OpenPay | Native voucher support, widest store network integration |
+| **PSE** | PayU, Kushki | Direct bank integration in Colombia |
+| **Rapipago / Pago Facil** | Prisma/Decidir, Mercado Pago | Native cash network integration in Argentina |
+
+### By Volume Tier
+
+| Volume Tier | Monthly Transactions | Recommended Setup |
+|-------------|---------------------|-------------------|
+| **Startup** | &lt;1,000 | Single global gateway (Stripe or Adyen) for simplicity |
+| **Growth** | 1,000 -- 10,000 | One global gateway + one local acquirer per primary country |
+| **Scale** | 10,000 -- 100,000 | Two local acquirers per country + one global fallback |
+| **Enterprise** | &lt;100,000+ | Three providers per major country with smart routing and failover |
+
+### By Feature Needs
+
+| Use Case | Recommended Providers | Key Reason |
+|----------|----------------------|------------|
+| **Marketplace / Split payments** | Stripe (Connect), Adyen, Stone | Native split and sub-merchant management |
+| **Subscriptions / Recurring** | Stripe, Adyen, Mercado Pago | Built-in billing engines, card updater services |
+| **Cross-border into LATAM** | dLocal, Adyen | Local payment method support without local entity |
+| **High-risk / Fraud-sensitive** | Adyen, Stripe, Checkout.com | Advanced ML-based fraud tools included |
+| **Payouts to sellers/drivers** | dLocal, Adyen, Kushki | Multi-country payout rails |
+
+---
+
+## Provider Onboarding
+
+| Provider | Typical Onboarding Time | KYC Requirements | Integration Complexity | Sandbox Available |
+|----------|------------------------|-------------------|------------------------|-------------------|
+| **Adyen** | 2--4 weeks | Full corporate KYC, UBO disclosure, processing history | Medium--High | Yes |
+| **Stripe** | 1--3 days (self-serve) | Automated identity verification, business docs for higher volumes | Low--Medium | Yes |
+| **dLocal** | 2--4 weeks | Corporate KYC, country-specific tax IDs, compliance review | Medium | Yes |
+| **Checkout.com** | 1--3 weeks | Corporate KYC, UBO disclosure, PCI compliance evidence | Medium | Yes |
+| **PagSeguro** | 3--7 days | Brazilian CNPJ, company docs | Low | Yes |
+| **Cielo** | 5--10 days | Brazilian CNPJ, banking details, credit analysis | Medium | Yes |
+| **Rede** | 5--10 days | Brazilian CNPJ, banking details | Medium | Yes |
+| **Stone** | 3--7 days | Brazilian CNPJ, company docs | Low--Medium | Yes |
+| **Mercado Pago** | 1--5 days | Local tax ID, business verification | Low | Yes |
+| **Conekta** | 3--7 days | Mexican RFC, company docs | Low--Medium | Yes |
+| **OpenPay** | 5--10 days | Mexican RFC, banking details | Medium | Yes |
+| **PayU** | 5--15 days | Local tax ID per country, corporate docs, compliance review | Medium | Yes |
+| **Kushki** | 5--10 days | Local tax ID, corporate KYC | Medium | Yes |
+| **Prisma/Decidir** | 5--15 days | Argentine CUIT, corporate docs, credit analysis | Medium--High | Yes |
+
+<Tip>
+Start sandbox integration in parallel with KYC onboarding. Most providers allow API testing immediately while production credentials are being processed. Configure your Yuno connections with sandbox keys first, then swap to production keys once approved.
+</Tip>
+
+---
+
+## SLA and Reliability
+
+| Provider | Uptime SLA | Avg API Response Time | Support Channels | Incident Transparency |
+|----------|------------|----------------------|------------------|-----------------------|
+| **Adyen** | 99.99% | &lt;200ms | 24/7 dedicated support, email, portal | Public status page |
+| **Stripe** | 99.99% | &lt;300ms | 24/7 email, chat (enterprise: phone) | Public status page, incident reports |
+| **dLocal** | 99.9% | &lt;400ms | Email, dedicated account manager | Private status updates |
+| **Checkout.com** | 99.99% | &lt;250ms | 24/7 support, Slack (enterprise), portal | Public status page |
+| **PagSeguro** | 99.9% | &lt;500ms | Email, phone (BR business hours) | Limited public reporting |
+| **Cielo** | 99.9% | &lt;400ms | Phone, email (BR business hours) | Limited public reporting |
+| **Rede** | 99.9% | &lt;400ms | Phone, email (BR business hours) | Limited public reporting |
+| **Stone** | 99.9% | &lt;350ms | Email, phone, dedicated account manager | Limited public reporting |
+| **Mercado Pago** | 99.9% | &lt;500ms | Email, developer forums, phone | Public status page |
+| **Conekta** | 99.9% | &lt;400ms | Email, Slack, developer forums | Public status page |
+| **OpenPay** | 99.5% | &lt;500ms | Email, phone (MX business hours) | Limited public reporting |
+| **PayU** | 99.9% | &lt;500ms | Email, phone, dedicated account manager | Limited public reporting |
+| **Kushki** | 99.9% | &lt;400ms | Email, Slack, dedicated account manager | Public status page |
+| **Prisma/Decidir** | 99.5% | &lt;600ms | Email, phone (AR business hours) | Limited public reporting |
+
+<Info>
+Yuno's orchestration layer adds automatic failover capabilities. When a provider experiences downtime, transactions can be rerouted to a backup provider within milliseconds if you have configured multiple providers for the same payment method and country. See [Routing Rules](/guides/routing-rules) for configuration.
+</Info>
+
+---
+
+## Combining Providers
+
+Multi-provider setups increase approval rates and provide resilience against downtime. Below are recommended configurations and anti-patterns.
+
+### Recommended 2-Provider Setups by Country
+
+| Country | Provider A (Primary) | Provider B (Failover) | Rationale |
+|---------|---------------------|-----------------------|-----------|
+| **Brazil** | Cielo or Stone | Adyen | Local acquirer maximizes domestic approval rates; global gateway handles international cards |
+| **Mexico** | Conekta | Adyen or Stripe | Conekta for OXXO/SPEI and domestic cards; global gateway for international and wallet payments |
+| **Colombia** | PayU | Kushki | PayU for PSE and broad method coverage; Kushki as card processing alternative |
+| **Argentina** | Prisma/Decidir | Mercado Pago | Prisma for card installments; Mercado Pago for wallet and cash methods |
+| **Chile** | Kushki | dLocal | Kushki for local cards; dLocal for broader method coverage and cross-border |
+| **Peru** | Kushki | dLocal | Same rationale as Chile |
+
+### Recommended 3-Provider Setups for High Volume
+
+| Country | Primary | Secondary | Tertiary / Fallback | Strategy |
+|---------|---------|-----------|---------------------|----------|
+| **Brazil** | Cielo | Stone | Adyen | Split domestic card volume between two local acquirers for redundancy; Adyen handles international cards and acts as final fallback |
+| **Mexico** | Conekta | Mercado Pago | Adyen | Conekta for cards/OXXO, Mercado Pago for wallet users, Adyen for international fallback |
+| **Colombia** | PayU | Kushki | dLocal | PayU primary for PSE/cards, Kushki for card retries, dLocal for cross-border |
+| **Multi-country LATAM** | dLocal | Mercado Pago | Adyen | dLocal for broad LATAM coverage, Mercado Pago where available, Adyen as global fallback |
+
+### Anti-Patterns to Avoid
+
+<Warning>
+These configurations lead to suboptimal results and should be avoided.
+</Warning>
+
+| Anti-Pattern | Why It Fails | Better Approach |
+|-------------|-------------|-----------------|
+| **Two global gateways only** (e.g., Stripe + Adyen for Brazil) | Both process as cross-border, losing 5--15% approval rate vs. local | Add at least one local acquirer per major country |
+| **Single provider per country** | No failover during outages, zero leverage for rate negotiation | Always configure at least two providers for countries with significant volume |
+| **Retrying declined transactions on the same provider** | Same decline reason will repeat; wastes API calls and may trigger rate limits | Route retries to a different provider with different acquiring bank relationships |
+| **Too many providers** (&lt;5 per country) | Splits volume, weakens negotiating position, increases reconciliation complexity | Limit to 2--3 providers per country and optimize routing rules |
+| **Ignoring provider-specific BIN routing** | Generic routing misses optimization opportunities per card brand/issuer | Configure BIN-level routing rules to match card issuers with their preferred acquirer |
+
+---
+
+## Requesting New Coverage
+
+To request a new country, payment method, or provider connection:
+
+<Steps>
+  <Step title="Assess requirements">
+    Identify the country, payment methods, expected monthly volume, and any specific feature needs (installments, recurring, payouts).
+  </Step>
+  <Step title="Check this matrix">
+    Review the provider catalog above to identify candidate providers that match your requirements.
+  </Step>
+  <Step title="Contact your Yuno account manager">
+    Provide your requirements and preferred providers. Yuno will assess availability, onboarding timelines, and any provider-specific prerequisites.
+  </Step>
+  <Step title="Begin parallel onboarding">
+    Start sandbox integration through Yuno while provider KYC is in progress. Configure connections in [Dashboard > Connections](/platform/dashboard/connections) with sandbox credentials.
+  </Step>
+  <Step title="Go live">
+    Once production credentials are received, update your Yuno connection settings and configure routing rules to include the new provider.
+  </Step>
+</Steps>
+
+<Note>
+Yuno continuously expands provider coverage. If a provider you need is not yet available through Yuno's orchestration layer, request it through your account manager. Custom integrations for high-priority providers are typically completed within 4--8 weeks.
+</Note>
