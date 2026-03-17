@@ -618,16 +618,6 @@
       "github": "https://github.com/yuno-payments"
     }
   },
-  "fonts": {
-    "heading": {
-      "family": "DM Sans",
-      "weight": 400
-    },
-    "body": {
-      "family": "DM Sans",
-      "weight": 400
-    }
-  },
   "appearance": {
     "default": "system"
   }
