@@ -1,0 +1,65 @@
+---
+title: "Set Up PayPal for Subscriptions"
+description: "Enroll a PayPal account as a billing agreement (PAYPAL_ENROLLMENT) and use it to create recurring subscriptions."
+---
+
+Yuno supports two different PayPal flows. Choosing the wrong one is the most common reason a PayPal subscription is never created.
+
+| Flow | Payment `type` | What you get | Use it for |
+| --- | --- | --- | --- |
+| **One-time PayPal** | `PAYPAL` | A single, completed payment. With `vault_on_success: true` it stores a wallet token for *one-click reuse*, **not** a billing agreement. | Single purchases, one-click checkout |
+| **PayPal Enrollment** | `PAYPAL_ENROLLMENT` | A **billing agreement / payment-method token** the customer approves once, then reusable for off-session recurring charges. | **Subscriptions and recurring billing** |
+
+<Warning>
+**A one-time `PAYPAL` payment cannot back a subscription — even with `vault_on_success: true`.**
+
+To charge a customer's PayPal account on a recurring basis you must enroll it as `PAYPAL_ENROLLMENT` first. The buyer approves the billing agreement on PayPal, and only then can you reference the enrolled payment method in [Create Subscription](/reference/create-subscription). Sending `type: PAYPAL` with subscription intent will succeed as a single charge but will **not** create a reusable subscription token.
+</Warning>
+
+## Prerequisites
+
+* A PayPal **connection that supports billing agreements / vaulting** configured on your [Yuno Dashboard](https://dashboard.y.uno).
+* `PAYPAL_ENROLLMENT` must be **connected, routed, and added to your checkout builder** for the account — otherwise it will not appear in the methods available to enroll. See [Set up connections](/docs/connections), [Build a route](/docs/routing), and [Configure the checkout builder](/docs/checkout-builder).
+* Your [API credentials](/docs/developers-credentials): `public-api-key`, `private-secret-key`, `account_id`.
+
+## Flow overview
+
+```
+Create customer ─▶ Create customer session ─▶ Enroll PAYPAL_ENROLLMENT
+        ─▶ Redirect buyer to PayPal approval URL ─▶ Buyer approves billing agreement
+        ─▶ Confirm status = ENROLLED (get vaulted_token) ─▶ Create subscription
+```
+
+## Step 1 — Create (or reuse) the customer
+
+Register the customer with [Create Customer](/reference/create-customer), supplying your `merchant_customer_id`. Reuse the returned `id` if the customer already exists.
+
+## Step 2 — Create a customer session
+
+PayPal enrollment uses the **Checkout workflow**, which requires a customer session. Call [Create Customer Session](/reference/create-customer-session) with the customer `id` and keep the returned `customer_session`.
+
+## Step 3 — (Optional) Confirm PAYPAL_ENROLLMENT is available
+
+Call [Retrieve Payment Methods to Enroll](/reference/retrieve-payment-methods-to-enroll-checkout) with the `customer_session`. `PAYPAL_ENROLLMENT` appears only if it is connected, routed, and in your checkout. If it is missing, revisit the [Prerequisites](#prerequisites).
+
+## Step 4 — Enroll the PayPal account
+
+Call [Enroll Payment Method](/reference/enroll-payment-method-checkout) with `payment_method_type: PAYPAL_ENROLLMENT`. The response contains a redirect URL for buyer approval at `provider.redirect.init_url`.
+
+## Step 5 — Redirect the buyer to approve the billing agreement
+
+Redirect the buyer to `provider.redirect.init_url`. PayPal hosts a billing-agreement approval screen (`paypal.com/agreements/approve`). **The agreement is created only after the buyer approves here** — if the buyer abandons this step, the payment method stays unconfirmed and no reusable token is produced.
+
+## Step 6 — Confirm enrollment
+
+After the buyer returns, call [Retrieve Enrolled Payment Methods](/reference/retrieve-enrolled-payment-methods-api) and confirm the PayPal method has `status: ENROLLED`. Store its `vaulted_token`. We recommend also listening to [Webhooks](/docs/configure-webhooks) for the enrollment status instead of polling.
+
+## Step 7 — Create the subscription
+
+With an `ENROLLED` PayPal payment method, call [Create Subscription](/reference/create-subscription), referencing the customer and the enrolled PayPal payment method (`vaulted_token`). Yuno then charges the billing agreement automatically for each cycle. Listen to subscription webhooks to track each cycle's outcome.
+
+<Note>
+**Already collected a one-time PayPal payment?**
+
+A prior `type: PAYPAL` payment (even with `vault_on_success: true`) does not produce a billing agreement. The customer must complete the `PAYPAL_ENROLLMENT` approval in Steps 4–6 before a subscription can be created.
+</Note>
