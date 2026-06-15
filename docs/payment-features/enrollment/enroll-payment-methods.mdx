@@ -28,6 +28,10 @@ A Vaulted Token is created once a payment method is enrolled and stored with the
 
 (*) SDK only. Consult the [SDK documentation](/docs/sdks/overview/quickstart) for integration details.
 
+<Tip>
+**Using PayPal for subscriptions?** A one-time `PAYPAL` payment (even with `vault_on_success: true`) does not create a billing agreement. See [Set Up PayPal for Subscriptions](/docs/payment-features/enrollment/paypal-subscriptions) for the `PAYPAL_ENROLLMENT` flow required for recurring billing.
+</Tip>
+
 ## Requirements
 
 * Gather your [API credentials](/docs/developers-credentials) from the [Yuno Dashboard](https://dashboard.y.uno/developers):
